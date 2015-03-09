@@ -11,6 +11,7 @@
 |
 */
 Route::any('search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{driverAge}', 'VehicleController@search');
+Route::any('book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{driverAge}', 'VehicleController@search');
 
 Route::controller('booking', 'BookingController');
 Route::controller('vehicle-classification', 'VehicleClassificationController');
