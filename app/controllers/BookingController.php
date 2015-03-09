@@ -2,6 +2,10 @@
 
 class BookingController extends BaseController 
 {
+	public function book()
+	{
+		
+	}
 	public function anyCreate(
 		$vehicleCategoryCode = '',
 		$checkoutStationCode = '',
