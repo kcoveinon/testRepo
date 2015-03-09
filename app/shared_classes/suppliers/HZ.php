@@ -130,6 +130,69 @@ class HZ extends SupplierApi
 	}
 
 	/**
+	 * Function that handles the data pull from Hertz's API
+	 * @param datetime $pickUpDate
+	 * @param datetime $pickUpTime  
+	 * @param datetime $returnDate   
+	 * @param datetime $returnTime      
+	 * @param int $pickUpLocationId
+	 * @param int $returnLocationId 
+	 * @param int $countryCode      
+	 * @param int $driverAge
+	 * @param string $xmlAction
+	 * @return MIXED
+	 */
+	public function doBooking($pickUpDate, 
+							   $pickUpTime, 
+							   $returnDate, 
+							   $returnTime, 
+							   $pickUpLocationId,
+							   $returnLocationId,
+							   $countryCode, 
+							   $driverAge,
+							   $xmlAction = self::DEFAULT_XML_ACTION)
+	{	
+
+		$xmlAction = "OTA_VehResRQ";
+		// $vehCategory = [ 1,2,3,4,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 ];
+		$vehCategory = [ 1,2,3,4,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21 ];
+		$vehClass = [ 1,2,3,4,5,6,7,8,9,10,23,32,33,34,35,36,37,39,40];
+
+		ini_set('max_execution_time', 120);
+		$curlMultiHandler = curl_multi_init();
+		$curlHandlers     = array();	
+		foreach ($vehCategory as $key => $value) {
+			$curlOptions = $this->defaultCurlOptions;
+			$curlOptions[CURLOPT_POSTFIELDS] =  $this->getXmlForBooking(
+													$this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime),
+													$this->convertToDateTimeDefaultFormat($returnDate, $returnTime),
+													"BNE",
+													"BNE",
+													$countryCode,
+													$xmlAction,
+													$value,
+													$vehClass[$key]
+												);	
+			echo $value. " - ".$vehClass[$key]."; ";
+		    $curlHandlers[$key] = curl_init();
+		    curl_setopt_array($curlHandlers[$key], $curlOptions);
+		    curl_multi_add_handle($curlMultiHandler, $curlHandlers[$key]);
+		}
+		do {
+			curl_multi_select($curlMultiHandler);
+		    curl_multi_exec($curlMultiHandler, $isRunning);
+		} while ($isRunning > 0);
+
+		foreach ($curlHandlers as $stationCode => $curlHandler) {
+		    $response[$stationCode] = new SimpleXMLElement(curl_multi_getcontent($curlHandler));
+		    curl_multi_remove_handle($curlMultiHandler, $curlHandler);
+		}
+
+		curl_multi_close($curlMultiHandler);
+		return $response;
+	}	
+
+	/**
 	 * Returns depots per location IDs
 	 * @param int $pickUpLocationId
 	 * @param int $returnLocationId
@@ -152,6 +215,74 @@ class HZ extends SupplierApi
 		$date =  new DateTime($date." ".$time);
 
 		return $date->format('Y-m-d H:i:s');
+	}
+
+	public function getXmlForBooking($pickUpDateTime,
+									 $returnDateTime,
+									 $pickUpLocationId,
+									 $returnLocationId,
+									 $countryCode,
+									 $xmlAction,
+									 $vehCategory,
+									 $vehClass)
+	{
+		$xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+				<OTA_VehResRQ xmlns=\"http://www.opentravel.org/OTA/2003/05\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.opentravel.org/OTA/2003/05 OTA_VehResRQ.xsd\" Version=\"1.008\" SequenceNmbr=\"123456789\">
+				   <POS>
+				      <Source PseudoCityCode=\"BNE\" ISOCountry=\"BS\" AgentDutyCode=\"B2S19P16R18\">
+				         <RequestorID Type=\"4\" ID=\"T487\">
+				            <CompanyName Code=\"CP\" CodeContext=\"A9CF\" />
+				         </RequestorID>
+				      </Source>
+				      <Source>
+				         <RequestorID Type=\"5\" ID=\"74008115\" />
+				      </Source>
+				   </POS>
+				   <VehResRQCore Status=\"All\">
+				      <VehRentalCore PickUpDateTime=\"2015-12-13T20:00:00Z\" ReturnDateTime=\"2015-12-19T20:00:00Z\">
+				         <PickUpLocation CodeContext=\"IATA\" LocationCode=\"BNE\" />
+				         <ReturnLocation CodeContext=\"IATA\" LocationCode=\"BNE\" />
+				      </VehRentalCore>
+				      <Customer>
+				         <Primary>
+				            <PersonName>
+				               <GivenName>PrePaidThree</GivenName>
+				               <Surname>Testing</Surname>
+				            </PersonName>
+				            <Telephone PhoneTechType=\"1\" AreaCityCode=\"999\" PhoneNumber=\"9999999\" />
+				            <Telephone PhoneTechType=\"3\" AreaCityCode=\"US999\" PhoneNumber=\"9999999\" />
+				            <Email>saford@hertz.com</Email>
+				            <Address>
+				               <AddressLine>5601 NW Exp</AddressLine>
+				               <AddressLine>Bldg 2</AddressLine>
+				               <CityName>Oklahoma City</CityName>
+				               <PostalCode>73112</PostalCode>
+				               <StateProv StateCode=\"OK\" />
+				               <CountryName Code=\"BS\" />
+				            </Address>
+				         </Primary>
+				      </Customer>
+				      <VehPref AirConditionInd=\"true\" 
+				      		   AirConditionPref=\"Preferred\" 
+				      		   TransmissionType=\"Automatic\" 
+				      		   TransmissionPref=\"Preferred\" 
+				      		   FuelType=\"Diesel\" 
+				      		   DriveType=\"Unspecified\"
+				      		   Code=\"ICAR\" 
+				      		   CodeContext=\"SIPP\">
+				         <VehType VehicleCategory=\"".$vehCategory."\" />
+				         <VehClass Size=\"".$vehClass."\"  />
+				      </VehPref>
+				   </VehResRQCore>
+				   <VehResRQInfo>
+				      <SpecialReqPref>Prefers Red Car with sunroof and 6-disk cd changer prefers beige leather interior no purple car</SpecialReqPref>
+				      <ArrivalDetails TransportationCode=\"14\" Number=\"1234\">
+				         <OperatingCompany Code=\"BA\" />
+				      </ArrivalDetails>
+				   </VehResRQInfo>
+				</OTA_VehResRQ>
+				";
+		return $xml;
 	}
 
 	/**
