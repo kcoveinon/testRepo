@@ -4,13 +4,23 @@ class BookingController extends BaseController
 {
 
 
+	public function cancelBooking($bookingId, $countryCode)
+	{
+		$result = [];
+		foreach ($this->supplierCodes as $supplierCode) {
+			$supplierApi = App::make($supplierCode);
+			$result[] = $supplierApi->cancelBooking($bookingId, $countryCode);
+
+		}
+		return Response::json($result);	
+	}
 
 	public function getBookingInfo($bookingId, $countryCode)
 	{
 		$result = [];
 		foreach ($this->supplierCodes as $supplierCode) {
 			$supplierApi = App::make($supplierCode);
-			$result[] = $supplierApi->getBookingDetails(["G504B2724A6","G505A188511"], $countryCode);
+			$result[] = $supplierApi->getBookingDetails($bookingId, $countryCode);
 
 		}
 		return Response::json($result);	

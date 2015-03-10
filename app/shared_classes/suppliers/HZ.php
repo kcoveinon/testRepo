@@ -10,6 +10,7 @@ class HZ extends SupplierApi
 	const SEARCH_VEHICLE_ACTION = "OTA_VehAvailRateRQ";
 	const BOOK_VEHICLE_ACTION = "OTA_VehResRQ";
 	const GET_BOOKING_INFO_ACTION = "OTA_VehRetResRQ";
+	const CANCEL_BOOKING_ACTION = "OTA_VehCancelRQ";
 
 	const DEFAULT_XMLNS = "http://www.opentravel.org/OTA/2003/05";
 	const DEFAULT_XMLNS_XSI = "http://www.w3.org/2001/XMLSchema-instance";
@@ -74,6 +75,40 @@ class HZ extends SupplierApi
 		);
 	}
 
+
+	public function cancelBooking($bookingId, $countryCode)
+	{
+		ini_set('max_execution_time', 120);
+		$bookingIdArray[] = $bookingId;
+
+		$curlMultiHandler = curl_multi_init();
+		$curlHandlers     = array();	
+		$curlOptions = $this->defaultCurlOptions;
+
+		$iterableArray = is_array($bookingId) ? reset($bookingIdArray) : $bookingIdArray;
+		foreach ($iterableArray as $key => $value) {
+			$curlOptions[CURLOPT_POSTFIELDS] =  $this->getCancelBookingXml(
+													$value,
+													$countryCode
+												);	
+		    $curlHandlers[$key] = curl_init();
+		    curl_setopt_array($curlHandlers[$key], $curlOptions);
+		    curl_multi_add_handle($curlMultiHandler, $curlHandlers[$key]);
+		}
+		do {
+			curl_multi_select($curlMultiHandler);
+		    curl_multi_exec($curlMultiHandler, $isRunning);
+		} while ($isRunning > 0);
+
+		foreach ($curlHandlers as $key => $curlHandler) {
+		    $response[$key] = new SimpleXMLElement(curl_multi_getcontent($curlHandler));
+		    curl_multi_remove_handle($curlMultiHandler, $curlHandler);
+		}
+
+		curl_multi_close($curlMultiHandler);
+		return $response;	
+	}	
+
 	public function getBookingDetails($bookingId, $countryCode)
 	{
 		ini_set('max_execution_time', 120);
@@ -106,6 +141,25 @@ class HZ extends SupplierApi
 		curl_multi_close($curlMultiHandler);
 		return $response;	
 	}
+
+
+	public function getCancelBookingXml($bookingId, $countryCode)
+	{
+		$xmlAction = self::CANCEL_BOOKING_ACTION;
+
+		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
+
+		$vehCancelRQCore = $xml->addChild("VehCancelRQCore");
+		$vehCancelRQCore->addAttribute("CancelType", "Book");
+		$uniqueIDNode = $vehCancelRQCore->addChild("UniqueID");
+		$uniqueIDNode->addAttribute("Type","14");
+		$uniqueIDNode->addAttribute("ID", (string)$bookingId);
+
+		$personNameNode = $vehCancelRQCore->addChild("PersonName");
+		$personNameNode->addChild("Surname","Testing");	
+		
+		return $xml->asXML();
+	}	
 
 	public function getBookingDetailsXML($bookingId, $countryCode)
 	{

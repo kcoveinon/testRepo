@@ -13,6 +13,7 @@
 Route::any('search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{driverAge}', 'VehicleController@search');
 Route::any('book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{vehCategory}/{vehClass}', 'BookingController@book');
 Route::any('bookingDetails/{bookingId}/{countryCode}', 'BookingController@getBookingInfo');
+Route::any('cancelBooking/{bookingId}/{countryCode}', 'BookingController@cancelBooking');
 
 Route::controller('booking', 'BookingController');
 Route::controller('vehicle-classification', 'VehicleClassificationController');
