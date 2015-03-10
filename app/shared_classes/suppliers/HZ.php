@@ -8,6 +8,7 @@
 class HZ extends SupplierApi
 {
 	const SEARCH_VEHICLE_ACTION = "OTA_VehAvailRateRQ";
+	const BOOK_VEHICLE_ACTION = "OTA_VehResRQ";
 	const DEFAULT_XMLNS = "http://www.opentravel.org/OTA/2003/05";
 	const DEFAULT_XMLNS_XSI = "http://www.w3.org/2001/XMLSchema-instance";
 	const DEFAULT_VERSION = "1.008";
@@ -151,8 +152,6 @@ class HZ extends SupplierApi
 							   $vehClass)
 	{	
 
-		$xmlAction = "OTA_VehResRQ";
-
 		$depoObject = $this->returnDepotByLocationId($pickUpLocationId, $returnLocationId);
 		$curlMultiHandler = curl_multi_init();
 		$curlHandlers     = array();
@@ -168,7 +167,7 @@ class HZ extends SupplierApi
 													$value->getDepotCode(),
 													$value->getDepotCode(),
 													$countryCode,
-													$xmlAction,
+													self::BOOK_VEHICLE_ACTION,
 													$vehCategory,
 													$vehClass
 												);	
@@ -192,67 +191,67 @@ class HZ extends SupplierApi
 
 	public function getXmlForBooking($pickUpDateTime,
 									 $returnDateTime,
-									 $pickUpLocationId,
-									 $returnLocationId,
+									 $pickUplocationCode,
+									 $returnLocationCode,
 									 $countryCode,
 									 $xmlAction,
 									 $vehCategory,
 									 $vehClass)
 	{
-		$xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-				<OTA_VehResRQ xmlns=\"http://www.opentravel.org/OTA/2003/05\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.opentravel.org/OTA/2003/05 OTA_VehResRQ.xsd\" Version=\"1.008\" SequenceNmbr=\"123456789\">
-				   <POS>
-				      <Source PseudoCityCode=\"BNE\" ISOCountry=\"BS\" AgentDutyCode=\"B2S19P16R18\">
-				         <RequestorID Type=\"4\" ID=\"T487\">
-				            <CompanyName Code=\"CP\" CodeContext=\"A9CF\" />
-				         </RequestorID>
-				      </Source>
-				   </POS>
-				   <VehResRQCore Status=\"All\">
-				      <VehRentalCore PickUpDateTime=\"2015-12-13T20:00:00Z\" ReturnDateTime=\"2015-12-19T20:00:00Z\">
-				         <PickUpLocation CodeContext=\"IATA\" LocationCode=\"BNE\" />
-				         <ReturnLocation CodeContext=\"IATA\" LocationCode=\"BNE\" />
-				      </VehRentalCore>
-				      <Customer>
-				         <Primary>
-				            <PersonName>
-				               <GivenName>PrePaidThree</GivenName>
-				               <Surname>Testing</Surname>
-				            </PersonName>
-				            <Telephone PhoneTechType=\"1\" AreaCityCode=\"999\" PhoneNumber=\"9999999\" />
-				            <Telephone PhoneTechType=\"3\" AreaCityCode=\"US999\" PhoneNumber=\"9999999\" />
-				            <Email>saford@hertz.com</Email>
-				            <Address>
-				               <AddressLine>5601 NW Exp</AddressLine>
-				               <AddressLine>Bldg 2</AddressLine>
-				               <CityName>Oklahoma City</CityName>
-				               <PostalCode>73112</PostalCode>
-				               <StateProv StateCode=\"OK\" />
-				               <CountryName Code=\"BS\" />
-				            </Address>
-				         </Primary>
-				      </Customer>
-				      <VehPref AirConditionInd=\"true\" 
-				      		   AirConditionPref=\"Preferred\" 
-				      		   TransmissionType=\"Automatic\" 
-				      		   TransmissionPref=\"Preferred\" 
-				      		   FuelType=\"Diesel\" 
-				      		   DriveType=\"Unspecified\"
-				      		   Code=\"ICAR\" 
-				      		   CodeContext=\"SIPP\">
-				         <VehType VehicleCategory=\"".$vehCategory."\" />
-				         <VehClass Size=\"".$vehClass."\"  />
-				      </VehPref>
-				   </VehResRQCore>
-				   <VehResRQInfo>
-				      <SpecialReqPref>Prefers Red Car with sunroof and 6-disk cd changer prefers beige leather interior no purple car</SpecialReqPref>
-				      <ArrivalDetails TransportationCode=\"14\" Number=\"1234\">
-				         <OperatingCompany Code=\"BA\" />
-				      </ArrivalDetails>
-				   </VehResRQInfo>
-				</OTA_VehResRQ>
-				";
-		return $xml;
+
+		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
+
+		$vehRsCore = $xml->addChild("VehResRQCore");
+		$vehRsCore->addAttribute("Status",self::DEFAULT_REQUEST_STATUS);
+
+		$vehRentalCoreNode = $vehRsCore->addChild("VehRentalCore");
+		$vehRentalCoreNode->addAttribute("PickUpDateTime",$pickUpDateTime);
+		$vehRentalCoreNode->addAttribute("ReturnDateTime",$returnDateTime);
+
+		$pickUplocationNode = $vehRentalCoreNode->addChild("PickUpLocation");
+		$pickUplocationNode->addAttribute("CodeContext",self::DEFAULT_CODE_CONTEXT);
+		$pickUplocationNode->addAttribute("LocationCode",$pickUplocationCode);
+
+		$returnLocationNode = $vehRentalCoreNode->addChild("ReturnLocation");
+		$returnLocationNode->addAttribute("CodeContext",self::DEFAULT_CODE_CONTEXT);
+		$returnLocationNode->addAttribute("LocationCode",$returnLocationCode);
+
+		$customerNode = $vehRsCore->addChild("Customer");
+		$primaryNode = $customerNode->addChild("Primary");
+		$personNameNode = $primaryNode->addChild("PersonName");
+		$personNameNode->addChild("GivenName","PrePaidThree");
+		$personNameNode->addChild("Surname","Testing");
+		$telephoneNode = $primaryNode->addChild("Telephone");
+		$telephoneNode->addAttribute("PhoneTechType","1");
+		$telephoneNode->addAttribute("AreaCityCode","9999");
+		$telephoneNode->addAttribute("PhoneNumber","9999999");
+		$primaryNode->addChild("Email","saford@hertz.com");		
+
+		$addressNode = $primaryNode->addChild("Address");
+		$addressNode->addChild("AddressLine","5601 NW Exp");
+		$addressNode->addChild("AddressLine","Bldg 2");
+		$addressNode->addChild("CityName","Oklahoma City");
+		$addressNode->addChild("PostalCode","73112");
+		$stateProveNode = $addressNode->addChild("StateProv");
+		$stateProveNode->addAttribute("StateCode","OK");
+		$addressNode->addChild("CountryName")->addAttribute("Code",$countryCode);
+
+		$vehPrefNode = $vehRsCore->addChild("VehPref");
+		$vehPrefNode->addAttribute("AirConditionInd","true");
+		$vehPrefNode->addAttribute("AirConditionPref","Preferred");
+		$vehPrefNode->addAttribute("TransmissionType","Automatic");
+		$vehPrefNode->addAttribute("TransmissionPref","Preferred");
+		$vehPrefNode->addAttribute("FuelType","Diesel");
+		$vehPrefNode->addAttribute("DriveType","Unspecified");
+		$vehPrefNode->addAttribute("Code","ICAR");
+		$vehPrefNode->addAttribute("CodeContext","SIPP");
+
+		$vehTypeNode = $vehPrefNode->addChild("VehType");
+		$vehTypeNode->addAttribute("VehicleCategory", $vehCategory);
+		$vehClassNode = $vehPrefNode->addChild("VehClass");
+		$vehClassNode = $vehClassNode->addAttribute("Size", $vehCategory);
+
+		return $xml->asXML();
 	}
 
 	/**
@@ -309,8 +308,8 @@ class HZ extends SupplierApi
 
 		$posNode = $xml->addChild("POS");
 		$sourceNode = $posNode->addChild("Source");
-		$sourceNode->addAttribute("PseudoCityCode",self::DEFAULT_PSEUDOCITYCODE);
-		$sourceNode->addAttribute("ISOCountry",$countryCode);
+		$sourceNode->addAttribute("PseudoCityCode","BNE");
+		$sourceNode->addAttribute("ISOCountry","BS");
 		$sourceNode->addAttribute("AgentDutyCode",$this->apiValidationCode);
 
 		$requestNode = $sourceNode->addChild("RequestorID");
