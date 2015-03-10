@@ -287,8 +287,8 @@ class HZ extends SupplierApi
 
 		curl_multi_close($curlMultiHandler);
 
-		$response[0]['executionTime'] = ((time() - $timeStart) . ' seconds');
 
+		$response[0]['executionTime'] = ((time() - $timeStart) . ' seconds');
 		return $response;
 	}
 
