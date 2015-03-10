@@ -10,10 +10,17 @@
 | and give it the Closure to execute when that URI is requested.
 |
 */
+
+Route::group(array('prefix' => '{username}', 'before' => 'uname'), function ($username) {
+    Route::get('/', array('uses' => 'UsersController@index'));
+});
+
+
 Route::any('search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{driverAge}', 'VehicleController@search');
 Route::any('book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{vehCategory}/{vehClass}', 'BookingController@book');
 Route::any('bookingDetails/{bookingId}/{countryCode}', 'BookingController@getBookingInfo');
 Route::any('cancelBooking/{bookingId}/{countryCode}', 'BookingController@cancelBooking');
+Route::any('modifyBooking/{bookingId}/{countryCode}', 'BookingController@modifyBooking');
 
 Route::controller('booking', 'BookingController');
 Route::controller('vehicle-classification', 'VehicleClassificationController');

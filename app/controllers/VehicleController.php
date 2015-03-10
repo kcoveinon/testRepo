@@ -7,15 +7,20 @@ class VehicleController extends BaseController
 		parent::__construct();
 	}
 
-	public function search($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $driverAge)
+
+	public function search($pickUpDate, 
+						   $pickUpTime, 
+						   $returnDate, 
+						   $returnTime, 
+						   $pickUpLocationId, 
+						   $returnLocationId, 
+						   $countryCode, 
+						   $driverAge)
 	{
 		$result = array();
 
-		foreach ($this->supplierCodes as $supplierCode) {
-			$supplierApi = App::make($supplierCode);
-
-			$result = $supplierApi->searchVehicles($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $driverAge);
-		}
+		$supplierApi = App::make($supplierCode);
+		$result = $supplierApi->searchVehicles($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $driverAge);
 
 		return Response::json($result);
 	}
