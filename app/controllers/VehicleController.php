@@ -7,8 +7,6 @@ class VehicleController extends BaseController
 		parent::__construct();
 	}
 
-
-
 	public function search($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $driverAge)
 	{
 		$result = array();

@@ -9,6 +9,8 @@ class HZ extends SupplierApi
 {
 	const SEARCH_VEHICLE_ACTION = "OTA_VehAvailRateRQ";
 	const BOOK_VEHICLE_ACTION = "OTA_VehResRQ";
+	const GET_BOOKING_INFO_ACTION = "OTA_VehRetResRQ";
+
 	const DEFAULT_XMLNS = "http://www.opentravel.org/OTA/2003/05";
 	const DEFAULT_XMLNS_XSI = "http://www.w3.org/2001/XMLSchema-instance";
 	const DEFAULT_VERSION = "1.008";
@@ -70,6 +72,56 @@ class HZ extends SupplierApi
 			CURLOPT_VERBOSE			=> false,
 			CURLOPT_HTTPHEADER		=> $this->headers
 		);
+	}
+
+	public function getBookingDetails($bookingId, $countryCode)
+	{
+		ini_set('max_execution_time', 120);
+		$bookingIdArray[] = $bookingId;
+
+		$curlMultiHandler = curl_multi_init();
+		$curlHandlers     = array();	
+		$curlOptions = $this->defaultCurlOptions;
+
+		$iterableArray = is_array($bookingId) ? reset($bookingIdArray) : $bookingIdArray;
+		foreach ($bookingIdArray as $key => $value) {
+			$curlOptions[CURLOPT_POSTFIELDS] =  $this->getBookingDetailsXML(
+													$value,
+													$countryCode
+												);	
+		    $curlHandlers[$key] = curl_init();
+		    curl_setopt_array($curlHandlers[$key], $curlOptions);
+		    curl_multi_add_handle($curlMultiHandler, $curlHandlers[$key]);
+		}
+		do {
+			curl_multi_select($curlMultiHandler);
+		    curl_multi_exec($curlMultiHandler, $isRunning);
+		} while ($isRunning > 0);
+
+		foreach ($curlHandlers as $key => $curlHandler) {
+		    $response[$key] = new SimpleXMLElement(curl_multi_getcontent($curlHandler));
+		    curl_multi_remove_handle($curlMultiHandler, $curlHandler);
+		}
+
+		curl_multi_close($curlMultiHandler);
+		return $response;	
+	}
+
+	public function getBookingDetailsXML($bookingId, $countryCode)
+	{
+		$xmlAction = self::GET_BOOKING_INFO_ACTION;
+
+		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
+
+		$vehRetResRQCoreNode = $xml->addChild("VehRetResRQCore");
+		$uniqueIDNode = $vehRetResRQCoreNode->addChild("UniqueID");
+		$uniqueIDNode->addAttribute("Type","14");
+		$uniqueIDNode->addAttribute("ID", (string)$bookingId);
+
+		$personNameNode = $vehRetResRQCoreNode->addChild("PersonName");
+		$personNameNode->addChild("Surname","Testing");	
+		
+		return $xml->asXML();
 	}
 
 	/**
