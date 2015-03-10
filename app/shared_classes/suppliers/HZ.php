@@ -84,7 +84,7 @@ class HZ extends SupplierApi
 		$curlOptions = $this->defaultCurlOptions;
 
 		$iterableArray = is_array($bookingId) ? reset($bookingIdArray) : $bookingIdArray;
-		foreach ($bookingIdArray as $key => $value) {
+		foreach ($iterableArray as $key => $value) {
 			$curlOptions[CURLOPT_POSTFIELDS] =  $this->getBookingDetailsXML(
 													$value,
 													$countryCode
@@ -145,6 +145,7 @@ class HZ extends SupplierApi
 								   $countryCode, 
 								   $driverAge)
 	{	
+
 		ini_set('max_execution_time', 120);
 
 		$depoObject = $this->returnDepotByLocationId($pickUpLocationId, $returnLocationId);
@@ -178,6 +179,7 @@ class HZ extends SupplierApi
 		}
 
 		curl_multi_close($curlMultiHandler);
+
 		return $response;
 	}
 
