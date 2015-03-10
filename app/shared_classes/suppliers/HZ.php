@@ -7,7 +7,7 @@
  */
 class HZ extends SupplierApi
 {
-	const DEFAULT_XML_ACTION = "OTA_VehAvailRateRQ";
+	const SEARCH_VEHICLE_ACTION = "OTA_VehAvailRateRQ";
 	const DEFAULT_XMLNS = "http://www.opentravel.org/OTA/2003/05";
 	const DEFAULT_XMLNS_XSI = "http://www.w3.org/2001/XMLSchema-instance";
 	const DEFAULT_VERSION = "1.008";
@@ -81,7 +81,6 @@ class HZ extends SupplierApi
 	 * @param int $returnLocationId 
 	 * @param int $countryCode      
 	 * @param int $driverAge
-	 * @param string $xmlAction
 	 * @return MIXED
 	 */
 	public function searchVehicles($pickUpDate, 
@@ -91,8 +90,7 @@ class HZ extends SupplierApi
 								   $pickUpLocationId,
 								   $returnLocationId,
 								   $countryCode, 
-								   $driverAge,
-								   $xmlAction = self::DEFAULT_XML_ACTION)
+								   $driverAge)
 	{	
 		ini_set('max_execution_time', 120);
 
@@ -102,13 +100,13 @@ class HZ extends SupplierApi
 
 		foreach ($depoObject as $key => $value) {
 			$curlOptions = $this->defaultCurlOptions;
-			$curlOptions[CURLOPT_POSTFIELDS] =  $this->getXML(
+			$curlOptions[CURLOPT_POSTFIELDS] =  $this->getSearchVehicleXML(
 													$this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime),
 													$this->convertToDateTimeDefaultFormat($returnDate, $returnTime),
 													$value->getDepotCode(),
 													$value->getDepotCode(),
 													$countryCode,
-													$xmlAction
+													self::SEARCH_VEHICLE_ACTION
 												);	
 		    $curlHandlers[$key] = curl_init();
 		    curl_setopt_array($curlHandlers[$key], $curlOptions);
@@ -267,33 +265,14 @@ class HZ extends SupplierApi
 	 * @param  string $xmlAction        
 	 * @return XML Object                   
 	 */
-	private function getXML($pickUpDateTime,
-						    $returnDateTime,
-						    $pickUpLocationId,
-						    $returnLocationId,
-						    $countryCode,
-						    $xmlAction)
+	private function getSearchVehicleXML($pickUpDateTime,
+									     $returnDateTime,
+									     $pickUpLocationId,
+									     $returnLocationId,
+									     $countryCode,
+									     $xmlAction)
 	{
-		$xml = new SimpleXMLElement("<$xmlAction></$xmlAction>");
-		$xml->addAttribute("xmlns",self::DEFAULT_XMLNS);
-		$xml->addAttribute("xmlns:xsi",self::DEFAULT_XMLNS_XSI);
-		$xml->addAttribute("xsi:schemaLocation",self::DEFAULT_XMLNS_XSI. " ".$xmlAction.".xsd");
-		$xml->addAttribute("Version",self::DEFAULT_VERSION);
-		$xml->addAttribute("SequenceNmbr",self::DEFAULT_SEQUENCENUMBER);
-
-		$posNode = $xml->addChild("POS");
-		$sourceNode = $posNode->addChild("Source");
-		$sourceNode->addAttribute("PseudoCityCode",self::DEFAULT_PSEUDOCITYCODE);
-		$sourceNode->addAttribute("ISOCountry",$countryCode);
-		$sourceNode->addAttribute("AgentDutyCode",$this->apiValidationCode);
-
-		$requestNode = $sourceNode->addChild("RequestorID");
-		$requestNode->addAttribute("Type",self::DEFAULT_REQUEST_TYPE);
-		$requestNode->addAttribute("ID",$this->apiValidationNumber);
-
-		$companyNameNode = $requestNode->addChild("CompanyName");
-		$companyNameNode->addAttribute("Code",self::DEFAULT_CONSUMER_PRODUCT);
-		$companyNameNode->addAttribute("CodeContext",$this->apiConsumerProductCode);
+		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
 
 		$vehAvailRQCoreNode = $xml->addChild("VehAvailRQCore");
 		$vehAvailRQCoreNode->addAttribute("Status",self::DEFAULT_REQUEST_STATUS);
@@ -311,6 +290,38 @@ class HZ extends SupplierApi
 		$returnLocationNode->addAttribute("LocationCode",$returnLocationId);
 
 		return $xml->asXML();
+	}
+
+	/**
+	 * Returns POS credential node
+	 * @param  string $xmlAction
+	 * @param  string $countryCode
+	 * @return XML Object
+	 */
+	public function getXMLCredentialNode($xmlAction, $countryCode)
+	{
+		$xml = new SimpleXMLElement("<$xmlAction></$xmlAction>");
+		$xml->addAttribute("xmlns",self::DEFAULT_XMLNS);
+		$xml->addAttribute("xmlns:xsi",self::DEFAULT_XMLNS_XSI);
+		$xml->addAttribute("xsi:schemaLocation",self::DEFAULT_XMLNS. " ".$xmlAction.".xsd");
+		$xml->addAttribute("Version",self::DEFAULT_VERSION);
+		$xml->addAttribute("SequenceNmbr",self::DEFAULT_SEQUENCENUMBER);
+
+		$posNode = $xml->addChild("POS");
+		$sourceNode = $posNode->addChild("Source");
+		$sourceNode->addAttribute("PseudoCityCode",self::DEFAULT_PSEUDOCITYCODE);
+		$sourceNode->addAttribute("ISOCountry",$countryCode);
+		$sourceNode->addAttribute("AgentDutyCode",$this->apiValidationCode);
+
+		$requestNode = $sourceNode->addChild("RequestorID");
+		$requestNode->addAttribute("Type",self::DEFAULT_REQUEST_TYPE);
+		$requestNode->addAttribute("ID",$this->apiValidationNumber);
+
+		$companyNameNode = $requestNode->addChild("CompanyName");
+		$companyNameNode->addAttribute("Code",self::DEFAULT_CONSUMER_PRODUCT);
+		$companyNameNode->addAttribute("CodeContext",$this->apiConsumerProductCode);
+
+		return $xml;	
 	}
 
 	/**
