@@ -76,7 +76,14 @@ class HZ extends SupplierApi
 		);
 	}
 
-
+	/**
+	 * Handles the cancel booking action
+	 * 
+	 * @param  int/array $bookingId (You can pass here an array of Ids or just a single booking ID)
+	 * @param  string $countryCode
+	 * 
+	 * @return XML Object
+	 */
 	public function cancelBooking($bookingId, $countryCode)
 	{
 		ini_set('max_execution_time', 120);
@@ -96,6 +103,7 @@ class HZ extends SupplierApi
 		    curl_setopt_array($curlHandlers[$key], $curlOptions);
 		    curl_multi_add_handle($curlMultiHandler, $curlHandlers[$key]);
 		}
+		
 		do {
 			curl_multi_select($curlMultiHandler);
 		    curl_multi_exec($curlMultiHandler, $isRunning);
@@ -109,6 +117,15 @@ class HZ extends SupplierApi
 		curl_multi_close($curlMultiHandler);
 		return $response;	
 	}	
+
+	/**
+	 * Handles the booking modification action
+	 * 
+	 * @param  int/array $bookingId (You can pass here an array of Ids or just a single booking ID)
+	 * @param  string $countryCode
+	 * 
+	 * @return XML Object
+	 */
 	public function modifyBooking($bookingId, $countryCode)
 	{
 		ini_set('max_execution_time', 120);
@@ -128,6 +145,7 @@ class HZ extends SupplierApi
 		    curl_setopt_array($curlHandlers[$key], $curlOptions);
 		    curl_multi_add_handle($curlMultiHandler, $curlHandlers[$key]);
 		}
+
 		do {
 			curl_multi_select($curlMultiHandler);
 		    curl_multi_exec($curlMultiHandler, $isRunning);
@@ -142,6 +160,14 @@ class HZ extends SupplierApi
 		return $response;	
 	}
 
+	/**
+	 * Retrieves booking details of a particular booking Id or an array of booking IDs
+	 * 
+	 * @param  int/array $bookingId (You can pass here an array of Ids or just a single booking ID)
+	 * @param  string $countryCode
+	 * 
+	 * @return XML Object
+	 */
 	public function getBookingDetails($bookingId, $countryCode)
 	{
 		ini_set('max_execution_time', 120);
@@ -161,6 +187,7 @@ class HZ extends SupplierApi
 		    curl_setopt_array($curlHandlers[$key], $curlOptions);
 		    curl_multi_add_handle($curlMultiHandler, $curlHandlers[$key]);
 		}
+
 		do {
 			curl_multi_select($curlMultiHandler);
 		    curl_multi_exec($curlMultiHandler, $isRunning);
@@ -175,64 +202,9 @@ class HZ extends SupplierApi
 		return $response;	
 	}
 
-	public function getModifyBookingXml($bookingId, $countryCode)
-	{
-		$xmlAction = self::MODIFY_BOOKING_ACTION;
-
-		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
-
-		$vehModifyRQCore = $xml->addChild("VehModifyRQCore");
-		$vehModifyRQCore->addAttribute("Status", "Confirmed");
-		$vehModifyRQCore->addAttribute("ModifyType", "Quote");
-		$uniqueIDNode = $vehModifyRQCore->addChild("UniqueID");
-		$uniqueIDNode->addAttribute("Type","14");
-
-		$uniqueIDNode->addAttribute("ID", (string) $bookingId);
-		$specialEquipPrefsNode = $vehModifyRQCore->addChild("SpecialEquipPrefs");
-		$specialChildNode = $specialEquipPrefsNode->addChild("SpecialEquipPref");
-		$specialChildNode->addAttribute("EquipType","8");
-		$specialChildNode->addAttribute("Quantity","1");
-		
-		return $xml->asXML();
-	}
-
-	public function getCancelBookingXml($bookingId, $countryCode)
-	{
-		$xmlAction = self::CANCEL_BOOKING_ACTION;
-
-		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
-
-		$vehCancelRQCore = $xml->addChild("VehCancelRQCore");
-		$vehCancelRQCore->addAttribute("CancelType", "Book");
-		$uniqueIDNode = $vehCancelRQCore->addChild("UniqueID");
-		$uniqueIDNode->addAttribute("Type","14");
-		$uniqueIDNode->addAttribute("ID", (string)$bookingId);
-
-		$personNameNode = $vehCancelRQCore->addChild("PersonName");
-		$personNameNode->addChild("Surname","Testing");	
-		
-		return $xml->asXML();
-	}	
-
-	public function getBookingDetailsXML($bookingId, $countryCode)
-	{
-		$xmlAction = self::GET_BOOKING_INFO_ACTION;
-
-		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
-
-		$vehRetResRQCoreNode = $xml->addChild("VehRetResRQCore");
-		$uniqueIDNode = $vehRetResRQCoreNode->addChild("UniqueID");
-		$uniqueIDNode->addAttribute("Type","14");
-		$uniqueIDNode->addAttribute("ID", (string)$bookingId);
-
-		$personNameNode = $vehRetResRQCoreNode->addChild("PersonName");
-		$personNameNode->addChild("Surname","Testing");	
-		
-		return $xml->asXML();
-	}
-
 	/**
-	 * Function that handles the data pull from Hertz's API
+	 * Function that handles the data pull for search
+	 * 
 	 * @param datetime $pickUpDate
 	 * @param datetime $pickUpTime  
 	 * @param datetime $returnDate   
@@ -241,7 +213,8 @@ class HZ extends SupplierApi
 	 * @param int $returnLocationId 
 	 * @param int $countryCode      
 	 * @param int $driverAge
-	 * @return MIXED
+	 * 
+	 * @return XML Object
 	 */
 	public function searchVehicles($pickUpDate, 
 								   $pickUpTime, 
@@ -293,7 +266,8 @@ class HZ extends SupplierApi
 	}
 
 	/**
-	 * Function that handles the data pull from Hertz's API
+	 * Function that handles the booking action
+	 * 
 	 * @param datetime $pickUpDate
 	 * @param datetime $pickUpTime  
 	 * @param datetime $returnDate   
@@ -301,9 +275,10 @@ class HZ extends SupplierApi
 	 * @param int $pickUpLocationId
 	 * @param int $returnLocationId 
 	 * @param int $countryCode      
-	 * @param int $driverAge
-	 * @param string $xmlAction
-	 * @return MIXED
+	 * @param string $vehCategory
+	 * @param string $vehClass
+	 * 
+	 * @return XML Object
 	 */
 	public function doBooking($pickUpDate, 
 							  $pickUpTime, 
@@ -354,8 +329,102 @@ class HZ extends SupplierApi
 
 		curl_multi_close($curlMultiHandler);
 		return $response;
+	}		
+
+	/**
+	 * Returns the needed XML request for modify booking action
+	 * 
+	 * @param  int $bookingId
+	 * @param  [type] $countryCode
+	 * 
+	 * @return XML
+	 */
+	public function getModifyBookingXml($bookingId, $countryCode)
+	{
+		$xmlAction = self::MODIFY_BOOKING_ACTION;
+
+		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
+
+		$vehModifyRQCore = $xml->addChild("VehModifyRQCore");
+		$vehModifyRQCore->addAttribute("Status", "Confirmed");
+		$vehModifyRQCore->addAttribute("ModifyType", "Quote");
+		$uniqueIDNode = $vehModifyRQCore->addChild("UniqueID");
+		$uniqueIDNode->addAttribute("Type","14");
+
+		$uniqueIDNode->addAttribute("ID", (string) $bookingId);
+		$specialEquipPrefsNode = $vehModifyRQCore->addChild("SpecialEquipPrefs");
+		$specialChildNode = $specialEquipPrefsNode->addChild("SpecialEquipPref");
+		$specialChildNode->addAttribute("EquipType","8");
+		$specialChildNode->addAttribute("Quantity","1");
+		
+		return $xml->asXML();
+	}
+
+	/**
+	 * Returns the needed XML request for modify booking action
+	 * 
+	 * @param  int $bookingId
+	 * @param  [type] $countryCode
+	 * 
+	 * @return XML
+	 */
+	public function getCancelBookingXml($bookingId, $countryCode)
+	{
+		$xmlAction = self::CANCEL_BOOKING_ACTION;
+
+		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
+
+		$vehCancelRQCore = $xml->addChild("VehCancelRQCore");
+		$vehCancelRQCore->addAttribute("CancelType", "Book");
+		$uniqueIDNode = $vehCancelRQCore->addChild("UniqueID");
+		$uniqueIDNode->addAttribute("Type","14");
+		$uniqueIDNode->addAttribute("ID", (string)$bookingId);
+
+		$personNameNode = $vehCancelRQCore->addChild("PersonName");
+		$personNameNode->addChild("Surname","Testing");	
+		
+		return $xml->asXML();
 	}	
 
+	/**
+	 * Returns the needed XML request for booking details
+	 * 
+	 * @param  int $bookingId
+	 * @param  [type] $countryCode
+	 * 
+	 * @return XML
+	 */
+	public function getBookingDetailsXML($bookingId, $countryCode)
+	{
+		$xmlAction = self::GET_BOOKING_INFO_ACTION;
+
+		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
+
+		$vehRetResRQCoreNode = $xml->addChild("VehRetResRQCore");
+		$uniqueIDNode = $vehRetResRQCoreNode->addChild("UniqueID");
+		$uniqueIDNode->addAttribute("Type","14");
+		$uniqueIDNode->addAttribute("ID", (string)$bookingId);
+
+		$personNameNode = $vehRetResRQCoreNode->addChild("PersonName");
+		$personNameNode->addChild("Surname","Testing");	
+		
+		return $xml->asXML();
+	}
+
+	/**
+	 * Returns the needed XML request for booking action
+	 * 
+	 * @param datetime $pickUpDate
+	 * @param datetime $pickUpTime  
+	 * @param datetime $returnDate   
+	 * @param datetime $returnTime      
+	 * @param int $pickUpLocationId
+	 * @param int $returnLocationId 
+	 * @param int $vehCategory      
+	 * @param int $vehClass
+	 * 
+	 * @return XML
+	 */
 	public function getXmlForBooking($pickUpDateTime,
 									 $returnDateTime,
 									 $pickUplocationCode,
@@ -418,17 +487,18 @@ class HZ extends SupplierApi
 		$vehClassNode = $vehClassNode->addAttribute("Size", $vehCategory);
 
 		return $xml->asXML();
-	}
+	}	
 
 	/**
-	 * Returns XML for post data
+	 * Returns XML Request for search vehicle action
+	 * 
 	 * @param  date $pickUpDateTime   
 	 * @param  date  $returnDateTime   
 	 * @param  string $pickUpLocationId 
 	 * @param  string $returnLocationId 
 	 * @param  string $countryCode      
-	 * @param  string $xmlAction        
-	 * @return XML Object                   
+	 *    
+	 * @return XML                   
 	 */
 	private function getSearchVehicleXML($pickUpDateTime,
 									     $returnDateTime,
@@ -454,13 +524,15 @@ class HZ extends SupplierApi
 		$returnLocationNode->addAttribute("LocationCode",$returnLocationId);
 
 		return $xml->asXML();
-	}
+	}	
 
 	/**
 	 * Returns POS credential node
+	 * 
 	 * @param  string $xmlAction
 	 * @param  string $countryCode
-	 * @return XML Object
+	 * 
+	 * @return XML
 	 */
 	public function getXMLCredentialNode($xmlAction, $countryCode)
 	{
@@ -490,9 +562,11 @@ class HZ extends SupplierApi
 
 	/**
 	 * Returns depots per location IDs
+	 * 
 	 * @param int $pickUpLocationId
 	 * @param int $returnLocationId
-	 * @return Object
+	 * 
+	 * @return DEPOT Object
 	 */
 	public function returnDepotByLocationId($pickUpLocationId, $returnLocationId)
 	{
