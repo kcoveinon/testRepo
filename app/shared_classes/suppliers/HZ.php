@@ -99,15 +99,16 @@ class HZ extends SupplierApi
 		$curlMultiHandler = curl_multi_init();
 		$curlHandlers     = array();	
 
+		$pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
+		$returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
+		$curlOptions = $this->defaultCurlOptions;
 		foreach ($depoObject as $key => $value) {
-			$curlOptions = $this->defaultCurlOptions;
 			$curlOptions[CURLOPT_POSTFIELDS] =  $this->getSearchVehicleXML(
-													$this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime),
-													$this->convertToDateTimeDefaultFormat($returnDate, $returnTime),
+													$pickUpDateTime,
+													$returnDateTime,
 													$value->getDepotCode(),
 													$value->getDepotCode(),
-													$countryCode,
-													self::SEARCH_VEHICLE_ACTION
+													$countryCode
 												);	
 		    $curlHandlers[$key] = curl_init();
 		    curl_setopt_array($curlHandlers[$key], $curlOptions);
@@ -142,14 +143,14 @@ class HZ extends SupplierApi
 	 * @return MIXED
 	 */
 	public function doBooking($pickUpDate, 
-							   $pickUpTime, 
-							   $returnDate, 
-							   $returnTime, 
-							   $pickUpLocationId,
-							   $returnLocationId,
-							   $countryCode, 
-							   $vehCategory,
-							   $vehClass)
+							  $pickUpTime, 
+							  $returnDate, 
+							  $returnTime, 
+							  $pickUpLocationId,
+							  $returnLocationId,
+							  $countryCode, 
+							  $vehCategory,
+							  $vehClass)
 	{	
 
 		$depoObject = $this->returnDepotByLocationId($pickUpLocationId, $returnLocationId);
@@ -159,15 +160,18 @@ class HZ extends SupplierApi
 		ini_set('max_execution_time', 120);
 		$curlMultiHandler = curl_multi_init();
 		$curlHandlers     = array();	
+
+		$pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
+		$returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
+
+		$curlOptions = $this->defaultCurlOptions;
 		foreach ($depoObject as $key => $value) {
-			$curlOptions = $this->defaultCurlOptions;
 			$curlOptions[CURLOPT_POSTFIELDS] =  $this->getXmlForBooking(
-													$this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime),
-													$this->convertToDateTimeDefaultFormat($returnDate, $returnTime),
+													$pickUpDateTime,
+													$returnDateTime,
 													$value->getDepotCode(),
 													$value->getDepotCode(),
 													$countryCode,
-													self::BOOK_VEHICLE_ACTION,
 													$vehCategory,
 													$vehClass
 												);	
@@ -194,11 +198,10 @@ class HZ extends SupplierApi
 									 $pickUplocationCode,
 									 $returnLocationCode,
 									 $countryCode,
-									 $xmlAction,
 									 $vehCategory,
 									 $vehClass)
 	{
-
+		$xmlAction = self::BOOK_VEHICLE_ACTION;
 		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
 
 		$vehRsCore = $xml->addChild("VehResRQCore");
@@ -268,10 +271,9 @@ class HZ extends SupplierApi
 									     $returnDateTime,
 									     $pickUpLocationId,
 									     $returnLocationId,
-									     $countryCode,
-									     $xmlAction)
+									     $countryCode)
 	{
-		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
+		$xml = $this->getXMLCredentialNode(self::SEARCH_VEHICLE_ACTION, $countryCode);
 
 		$vehAvailRQCoreNode = $xml->addChild("VehAvailRQCore");
 		$vehAvailRQCoreNode->addAttribute("Status",self::DEFAULT_REQUEST_STATUS);
