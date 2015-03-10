@@ -252,7 +252,7 @@ class HZ extends SupplierApi
 								   $countryCode, 
 								   $driverAge)
 	{	
-
+		$timeStart = time();
 		ini_set('max_execution_time', 120);
 
 		$depoObject = $this->returnDepotByLocationId($pickUpLocationId, $returnLocationId);
@@ -286,6 +286,8 @@ class HZ extends SupplierApi
 		}
 
 		curl_multi_close($curlMultiHandler);
+
+		$response[0]['executionTime'] = ((time() - $timeStart) . ' seconds');
 
 		return $response;
 	}

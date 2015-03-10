@@ -11,10 +11,6 @@
 |
 */
 
-Route::group(array('prefix' => '{username}', 'before' => 'uname'), function ($username) {
-    Route::get('/', array('uses' => 'UsersController@index'));
-});
-
 
 Route::any('search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{driverAge}', 'VehicleController@search');
 Route::any('book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{vehCategory}/{vehClass}', 'BookingController@book');
