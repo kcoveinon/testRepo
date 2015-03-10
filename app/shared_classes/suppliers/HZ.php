@@ -149,31 +149,31 @@ class HZ extends SupplierApi
 							   $pickUpLocationId,
 							   $returnLocationId,
 							   $countryCode, 
-							   $driverAge,
-							   $xmlAction = self::DEFAULT_XML_ACTION)
+							   $vehCategory,
+							   $vehClass)
 	{	
 
 		$xmlAction = "OTA_VehResRQ";
-		// $vehCategory = [ 1,2,3,4,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 ];
-		$vehCategory = [ 1,2,3,4,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21 ];
-		$vehClass = [ 1,2,3,4,5,6,7,8,9,10,23,32,33,34,35,36,37,39,40];
+
+		$depoObject = $this->returnDepotByLocationId($pickUpLocationId, $returnLocationId);
+		$curlMultiHandler = curl_multi_init();
+		$curlHandlers     = array();
 
 		ini_set('max_execution_time', 120);
 		$curlMultiHandler = curl_multi_init();
 		$curlHandlers     = array();	
-		foreach ($vehCategory as $key => $value) {
+		foreach ($depoObject as $key => $value) {
 			$curlOptions = $this->defaultCurlOptions;
 			$curlOptions[CURLOPT_POSTFIELDS] =  $this->getXmlForBooking(
 													$this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime),
 													$this->convertToDateTimeDefaultFormat($returnDate, $returnTime),
-													"BNE",
-													"BNE",
+													$value->getDepotCode(),
+													$value->getDepotCode(),
 													$countryCode,
 													$xmlAction,
-													$value,
-													$vehClass[$key]
+													$vehCategory,
+													$vehClass
 												);	
-			echo $value. " - ".$vehClass[$key]."; ";
 		    $curlHandlers[$key] = curl_init();
 		    curl_setopt_array($curlHandlers[$key], $curlOptions);
 		    curl_multi_add_handle($curlMultiHandler, $curlHandlers[$key]);
@@ -192,31 +192,6 @@ class HZ extends SupplierApi
 		return $response;
 	}	
 
-	/**
-	 * Returns depots per location IDs
-	 * @param int $pickUpLocationId
-	 * @param int $returnLocationId
-	 * @return Object
-	 */
-	public function returnDepotByLocationId($pickUpLocationId, $returnLocationId)
-	{
-		$pickUpObj = Location::find($pickUpLocationId);
-		return $pickUpObj ? Depot::getGroupedDepotCode($pickUpObj->getCity())->get() : false;
-	}
-
-	/**
-	 * Returns default datetime format
-	 * @param  date $date
-	 * @param  time $time
-	 * @return DATE object
-	 */
-	private function convertToDateTimeDefaultFormat($date, $time)
-	{
-		$date =  new DateTime($date." ".$time);
-
-		return $date->format('Y-m-d H:i:s');
-	}
-
 	public function getXmlForBooking($pickUpDateTime,
 									 $returnDateTime,
 									 $pickUpLocationId,
@@ -233,9 +208,6 @@ class HZ extends SupplierApi
 				         <RequestorID Type=\"4\" ID=\"T487\">
 				            <CompanyName Code=\"CP\" CodeContext=\"A9CF\" />
 				         </RequestorID>
-				      </Source>
-				      <Source>
-				         <RequestorID Type=\"5\" ID=\"74008115\" />
 				      </Source>
 				   </POS>
 				   <VehResRQCore Status=\"All\">
@@ -339,6 +311,31 @@ class HZ extends SupplierApi
 		$returnLocationNode->addAttribute("LocationCode",$returnLocationId);
 
 		return $xml->asXML();
+	}
+
+	/**
+	 * Returns depots per location IDs
+	 * @param int $pickUpLocationId
+	 * @param int $returnLocationId
+	 * @return Object
+	 */
+	public function returnDepotByLocationId($pickUpLocationId, $returnLocationId)
+	{
+		$pickUpObj = Location::find($pickUpLocationId);
+		return $pickUpObj ? Depot::getGroupedDepotCode($pickUpObj->getCity())->get() : false;
+	}
+
+	/**
+	 * Returns default datetime format
+	 * @param  date $date
+	 * @param  time $time
+	 * @return DATE object
+	 */
+	private function convertToDateTimeDefaultFormat($date, $time)
+	{
+		$date =  new DateTime($date." ".$time);
+
+		return $date->format('Y-m-d H:i:s');
 	}
 }
 
