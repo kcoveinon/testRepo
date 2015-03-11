@@ -2,15 +2,12 @@
 
 class BookingController extends BaseController 
 {
-
-
-
-	public function modifyBooking($bookingId, $countryCode)
+	public function modifyBooking($bookingId, $pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $vehCategory, $vehClass)
 	{
 		$result = [];
 		foreach ($this->supplierCodes as $supplierCode) {
 			$supplierApi = App::make($supplierCode);
-			$result[] = $supplierApi->modifyBooking($bookingId, $countryCode);
+			$result[] = $supplierApi->modifyBooking($bookingId, $pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $vehCategory, $vehClass);
 
 		}
 		return Response::json($result);	
