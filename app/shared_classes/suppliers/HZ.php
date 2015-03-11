@@ -90,7 +90,7 @@ class HZ extends SupplierApi
 	{
 		ini_set('max_execution_time', 120);
 		$curlOptions = $this->defaultCurlOptions;
-		$xmlRequest = $this->getXmlForGetLocationDepots(
+		$xmlRequest  = $this->getXmlForGetLocationDepots(
 								$locationCode,
 								$countryCode
 							);
@@ -113,7 +113,7 @@ class HZ extends SupplierApi
 	{
 		ini_set('max_execution_time', 120);
 		$curlOptions = $this->defaultCurlOptions;
-		$xmlRequest = $this->getXmlForDepotDetails(
+		$xmlRequest  = $this->getXmlForDepotDetails(
 								$locationCode,
 								$countryCode
 							);
