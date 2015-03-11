@@ -17,6 +17,7 @@ Route::any('book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLoca
 Route::any('bookingDetails/{bookingId}/{countryCode}', 'BookingController@getBookingInfo');
 Route::any('cancelBooking/{bookingId}/{countryCode}', 'BookingController@cancelBooking');
 Route::any('modifyBooking/{bookingId}/{countryCode}', 'BookingController@modifyBooking');
+Route::any('getDepotDetails/{locationCode}/{countryCode}', 'VehicleController@getDepotDetails');
 
 Route::controller('booking', 'BookingController');
 Route::controller('vehicle-classification', 'VehicleClassificationController');

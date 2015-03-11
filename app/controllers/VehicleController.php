@@ -7,6 +7,14 @@ class VehicleController extends BaseController
 		parent::__construct();
 	}
 
+	public function getDepotDetails($locationCode, $countryCode)
+	{
+		$hertApi = App::make("HZ");
+		
+		$result = $hertApi->getDepotDetails($locationCode, $countryCode);
+		
+		return Response::json($result);
+	}
 
 	public function search($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $driverAge)
 	{
