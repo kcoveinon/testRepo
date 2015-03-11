@@ -18,6 +18,7 @@ Route::any('bookingDetails/{bookingId}/{countryCode}', 'BookingController@getBoo
 Route::any('cancelBooking/{bookingId}/{countryCode}', 'BookingController@cancelBooking');
 Route::any('modifyBooking/{bookingId}/{countryCode}', 'BookingController@modifyBooking');
 Route::any('getDepotDetails/{locationCode}/{countryCode}', 'VehicleController@getDepotDetails');
+Route::any('getLocationDepots/{locationCode}/{countryCode}', 'VehicleController@getLocationDepots');
 
 Route::controller('booking', 'BookingController');
 Route::controller('vehicle-classification', 'VehicleClassificationController');

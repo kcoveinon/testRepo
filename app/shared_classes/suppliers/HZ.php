@@ -13,6 +13,7 @@ class HZ extends SupplierApi
 	const CANCEL_BOOKING_ACTION = "OTA_VehCancelRQ";
 	const MODIFY_BOOKING_ACTION = "OTA_VehModifyRQ";
 	const GET_DEPOT_DETAILS_ACTION = "OTA_VehLocDetailRQ";
+	const GET_LOCATION_DEPOTS = "OTA_VehLocSearchRQ";
 
 	const DEFAULT_XMLNS = "http://www.opentravel.org/OTA/2003/05";
 	const DEFAULT_XMLNS_XSI = "http://www.w3.org/2001/XMLSchema-instance";
@@ -76,6 +77,39 @@ class HZ extends SupplierApi
 			CURLOPT_HTTPHEADER		=> $this->headers
 		);
 	}
+
+	public function getLocationDepots($locationCode, $countryCode)
+	{
+		set_time_limit(0);
+		$curlOptions = $this->defaultCurlOptions;
+		$curlOptions[CURLOPT_POSTFIELDS] = 	trim($this->getXmlForGetLocationDepots(
+												$locationCode,
+												$countryCode
+											));
+		$curlHandler = curl_init();
+
+		curl_setopt_array($curlHandler, $curlOptions);
+		$response = curl_exec($curlHandler);
+		curl_close($curlHandler);
+
+		return new SimpleXMLElement($response);
+	}
+
+
+	public Function getXmlForGetLocationDepots($locationCode, $countryCode)
+	{
+		$xmlAction = self::GET_LOCATION_DEPOTS;
+
+		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
+
+		$vehLocSearchCriterionNode = $xml->addChild("VehLocSearchCriterion");
+		$codeRefNode = $vehLocSearchCriterionNode->addChild("CodeRef");
+		$codeRefNode->addAttribute("LocationCode",$locationCode);
+		$vendorNode = $xml->addChild("Vendor");
+		$vendorNode->addAttribute("Code","ZE");
+		
+		return $xml->asXML();
+	}	
 
 	/**
 	 * Returns the details for a particular locationCode
