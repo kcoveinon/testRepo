@@ -328,8 +328,8 @@ class HZ extends SupplierApi
 		$returnLocationId,
 		$countryCode, 
 		$vehCategory,
-		$vehClass)
-	{	
+		$vehClass
+	) {	
 
 		$curlMultiHandler = curl_multi_init();
 		$curlHandlers     = array();
