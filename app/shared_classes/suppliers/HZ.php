@@ -78,6 +78,14 @@ class HZ extends SupplierApi
 		);
 	}
 
+	/**
+	 * Returns location depots
+	 * 
+	 * @param  string $locationCode
+	 * @param  string $countryCode
+	 * @return XML Object
+	 * 
+	 */
 	public function getLocationDepots($locationCode, $countryCode)
 	{
 		set_time_limit(0);
@@ -94,22 +102,6 @@ class HZ extends SupplierApi
 
 		return new SimpleXMLElement($response);
 	}
-
-
-	public Function getXmlForGetLocationDepots($locationCode, $countryCode)
-	{
-		$xmlAction = self::GET_LOCATION_DEPOTS;
-
-		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
-
-		$vehLocSearchCriterionNode = $xml->addChild("VehLocSearchCriterion");
-		$codeRefNode = $vehLocSearchCriterionNode->addChild("CodeRef");
-		$codeRefNode->addAttribute("LocationCode",$locationCode);
-		$vendorNode = $xml->addChild("Vendor");
-		$vendorNode->addAttribute("Code","ZE");
-		
-		return $xml->asXML();
-	}	
 
 	/**
 	 * Returns the details for a particular locationCode
@@ -132,18 +124,6 @@ class HZ extends SupplierApi
 		curl_close($curlHandler);
 
 		return new SimpleXMLElement($response);
-	}
-
-	public Function getXmlForDepotDetails($locationCode, $countryCode)
-	{
-		$xmlAction = self::GET_DEPOT_DETAILS_ACTION;
-
-		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
-
-		$locationNode = $xml->addChild("Location");
-		$locationNode->addAttribute("LocationCode", $locationCode);
-		
-		return $xml->asXML();
 	}
 
 	/**
@@ -390,6 +370,27 @@ class HZ extends SupplierApi
 	}		
 
 	/**
+	 * Returns XMl for get location depots
+	 * @param  string $locationCode
+	 * @param  string $countryCode
+	 * @return XML
+	 */
+	public function getXmlForGetLocationDepots($locationCode, $countryCode)
+	{
+		$xmlAction = self::GET_LOCATION_DEPOTS;
+
+		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
+
+		$vehLocSearchCriterionNode = $xml->addChild("VehLocSearchCriterion");
+		$codeRefNode = $vehLocSearchCriterionNode->addChild("CodeRef");
+		$codeRefNode->addAttribute("LocationCode",$locationCode);
+		$vendorNode = $xml->addChild("Vendor");
+		$vendorNode->addAttribute("Code","ZE");
+		
+		return $xml->asXML();
+	}	
+
+	/**
 	 * Returns the needed XML request for modify booking action
 	 * 
 	 * @param  int $bookingId
@@ -414,6 +415,24 @@ class HZ extends SupplierApi
 		$specialChildNode = $specialEquipPrefsNode->addChild("SpecialEquipPref");
 		$specialChildNode->addAttribute("EquipType","8");
 		$specialChildNode->addAttribute("Quantity","1");
+		
+		return $xml->asXML();
+	}
+
+	/**
+	 * Returns XML request for getDepotDetails
+	 * @param  string $locationCode
+	 * @param  string $countryCode
+	 * @return XML
+	 */
+	public function getXmlForDepotDetails($locationCode, $countryCode)
+	{
+		$xmlAction = self::GET_DEPOT_DETAILS_ACTION;
+
+		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
+
+		$locationNode = $xml->addChild("Location");
+		$locationNode->addAttribute("LocationCode", $locationCode);
 		
 		return $xml->asXML();
 	}
