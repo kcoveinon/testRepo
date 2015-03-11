@@ -298,37 +298,24 @@ class HZ extends SupplierApi
 		$timeStart = time();
 		ini_set('max_execution_time', 120);
 
-		$depoObject = $this->returnDepotByLocationId($pickUpLocationId, $returnLocationId);
 		$curlMultiHandler = curl_multi_init();
 		$curlHandlers     = array();	
 
-		$pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
-		$returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
 		$curlOptions = $this->defaultCurlOptions;
-		foreach ($depoObject as $key => $value) {
-			$curlOptions[CURLOPT_POSTFIELDS] =  $this->getSearchVehicleXML(
-													$pickUpDateTime,
-													$returnDateTime,
-													$value->getDepotCode(),
-													$value->getDepotCode(),
-													$countryCode
+		$curlOptions[CURLOPT_POSTFIELDS] = 	$this->getSearchVehicleXML(
+													$this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime),
+													$this->convertToDateTimeDefaultFormat($returnDate, $returnTime),
+													"BNE",
+													"ADL",
+													"AU"
 												);	
-		    $curlHandlers[$key] = curl_init();
-		    curl_setopt_array($curlHandlers[$key], $curlOptions);
-		    curl_multi_add_handle($curlMultiHandler, $curlHandlers[$key]);
-		}
+		$curlHandler = curl_init();
 
-		do {
-			curl_multi_select($curlMultiHandler);
-		    curl_multi_exec($curlMultiHandler, $isRunning);
-		} while ($isRunning > 0);
+		curl_setopt_array($curlHandler, $curlOptions);
+		$response = curl_exec($curlHandler);
+		curl_close($curlHandler);
 
-		foreach ($curlHandlers as $stationCode => $curlHandler) {
-		    $response[$stationCode] = new SimpleXMLElement(curl_multi_getcontent($curlHandler));
-		    curl_multi_remove_handle($curlMultiHandler, $curlHandler);
-		}
-
-		curl_multi_close($curlMultiHandler);
+		return new SimpleXMLElement($response);		
 
 
 		$response[0]['executionTime'] = ((time() - $timeStart) . ' seconds');
@@ -361,7 +348,6 @@ class HZ extends SupplierApi
 							  $vehClass)
 	{	
 
-		$depoObject = $this->returnDepotByLocationId($pickUpLocationId, $returnLocationId);
 		$curlMultiHandler = curl_multi_init();
 		$curlHandlers     = array();
 
@@ -372,13 +358,20 @@ class HZ extends SupplierApi
 		$pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
 		$returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
 
+		$depotObject = $this->getLocationDepots("BNE","AU");
+		$depotArray = [];	
+		foreach ($depotObject->VehMatchedLocs->VehMatchedLoc as $value) {
+			$test = $value->LocationDetail->attributes();
+			$depotArray[] =  $test->Code;
+		}
+
 		$curlOptions = $this->defaultCurlOptions;
-		foreach ($depoObject as $key => $value) {
+		foreach ($depotArray as $key => $value) {
 			$curlOptions[CURLOPT_POSTFIELDS] =  $this->getXmlForBooking(
 													$pickUpDateTime,
 													$returnDateTime,
-													$value->getDepotCode(),
-													$value->getDepotCode(),
+													$value,
+													$value,
 													$countryCode,
 													$vehCategory,
 													$vehClass
