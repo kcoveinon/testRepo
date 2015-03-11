@@ -101,8 +101,8 @@ class HZ extends SupplierApi
 		$pickUpLocationId, 
 		$returnLocationId, 
 		$countryCode, 
-		$vehCategory, 
-		$vehClass
+		$vehicleCategory, 
+		$vehicleClass
 	) {
 		return $this->otaVehModifyRQ(
 					$bookingId, 
@@ -113,8 +113,8 @@ class HZ extends SupplierApi
 					$pickUpLocationId, 
 					$returnLocationId, 
 					$countryCode, 
-					$vehCategory, 
-					$vehClass
+					$vehicleCategory, 
+					$vehicleClass
 				);
 	}
 
@@ -153,8 +153,8 @@ class HZ extends SupplierApi
 		$pickUpLocationId,
 		$returnLocationId,
 		$countryCode, 
-		$vehCategory,
-		$vehClass
+		$vehicleCategory,
+		$vehicleClass
 	) {	
 		return $this->otaVehResRQ(
 				$pickUpDate, 
@@ -164,8 +164,8 @@ class HZ extends SupplierApi
 				$pickUpLocationId,
 				$returnLocationId,
 				$countryCode, 
-				$vehCategory,
-				$vehClass
+				$vehicleCategory,
+				$vehicleClass
 			);
 	}
 
@@ -274,8 +274,8 @@ class HZ extends SupplierApi
 	 * @param int $pickUpLocationId
 	 * @param int $returnLocationId 
 	 * @param int $countryCode      
-	 * @param string $vehCategory
-	 * @param string $vehClass
+	 * @param string $vehicleCategory
+	 * @param string $vehicleClass
 	 * 
 	 * @return XML Object
 	 */
@@ -288,8 +288,8 @@ class HZ extends SupplierApi
 		$pickUpLocationId, 
 		$returnLocationId, 
 		$countryCode, 
-		$vehCategory, 
-		$vehClass
+		$vehicleCategory, 
+		$vehicleClass
 	) {
 		ini_set('max_execution_time', 120);
 		$bookingIdArray[] = $bookingId;
@@ -304,15 +304,15 @@ class HZ extends SupplierApi
 
 		foreach ($iterableArray as $key => $value) {
 			$xmlRequest = $this->getModifyBookingXml(
-									$value, 
-									$pickUpDateTime,
-									$returnDateTime, 
-									$pickUpLocationId, 
-									$returnLocationId, 
-									$countryCode, 
-									$vehCategory, 
-									$vehClass
-								);
+						      $value,
+						      $pickUpDateTime,
+						      $returnDateTime, 
+						      $pickUpLocationId,
+						      $returnLocationId, 
+						      $countryCode, 
+						      $vehicleCategory, 
+						      $vehicleClass
+						   );
 			$curlOptions[CURLOPT_POSTFIELDS] =  $xmlRequest->asXML();
 		    $curlHandlers[$key] = curl_init();
 		    curl_setopt_array($curlHandlers[$key], $curlOptions);
@@ -423,11 +423,10 @@ class HZ extends SupplierApi
 		$xmlObject = new SimpleXMLElement($response);
 		$result = [];
 
-		if(isset($xmlObject->Errors)) {
+		if (isset($xmlObject->Errors)) {
 			$result['status'] =  "Failed";
 			$result['data'][] = $xmlObject->Errors->Error->attributes()->ShortText;
-		}
-		else {
+		} else {
 			$vehRsCore = $xmlObject->VehAvailRSCore->VehVendorAvails->VehVendorAvail;
 			$carDetails = $vehRsCore->VehAvails->VehAvail->VehAvailCore->Vehicle;
 			$rentalDetails = $vehRsCore->VehAvails->VehAvail->VehAvailCore->RentalRate;
@@ -453,7 +452,7 @@ class HZ extends SupplierApi
 	            'xrsBasePrice'                       =>  'N/A',
 	            'xrsBasePriceInBookingCurrency'      =>  'N/A',
 	            'totalRateEstimate'                  =>  $vehRsCore->VehAvails->VehAvail->VehAvailCore->TotalCharge->attributes()->EstimatedTotalAmount,
-	            'totalRateEstimateInBookingCurrency' =>  $vehRsCore->VehAvails->VehAvail->VehAvailCore->TotalCharge->attributes()->CurrencyCode,
+	            'totalRateEstimateInBookingCurrency' =>  'N/A',
 	        );
 		}
 
@@ -470,8 +469,8 @@ class HZ extends SupplierApi
 	 * @param int $pickUpLocationId
 	 * @param int $returnLocationId 
 	 * @param int $countryCode      
-	 * @param string $vehCategory
-	 * @param string $vehClass
+	 * @param string $vehicleCategory
+	 * @param string $vehicleClass
 	 * 
 	 * @return XML Object
 	 */
@@ -483,8 +482,8 @@ class HZ extends SupplierApi
 		$pickUpLocationId,
 		$returnLocationId,
 		$countryCode, 
-		$vehCategory,
-		$vehClass
+		$vehicleCategory,
+		$vehicleClass
 	) {	
 
 		$curlMultiHandler = curl_multi_init();
@@ -500,7 +499,7 @@ class HZ extends SupplierApi
 		$depotObject = $this->getLocationDepots("BNE","AU");
 		$depotArray  = [];	
 		foreach ($depotObject->VehMatchedLocs->VehMatchedLoc as $value) {
-			$test         = $value->LocationDetail->attributes();
+			$attribut         = $value->LocationDetail->attributes();
 			$depotArray[] =  $test->Code;
 		}
 
@@ -512,8 +511,8 @@ class HZ extends SupplierApi
 							$value,
 							$value,
 							$countryCode,
-							$vehCategory,
-							$vehClass
+							$vehicleCategory,
+							$vehicleClass
 						);
  			$curlOptions[CURLOPT_POSTFIELDS] = $xmlRequest->asXML();
 		    $curlHandlers[$key] = curl_init();
@@ -570,8 +569,8 @@ class HZ extends SupplierApi
 	 * @param int $pickUpLocationId
 	 * @param int $returnLocationId 
 	 * @param int $countryCode      
-	 * @param string $vehCategory
-	 * @param string $vehClass
+	 * @param string $vehicleCategory
+	 * @param string $vehicleClass
 	 * 
 	 * @return XML Object
 	 */
@@ -582,12 +581,12 @@ class HZ extends SupplierApi
 		$pickUplocationCode,
 		$returnLocationCode,
 		$countryCode,
-		$vehCategory,
-		$vehClass	
+		$vehicleCategory,
+		$vehicleClass	
 	) {
-		$xmlAction          = self::MODIFY_BOOKING_ACTION;
+		$xmlAction = self::MODIFY_BOOKING_ACTION;
 		
-		$xml                = $this->getXMLCredentialNode($xmlAction, $countryCode);
+		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
 		
 		$vehModifyRQCore    = $xml->addChild("VehModifyRQCore");
 		$vehModifyRQCore->addAttribute("Status", "Confirmed");
@@ -614,6 +613,7 @@ class HZ extends SupplierApi
 		$personNameNode     = $primaryNode->addChild("PersonName");
 		$personNameNode->addChild("GivenName", "PrePaidThree");
 		$personNameNode->addChild("Surname", "Testing");
+
 		$telephoneNode      = $primaryNode->addChild("Telephone");
 		$telephoneNode->addAttribute("PhoneTechType", "1");
 		$telephoneNode->addAttribute("AreaCityCode", "9999");
@@ -640,9 +640,9 @@ class HZ extends SupplierApi
 		$vehPrefNode->addAttribute("CodeContext", "SIPP");
 		
 		$vehTypeNode        = $vehPrefNode->addChild("VehType");
-		$vehTypeNode->addAttribute("VehicleCategory", $vehCategory);
-		$vehClassNode       = $vehPrefNode->addChild("VehClass");
-		$vehClassNode       = $vehClassNode->addAttribute("Size", $vehCategory);
+		$vehTypeNode->addAttribute("VehicleCategory", $vehicleCategory);
+		$vehicleClassNode       = $vehPrefNode->addChild("vehicleClass");
+		$vehicleClassNode       = $vehicleClassNode->addAttribute("Size", $vehicleCategory);
 
 		return $xml;
 	}
@@ -685,8 +685,8 @@ class HZ extends SupplierApi
 		$vehCancelRQCore->addAttribute("CancelType", "Book");
 
 		$uniqueIDNode = $vehCancelRQCore->addChild("UniqueID");
-		$uniqueIDNode->addAttribute("Type","14");
-		$uniqueIDNode->addAttribute("ID", (string)$bookingId);
+		$uniqueIDNode->addAttribute("Type", "14");
+		$uniqueIDNode->addAttribute("ID", (string) $bookingId);
 
 		$personNameNode = $vehCancelRQCore->addChild("PersonName");
 		$personNameNode->addChild("Surname","Testing");	
@@ -728,8 +728,8 @@ class HZ extends SupplierApi
 	 * @param datetime $returnTime      
 	 * @param int $pickUpLocationId
 	 * @param int $returnLocationId 
-	 * @param int $vehCategory      
-	 * @param int $vehClass
+	 * @param int $vehicleCategory      
+	 * @param int $vehicleClass
 	 * 
 	 * @return XML
 	 */
@@ -739,8 +739,8 @@ class HZ extends SupplierApi
 		$pickUplocationCode,
 		$returnLocationCode,
 		$countryCode,
-		$vehCategory,
-		$vehClass
+		$vehicleCategory,
+		$vehicleClass
 	) {
 		$xmlAction = self::BOOK_VEHICLE_ACTION;
 		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
@@ -791,9 +791,9 @@ class HZ extends SupplierApi
 		$vehPrefNode->addAttribute("CodeContext", "SIPP");
 
 		$vehTypeNode = $vehPrefNode->addChild("VehType");
-		$vehTypeNode->addAttribute("VehicleCategory", $vehCategory);
-		$vehClassNode = $vehPrefNode->addChild("VehClass");
-		$vehClassNode = $vehClassNode->addAttribute("Size", $vehCategory);
+		$vehTypeNode->addAttribute("VehicleCategory", $vehicleCategory);
+		$vehicleClassNode = $vehPrefNode->addChild("vehicleClass");
+		$vehicleClassNode = $vehicleClassNode->addAttribute("Size", $vehicleCategory);
 
 		return $xml;
 	}	
