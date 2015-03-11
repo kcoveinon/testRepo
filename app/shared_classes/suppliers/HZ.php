@@ -400,6 +400,7 @@ class HZ extends SupplierApi
 		$countryCode, 
 		$driverAge
 	) {	
+		
 		ini_set('max_execution_time', 120);
 
 		$curlMultiHandler = curl_multi_init();
@@ -415,12 +416,48 @@ class HZ extends SupplierApi
 						);
 		$curlOptions[CURLOPT_POSTFIELDS] = $xmlRequest->asXML();
 		$curlHandler = curl_init();
-
 		curl_setopt_array($curlHandler, $curlOptions);
 		$response = curl_exec($curlHandler);
 		curl_close($curlHandler);
+		
+		$xmlObject = new SimpleXMLElement($response);
+		$result = [];
 
-		return new SimpleXMLElement($response);		
+		if(isset($xmlObject->Errors)) {
+			$result['status'] =  "Failed";
+			$result['data'][] = $xmlObject->Errors->Error->attributes()->ShortText;
+		}
+		else {
+			$vehRsCore = $xmlObject->VehAvailRSCore->VehVendorAvails->VehVendorAvail;
+			$carDetails = $vehRsCore->VehAvails->VehAvail->VehAvailCore->Vehicle;
+			$rentalDetails = $vehRsCore->VehAvails->VehAvail->VehAvailCore->RentalRate;
+
+			$result['status'][] = "Success";
+			$result['data'][] = array(
+	            'hasAirCondition' => $carDetails->attributes()->AirConditionInd,
+	            'transmission'    => $carDetails->attributes()->TransmissionType,
+	            'baggageQty'      => '',
+	            'co2Qty'          => '',
+	            'categoryCode'    => $carDetails->attributes()->Code,
+	            'doorCount'       => $carDetails->VehType->attributes()->DoorCount,
+	            'name'            => $carDetails->VehMakeModel->attributes()->Name,
+	            'seats'           => $carDetails->VehClass->attributes()->Size,
+	            'vehicleStatus'   => array(
+	                'code'        => '',
+	                'description' => '',
+	            ),
+	            'rateId'    => $vehRsCore->VehAvails->VehAvail->VehAvailCore->Reference->attributes()->ID,
+	            'basePrice' => $rentalDetails->VehicleCharges->VehicleCharge->attributes()->Amount,
+	            'currency'  => $rentalDetails->VehicleCharges->VehicleCharge->attributes()->CurrencyCode,
+	            'bookingCurrencyOfTotalRateEstimate' => '',
+	            'xrsBasePrice'                       =>  '',
+	            'xrsBasePriceInBookingCurrency'      =>  '',
+	            'totalRateEstimate'                  =>  $vehRsCore->VehAvails->VehAvail->VehAvailCore->TotalCharge->attributes()->EstimatedTotalAmount,
+	            'totalRateEstimateInBookingCurrency' =>  $vehRsCore->VehAvails->VehAvail->VehAvailCore->TotalCharge->attributes()->CurrencyCode,
+	        );
+		}
+
+		return $result;		
 	}
 
 	/**
@@ -548,51 +585,51 @@ class HZ extends SupplierApi
 		$vehCategory,
 		$vehClass	
 	) {
-		$xmlAction = self::MODIFY_BOOKING_ACTION;
-
-		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
-
-		$vehModifyRQCore = $xml->addChild("VehModifyRQCore");
+		$xmlAction          = self::MODIFY_BOOKING_ACTION;
+		
+		$xml                = $this->getXMLCredentialNode($xmlAction, $countryCode);
+		
+		$vehModifyRQCore    = $xml->addChild("VehModifyRQCore");
 		$vehModifyRQCore->addAttribute("Status", "Confirmed");
 		$vehModifyRQCore->addAttribute("ModifyType", "Quote");
-
-		$uniqueIDNode = $vehModifyRQCore->addChild("UniqueID");
+		
+		$uniqueIDNode       = $vehModifyRQCore->addChild("UniqueID");
 		$uniqueIDNode->addAttribute("Type", "14");
 		$uniqueIDNode->addAttribute("ID", (string) $bookingId);
 		
-		$vehRentalCoreNode = $vehModifyRQCore->addChild("VehRentalCore");
+		$vehRentalCoreNode  = $vehModifyRQCore->addChild("VehRentalCore");
 		$vehRentalCoreNode->addAttribute("PickUpDateTime", $pickUpDateTime);
 		$vehRentalCoreNode->addAttribute("ReturnDateTime", $returnDateTime);
-
+		
 		$pickUplocationNode = $vehModifyRQCore->addChild("PickUpLocation");
 		$pickUplocationNode->addAttribute("CodeContext", self::DEFAULT_CODE_CONTEXT);
 		$pickUplocationNode->addAttribute("LocationCode", $pickUplocationCode);
-
+		
 		$returnLocationNode = $vehModifyRQCore->addChild("ReturnLocation");
 		$returnLocationNode->addAttribute("CodeContext", self::DEFAULT_CODE_CONTEXT);
 		$returnLocationNode->addAttribute("LocationCode", $returnLocationCode);
-
-		$customerNode = $vehModifyRQCore->addChild("Customer");
-		$primaryNode = $customerNode->addChild("Primary");
-		$personNameNode = $primaryNode->addChild("PersonName");
+		
+		$customerNode       = $vehModifyRQCore->addChild("Customer");
+		$primaryNode        = $customerNode->addChild("Primary");
+		$personNameNode     = $primaryNode->addChild("PersonName");
 		$personNameNode->addChild("GivenName", "PrePaidThree");
 		$personNameNode->addChild("Surname", "Testing");
-		$telephoneNode = $primaryNode->addChild("Telephone");
+		$telephoneNode      = $primaryNode->addChild("Telephone");
 		$telephoneNode->addAttribute("PhoneTechType", "1");
 		$telephoneNode->addAttribute("AreaCityCode", "9999");
 		$telephoneNode->addAttribute("PhoneNumber", "9999999");
 		$primaryNode->addChild("Email", "saford@hertz.com");		
-
-		$addressNode = $primaryNode->addChild("Address");
+		
+		$addressNode        = $primaryNode->addChild("Address");
 		$addressNode->addChild("AddressLine", "5601 NW Exp");
 		$addressNode->addChild("AddressLine", "Bldg 2");
 		$addressNode->addChild("CityName", "Oklahoma City");
 		$addressNode->addChild("PostalCode", "73112");
-		$stateProveNode = $addressNode->addChild("StateProv");
+		$stateProveNode     = $addressNode->addChild("StateProv");
 		$stateProveNode->addAttribute("StateCode", "OK");
 		$addressNode->addChild("CountryName")->addAttribute("Code", $countryCode);	
-
-		$vehPrefNode = $vehModifyRQCore->addChild("VehPref");
+		
+		$vehPrefNode        = $vehModifyRQCore->addChild("VehPref");
 		$vehPrefNode->addAttribute("AirConditionInd", "true");
 		$vehPrefNode->addAttribute("AirConditionPref", "Preferred");
 		$vehPrefNode->addAttribute("TransmissionType", "Automatic");
@@ -601,11 +638,11 @@ class HZ extends SupplierApi
 		$vehPrefNode->addAttribute("DriveType", "Unspecified");
 		$vehPrefNode->addAttribute("Code", "ICAR");
 		$vehPrefNode->addAttribute("CodeContext", "SIPP");
-
-		$vehTypeNode = $vehPrefNode->addChild("VehType");
+		
+		$vehTypeNode        = $vehPrefNode->addChild("VehType");
 		$vehTypeNode->addAttribute("VehicleCategory", $vehCategory);
-		$vehClassNode = $vehPrefNode->addChild("VehClass");
-		$vehClassNode = $vehClassNode->addAttribute("Size", $vehCategory);
+		$vehClassNode       = $vehPrefNode->addChild("VehClass");
+		$vehClassNode       = $vehClassNode->addAttribute("Size", $vehCategory);
 
 		return $xml;
 	}
