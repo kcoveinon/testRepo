@@ -287,13 +287,13 @@ class HZ extends SupplierApi
 		$curlHandlers     = array();	
 
 		$curlOptions = $this->defaultCurlOptions;
-		$xmlRequest  =  $this->getSearchVehicleXML(
-								$this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime),
-								$this->convertToDateTimeDefaultFormat($returnDate, $returnTime),
-								$pickUpLocationCode,
-								$returnLocationCode,
-								$countryCode
-							);
+		$xmlRequest  = $this->getSearchVehicleXML(
+							$this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime),
+							$this->convertToDateTimeDefaultFormat($returnDate, $returnTime),
+							$pickUpLocationCode,
+							$returnLocationCode,
+							$countryCode
+						);
 		$curlOptions[CURLOPT_POSTFIELDS] = $xmlRequest->asXML();
 		$curlHandler = curl_init();
 
@@ -493,7 +493,7 @@ class HZ extends SupplierApi
 		$vehRetResRQCoreNode = $xml->addChild("VehRetResRQCore");
 		$uniqueIDNode = $vehRetResRQCoreNode->addChild("UniqueID");
 		$uniqueIDNode->addAttribute("Type", "14");
-		$uniqueIDNode->addAttribute("ID", (string)$bookingId);
+		$uniqueIDNode->addAttribute("ID", (string) $bookingId);
 
 		$personNameNode = $vehRetResRQCoreNode->addChild("PersonName");
 		$personNameNode->addChild("Surname", "Testing");	

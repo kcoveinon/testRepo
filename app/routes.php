@@ -11,6 +11,18 @@
 |
 */
 
+Route::group(array('prefix' => 'api/{supplierCode}'), function () {
+    Route::get(
+        'search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{driverAge}', 
+        function($supplierCode, $pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $driverAge) {
+            $supplierApi = App::make($supplierCode);
+
+            $result = $supplierApi->searchVehicles($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $driverAge);
+
+            return Response::json($result);
+        }
+    );
+});
 
 Route::any('search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{driverAge}', 'VehicleController@search');
 Route::any('book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{vehCategory}/{vehClass}', 'BookingController@book');
