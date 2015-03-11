@@ -24,12 +24,17 @@ Route::group(array('prefix' => 'api/{supplierCode}'), function () {
     );
 });
 
-Route::any('HZ/book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{vehCategory}/{vehClass}', 'BookingController@book');
-Route::any('HZ/bookingDetails/{bookingId}/{countryCode}', 'BookingController@getBookingInfo');
-Route::any('HZ/cancelBooking/{bookingId}/{countryCode}', 'BookingController@cancelBooking');
-Route::any('HZ/modifyBooking/{bookingId}/{countryCode}', 'BookingController@modifyBooking');
-Route::any('HZ/getDepotDetails/{locationCode}/{countryCode}', 'VehicleController@getDepotDetails');
-Route::any('HZ/getLocationDepots/{locationCode}/{countryCode}', 'VehicleController@getLocationDepots');
+Route::group(array('prefix' => 'HZ/'), function()
+{
+	Route::any('search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{driverAge}', 'VehicleController@search');
+	Route::any('book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{vehCategory}/{vehClass}', 'BookingController@book');
+	Route::any('HZ/bookingDetails/{bookingId}/{countryCode}', 'BookingController@getBookingInfo');
+	Route::any('cancelBooking/{bookingId}/{countryCode}', 'BookingController@cancelBooking');
+	Route::any('modifyBooking/{bookingId}/{countryCode}', 'BookingController@modifyBooking');
+	Route::any('getDepotDetails/{locationCode}/{countryCode}', 'VehicleController@getDepotDetails');
+	Route::any('getLocationDepots/{locationCode}/{countryCode}', 'VehicleController@getLocationDepots');
+});
+
 
 Route::controller('booking', 'BookingController');
 Route::controller('vehicle-classification', 'VehicleClassificationController');
