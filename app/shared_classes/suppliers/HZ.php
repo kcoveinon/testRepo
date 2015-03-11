@@ -54,10 +54,10 @@ class HZ extends SupplierApi
 
 	public function __construct()
 	{
-		$this->apiUrl              		= Config::get(get_class() . '.api.url');
-		$this->apiValidationCode 		= Config::get(get_class() . '.api.validationCode');
-		$this->apiValidationNumber 		= Config::get(get_class() . '.api.validationNumber');
-		$this->apiConsumerProductCode 	= Config::get(get_class() . '.api.consumerProductCode');
+		$this->apiUrl                 = Config::get(get_class() . '.api.url');
+		$this->apiValidationCode      = Config::get(get_class() . '.api.validationCode');
+		$this->apiValidationNumber    = Config::get(get_class() . '.api.validationNumber');
+		$this->apiConsumerProductCode = Config::get(get_class() . '.api.consumerProductCode');
 
 		$this->headers = array(
 		    "Content-type: text/xml;charset=\"utf-8\"",
@@ -90,12 +90,12 @@ class HZ extends SupplierApi
 	{
 		set_time_limit(0);
 		$curlOptions = $this->defaultCurlOptions;
-		$curlOptions[CURLOPT_POSTFIELDS] = 	trim($this->getXmlForGetLocationDepots(
-												$locationCode,
-												$countryCode
-											));
+		$xmlRequest = $this->getXmlForGetLocationDepots(
+								$locationCode,
+								$countryCode
+							);
+		$curlOptions[CURLOPT_POSTFIELDS] = 	$xmlRequest->asXML();
 		$curlHandler = curl_init();
-
 		curl_setopt_array($curlHandler, $curlOptions);
 		$response = curl_exec($curlHandler);
 		curl_close($curlHandler);
@@ -113,12 +113,12 @@ class HZ extends SupplierApi
 	{
 		set_time_limit(0);
 		$curlOptions = $this->defaultCurlOptions;
-		$curlOptions[CURLOPT_POSTFIELDS] = 	trim($this->getXmlForDepotDetails(
-												$locationCode,
-												$countryCode
-											));
+		$xmlRequest = $this->getXmlForDepotDetails(
+								$locationCode,
+								$countryCode
+							);
+		$curlOptions[CURLOPT_POSTFIELDS] = 	$xmlRequest->asXML();
 		$curlHandler = curl_init();
-
 		curl_setopt_array($curlHandler, $curlOptions);
 		$response = curl_exec($curlHandler);
 		curl_close($curlHandler);
@@ -140,15 +140,17 @@ class HZ extends SupplierApi
 		$bookingIdArray[] = $bookingId;
 
 		$curlMultiHandler = curl_multi_init();
-		$curlHandlers     = array();	
-		$curlOptions = $this->defaultCurlOptions;
+		$curlHandlers     = array();
+		$curlOptions      = $this->defaultCurlOptions;
 
 		$iterableArray = is_array($bookingId) ? reset($bookingIdArray) : $bookingIdArray;
+
 		foreach ($iterableArray as $key => $value) {
-			$curlOptions[CURLOPT_POSTFIELDS] =  $this->getCancelBookingXml(
-													$value,
-													$countryCode
-												);	
+			$xmlRequest = $this->getCancelBookingXml(
+									$value,
+									$countryCode
+								);
+			$curlOptions[CURLOPT_POSTFIELDS] =  $xmlRequest->asXML();
 		    $curlHandlers[$key] = curl_init();
 		    curl_setopt_array($curlHandlers[$key], $curlOptions);
 		    curl_multi_add_handle($curlMultiHandler, $curlHandlers[$key]);
@@ -183,14 +185,16 @@ class HZ extends SupplierApi
 
 		$curlMultiHandler = curl_multi_init();
 		$curlHandlers     = array();	
-		$curlOptions = $this->defaultCurlOptions;
+		$curlOptions      = $this->defaultCurlOptions;
 
 		$iterableArray = is_array($bookingId) ? reset($bookingIdArray) : $bookingIdArray;
+
 		foreach ($iterableArray as $key => $value) {
-			$curlOptions[CURLOPT_POSTFIELDS] =  $this->getModifyBookingXml(
-													$value,
-													$countryCode
-												);	
+			$xmlRequest = $this->getModifyBookingXml(
+									$value,
+									$countryCode
+								);
+			$curlOptions[CURLOPT_POSTFIELDS] =  $xmlRequest->asXML();
 		    $curlHandlers[$key] = curl_init();
 		    curl_setopt_array($curlHandlers[$key], $curlOptions);
 		    curl_multi_add_handle($curlMultiHandler, $curlHandlers[$key]);
@@ -225,14 +229,15 @@ class HZ extends SupplierApi
 
 		$curlMultiHandler = curl_multi_init();
 		$curlHandlers     = array();	
-		$curlOptions = $this->defaultCurlOptions;
+		$curlOptions      = $this->defaultCurlOptions;
 
 		$iterableArray = is_array($bookingId) ? reset($bookingIdArray) : $bookingIdArray;
 		foreach ($iterableArray as $key => $value) {
-			$curlOptions[CURLOPT_POSTFIELDS] =  $this->getBookingDetailsXML(
-													$value,
-													$countryCode
-												);	
+			$xmlRequest = $this->getBookingDetailsXML(
+									$value,
+									$countryCode
+								);			
+			$curlOptions[CURLOPT_POSTFIELDS] =  $xmlRequest->asXML();
 		    $curlHandlers[$key] = curl_init();
 		    curl_setopt_array($curlHandlers[$key], $curlOptions);
 		    curl_multi_add_handle($curlMultiHandler, $curlHandlers[$key]);
@@ -259,35 +264,37 @@ class HZ extends SupplierApi
 	 * @param datetime $pickUpTime  
 	 * @param datetime $returnDate   
 	 * @param datetime $returnTime      
-	 * @param int $pickUpLocationId
-	 * @param int $returnLocationId 
+	 * @param int $pickUpLocationCode
+	 * @param int $returnLocationCode 
 	 * @param int $countryCode      
 	 * @param int $driverAge
 	 * 
 	 * @return XML Object
 	 */
-	public function searchVehicles($pickUpDate, 
-								   $pickUpTime, 
-								   $returnDate, 
-								   $returnTime, 
-								   $pickUpLocationId,
-								   $returnLocationId,
-								   $countryCode, 
-								   $driverAge)
-	{	
+	public function searchVehicles(
+		$pickUpDate, 
+		$pickUpTime, 
+		$returnDate, 
+		$returnTime, 
+		$pickUpLocationCode,
+		$returnLocationCode,
+		$countryCode, 
+		$driverAge
+	) {	
 		ini_set('max_execution_time', 120);
 
 		$curlMultiHandler = curl_multi_init();
 		$curlHandlers     = array();	
 
 		$curlOptions = $this->defaultCurlOptions;
-		$curlOptions[CURLOPT_POSTFIELDS] = 	$this->getSearchVehicleXML(
-													$this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime),
-													$this->convertToDateTimeDefaultFormat($returnDate, $returnTime),
-													"BNE",
-													"ADL",
-													"AU"
-												);	
+		$xmlRequest  =  $this->getSearchVehicleXML(
+								$this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime),
+								$this->convertToDateTimeDefaultFormat($returnDate, $returnTime),
+								$pickUpLocationCode,
+								$returnLocationCode,
+								$countryCode
+							);
+		$curlOptions[CURLOPT_POSTFIELDS] = $xmlRequest->asXML();
 		$curlHandler = curl_init();
 
 		curl_setopt_array($curlHandler, $curlOptions);
@@ -312,15 +319,16 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML Object
 	 */
-	public function doBooking($pickUpDate, 
-							  $pickUpTime, 
-							  $returnDate, 
-							  $returnTime, 
-							  $pickUpLocationId,
-							  $returnLocationId,
-							  $countryCode, 
-							  $vehCategory,
-							  $vehClass)
+	public function doBooking(
+		$pickUpDate, 
+		$pickUpTime, 
+		$returnDate, 
+		$returnTime, 
+		$pickUpLocationId,
+		$returnLocationId,
+		$countryCode, 
+		$vehCategory,
+		$vehClass)
 	{	
 
 		$curlMultiHandler = curl_multi_init();
@@ -334,27 +342,29 @@ class HZ extends SupplierApi
 		$returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
 
 		$depotObject = $this->getLocationDepots("BNE","AU");
-		$depotArray = [];	
+		$depotArray  = [];	
 		foreach ($depotObject->VehMatchedLocs->VehMatchedLoc as $value) {
-			$test = $value->LocationDetail->attributes();
+			$test         = $value->LocationDetail->attributes();
 			$depotArray[] =  $test->Code;
 		}
 
 		$curlOptions = $this->defaultCurlOptions;
 		foreach ($depotArray as $key => $value) {
-			$curlOptions[CURLOPT_POSTFIELDS] =  $this->getXmlForBooking(
-													$pickUpDateTime,
-													$returnDateTime,
-													$value,
-													$value,
-													$countryCode,
-													$vehCategory,
-													$vehClass
-												);	
+ 			$xmlRequest = $this->getXmlForBooking(
+							$pickUpDateTime,
+							$returnDateTime,
+							$value,
+							$value,
+							$countryCode,
+							$vehCategory,
+							$vehClass
+						);
+ 			$curlOptions[CURLOPT_POSTFIELDS] = $xmlRequest->asXML();
 		    $curlHandlers[$key] = curl_init();
 		    curl_setopt_array($curlHandlers[$key], $curlOptions);
 		    curl_multi_add_handle($curlMultiHandler, $curlHandlers[$key]);
 		}
+
 		do {
 			curl_multi_select($curlMultiHandler);
 		    curl_multi_exec($curlMultiHandler, $isRunning);
@@ -383,18 +393,19 @@ class HZ extends SupplierApi
 
 		$vehLocSearchCriterionNode = $xml->addChild("VehLocSearchCriterion");
 		$codeRefNode = $vehLocSearchCriterionNode->addChild("CodeRef");
-		$codeRefNode->addAttribute("LocationCode",$locationCode);
+		$codeRefNode->addAttribute("LocationCode", $locationCode);
+
 		$vendorNode = $xml->addChild("Vendor");
 		$vendorNode->addAttribute("Code","ZE");
 		
-		return $xml->asXML();
+		return $xml;
 	}	
 
 	/**
 	 * Returns the needed XML request for modify booking action
 	 * 
 	 * @param  int $bookingId
-	 * @param  [type] $countryCode
+	 * @param  string $countryCode
 	 * 
 	 * @return XML
 	 */
@@ -407,16 +418,17 @@ class HZ extends SupplierApi
 		$vehModifyRQCore = $xml->addChild("VehModifyRQCore");
 		$vehModifyRQCore->addAttribute("Status", "Confirmed");
 		$vehModifyRQCore->addAttribute("ModifyType", "Quote");
-		$uniqueIDNode = $vehModifyRQCore->addChild("UniqueID");
-		$uniqueIDNode->addAttribute("Type","14");
 
+		$uniqueIDNode = $vehModifyRQCore->addChild("UniqueID");
+		$uniqueIDNode->addAttribute("Type", "14");
 		$uniqueIDNode->addAttribute("ID", (string) $bookingId);
+
 		$specialEquipPrefsNode = $vehModifyRQCore->addChild("SpecialEquipPrefs");
 		$specialChildNode = $specialEquipPrefsNode->addChild("SpecialEquipPref");
-		$specialChildNode->addAttribute("EquipType","8");
-		$specialChildNode->addAttribute("Quantity","1");
+		$specialChildNode->addAttribute("EquipType", "8");
+		$specialChildNode->addAttribute("Quantity", "1");
 		
-		return $xml->asXML();
+		return $xml;
 	}
 
 	/**
@@ -434,14 +446,14 @@ class HZ extends SupplierApi
 		$locationNode = $xml->addChild("Location");
 		$locationNode->addAttribute("LocationCode", $locationCode);
 		
-		return $xml->asXML();
+		return $xml;
 	}
 
 	/**
 	 * Returns the needed XML request for modify booking action
 	 * 
 	 * @param  int $bookingId
-	 * @param  [type] $countryCode
+	 * @param  string $countryCode
 	 * 
 	 * @return XML
 	 */
@@ -453,6 +465,7 @@ class HZ extends SupplierApi
 
 		$vehCancelRQCore = $xml->addChild("VehCancelRQCore");
 		$vehCancelRQCore->addAttribute("CancelType", "Book");
+
 		$uniqueIDNode = $vehCancelRQCore->addChild("UniqueID");
 		$uniqueIDNode->addAttribute("Type","14");
 		$uniqueIDNode->addAttribute("ID", (string)$bookingId);
@@ -460,14 +473,14 @@ class HZ extends SupplierApi
 		$personNameNode = $vehCancelRQCore->addChild("PersonName");
 		$personNameNode->addChild("Surname","Testing");	
 		
-		return $xml->asXML();
+		return $xml;
 	}	
 
 	/**
 	 * Returns the needed XML request for booking details
 	 * 
 	 * @param  int $bookingId
-	 * @param  [type] $countryCode
+	 * @param $countryCode
 	 * 
 	 * @return XML
 	 */
@@ -479,13 +492,13 @@ class HZ extends SupplierApi
 
 		$vehRetResRQCoreNode = $xml->addChild("VehRetResRQCore");
 		$uniqueIDNode = $vehRetResRQCoreNode->addChild("UniqueID");
-		$uniqueIDNode->addAttribute("Type","14");
+		$uniqueIDNode->addAttribute("Type", "14");
 		$uniqueIDNode->addAttribute("ID", (string)$bookingId);
 
 		$personNameNode = $vehRetResRQCoreNode->addChild("PersonName");
-		$personNameNode->addChild("Surname","Testing");	
+		$personNameNode->addChild("Surname", "Testing");	
 		
-		return $xml->asXML();
+		return $xml;
 	}
 
 	/**
@@ -502,14 +515,15 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML
 	 */
-	public function getXmlForBooking($pickUpDateTime,
-									 $returnDateTime,
-									 $pickUplocationCode,
-									 $returnLocationCode,
-									 $countryCode,
-									 $vehCategory,
-									 $vehClass)
-	{
+	public function getXmlForBooking(
+		$pickUpDateTime,
+		$returnDateTime,
+		$pickUplocationCode,
+		$returnLocationCode,
+		$countryCode,
+		$vehCategory,
+		$vehClass
+	) {
 		$xmlAction = self::BOOK_VEHICLE_ACTION;
 		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
 
@@ -517,53 +531,53 @@ class HZ extends SupplierApi
 		$vehRsCore->addAttribute("Status",self::DEFAULT_REQUEST_STATUS);
 
 		$vehRentalCoreNode = $vehRsCore->addChild("VehRentalCore");
-		$vehRentalCoreNode->addAttribute("PickUpDateTime",$pickUpDateTime);
-		$vehRentalCoreNode->addAttribute("ReturnDateTime",$returnDateTime);
+		$vehRentalCoreNode->addAttribute("PickUpDateTime", $pickUpDateTime);
+		$vehRentalCoreNode->addAttribute("ReturnDateTime", $returnDateTime);
 
 		$pickUplocationNode = $vehRentalCoreNode->addChild("PickUpLocation");
-		$pickUplocationNode->addAttribute("CodeContext",self::DEFAULT_CODE_CONTEXT);
-		$pickUplocationNode->addAttribute("LocationCode",$pickUplocationCode);
+		$pickUplocationNode->addAttribute("CodeContext", self::DEFAULT_CODE_CONTEXT);
+		$pickUplocationNode->addAttribute("LocationCode", $pickUplocationCode);
 
 		$returnLocationNode = $vehRentalCoreNode->addChild("ReturnLocation");
-		$returnLocationNode->addAttribute("CodeContext",self::DEFAULT_CODE_CONTEXT);
-		$returnLocationNode->addAttribute("LocationCode",$returnLocationCode);
+		$returnLocationNode->addAttribute("CodeContext", self::DEFAULT_CODE_CONTEXT);
+		$returnLocationNode->addAttribute("LocationCode", $returnLocationCode);
 
 		$customerNode = $vehRsCore->addChild("Customer");
 		$primaryNode = $customerNode->addChild("Primary");
 		$personNameNode = $primaryNode->addChild("PersonName");
-		$personNameNode->addChild("GivenName","PrePaidThree");
-		$personNameNode->addChild("Surname","Testing");
+		$personNameNode->addChild("GivenName", "PrePaidThree");
+		$personNameNode->addChild("Surname", "Testing");
 		$telephoneNode = $primaryNode->addChild("Telephone");
-		$telephoneNode->addAttribute("PhoneTechType","1");
-		$telephoneNode->addAttribute("AreaCityCode","9999");
-		$telephoneNode->addAttribute("PhoneNumber","9999999");
-		$primaryNode->addChild("Email","saford@hertz.com");		
+		$telephoneNode->addAttribute("PhoneTechType", "1");
+		$telephoneNode->addAttribute("AreaCityCode", "9999");
+		$telephoneNode->addAttribute("PhoneNumber", "9999999");
+		$primaryNode->addChild("Email", "saford@hertz.com");		
 
 		$addressNode = $primaryNode->addChild("Address");
-		$addressNode->addChild("AddressLine","5601 NW Exp");
-		$addressNode->addChild("AddressLine","Bldg 2");
-		$addressNode->addChild("CityName","Oklahoma City");
-		$addressNode->addChild("PostalCode","73112");
+		$addressNode->addChild("AddressLine", "5601 NW Exp");
+		$addressNode->addChild("AddressLine", "Bldg 2");
+		$addressNode->addChild("CityName", "Oklahoma City");
+		$addressNode->addChild("PostalCode", "73112");
 		$stateProveNode = $addressNode->addChild("StateProv");
-		$stateProveNode->addAttribute("StateCode","OK");
-		$addressNode->addChild("CountryName")->addAttribute("Code",$countryCode);
+		$stateProveNode->addAttribute("StateCode", "OK");
+		$addressNode->addChild("CountryName")->addAttribute("Code", $countryCode);
 
 		$vehPrefNode = $vehRsCore->addChild("VehPref");
-		$vehPrefNode->addAttribute("AirConditionInd","true");
-		$vehPrefNode->addAttribute("AirConditionPref","Preferred");
-		$vehPrefNode->addAttribute("TransmissionType","Automatic");
-		$vehPrefNode->addAttribute("TransmissionPref","Preferred");
-		$vehPrefNode->addAttribute("FuelType","Diesel");
-		$vehPrefNode->addAttribute("DriveType","Unspecified");
-		$vehPrefNode->addAttribute("Code","ICAR");
-		$vehPrefNode->addAttribute("CodeContext","SIPP");
+		$vehPrefNode->addAttribute("AirConditionInd", "true");
+		$vehPrefNode->addAttribute("AirConditionPref", "Preferred");
+		$vehPrefNode->addAttribute("TransmissionType", "Automatic");
+		$vehPrefNode->addAttribute("TransmissionPref", "Preferred");
+		$vehPrefNode->addAttribute("FuelType", "Diesel");
+		$vehPrefNode->addAttribute("DriveType", "Unspecified");
+		$vehPrefNode->addAttribute("Code", "ICAR");
+		$vehPrefNode->addAttribute("CodeContext", "SIPP");
 
 		$vehTypeNode = $vehPrefNode->addChild("VehType");
 		$vehTypeNode->addAttribute("VehicleCategory", $vehCategory);
 		$vehClassNode = $vehPrefNode->addChild("VehClass");
 		$vehClassNode = $vehClassNode->addAttribute("Size", $vehCategory);
 
-		return $xml->asXML();
+		return $xml;
 	}	
 
 	/**
@@ -577,30 +591,31 @@ class HZ extends SupplierApi
 	 *    
 	 * @return XML                   
 	 */
-	private function getSearchVehicleXML($pickUpDateTime,
-									     $returnDateTime,
-									     $pickUpLocationId,
-									     $returnLocationId,
-									     $countryCode)
-	{
+	private function getSearchVehicleXML(
+		$pickUpDateTime,
+		$returnDateTime,
+		$pickUpLocationId,
+		$returnLocationId,
+		$countryCode
+	) {
 		$xml = $this->getXMLCredentialNode(self::SEARCH_VEHICLE_ACTION, $countryCode);
 
 		$vehAvailRQCoreNode = $xml->addChild("VehAvailRQCore");
-		$vehAvailRQCoreNode->addAttribute("Status",self::DEFAULT_REQUEST_STATUS);
+		$vehAvailRQCoreNode->addAttribute("Status", self::DEFAULT_REQUEST_STATUS);
 
 		$vehRentalCoreNode = $vehAvailRQCoreNode->addChild("VehRentalCore");
-		$vehRentalCoreNode->addAttribute("PickUpDateTime",$pickUpDateTime);
-		$vehRentalCoreNode->addAttribute("ReturnDateTime",$returnDateTime);
+		$vehRentalCoreNode->addAttribute("PickUpDateTime", $pickUpDateTime);
+		$vehRentalCoreNode->addAttribute("ReturnDateTime", $returnDateTime);
 
 		$pickUplocationNode = $vehRentalCoreNode->addChild("PickUpLocation");
-		$pickUplocationNode->addAttribute("CodeContext",self::DEFAULT_CODE_CONTEXT);
-		$pickUplocationNode->addAttribute("LocationCode",$pickUpLocationId);
+		$pickUplocationNode->addAttribute("CodeContext", self::DEFAULT_CODE_CONTEXT);
+		$pickUplocationNode->addAttribute("LocationCode", $pickUpLocationId);
 
 		$returnLocationNode = $vehRentalCoreNode->addChild("ReturnLocation");
-		$returnLocationNode->addAttribute("CodeContext",self::DEFAULT_CODE_CONTEXT);
-		$returnLocationNode->addAttribute("LocationCode",$returnLocationId);
+		$returnLocationNode->addAttribute("CodeContext", self::DEFAULT_CODE_CONTEXT);
+		$returnLocationNode->addAttribute("LocationCode", $returnLocationId);
 
-		return $xml->asXML();
+		return $xml;
 	}	
 
 	/**
@@ -613,26 +628,26 @@ class HZ extends SupplierApi
 	 */
 	public function getXMLCredentialNode($xmlAction, $countryCode)
 	{
-		$xml = new SimpleXMLElement("<$xmlAction></$xmlAction>");
-		$xml->addAttribute("xmlns",self::DEFAULT_XMLNS);
-		$xml->addAttribute("xmlns:xsi",self::DEFAULT_XMLNS_XSI);
-		$xml->addAttribute("xsi:schemaLocation",self::DEFAULT_XMLNS. " ".$xmlAction.".xsd");
-		$xml->addAttribute("Version",self::DEFAULT_VERSION);
-		$xml->addAttribute("SequenceNmbr",self::DEFAULT_SEQUENCENUMBER);
+		$xml = new SimpleXMLElement('<' . $xmlAction . '></' . $xmlAction . '>');
+		$xml->addAttribute("xmlns", self::DEFAULT_XMLNS);
+		$xml->addAttribute("xmlns:xsi", self::DEFAULT_XMLNS_XSI);
+		$xml->addAttribute("xsi:schemaLocation", self::DEFAULT_XMLNS. " " . $xmlAction . ".xsd");
+		$xml->addAttribute("Version", self::DEFAULT_VERSION);
+		$xml->addAttribute("SequenceNmbr", self::DEFAULT_SEQUENCENUMBER);
 
 		$posNode = $xml->addChild("POS");
 		$sourceNode = $posNode->addChild("Source");
-		$sourceNode->addAttribute("PseudoCityCode","BNE");
-		$sourceNode->addAttribute("ISOCountry",$countryCode);
-		$sourceNode->addAttribute("AgentDutyCode",$this->apiValidationCode);
+		$sourceNode->addAttribute("PseudoCityCode", "BNE");
+		$sourceNode->addAttribute("ISOCountry", $countryCode);
+		$sourceNode->addAttribute("AgentDutyCode", $this->apiValidationCode);
 
 		$requestNode = $sourceNode->addChild("RequestorID");
-		$requestNode->addAttribute("Type",self::DEFAULT_REQUEST_TYPE);
-		$requestNode->addAttribute("ID",$this->apiValidationNumber);
+		$requestNode->addAttribute("Type", self::DEFAULT_REQUEST_TYPE);
+		$requestNode->addAttribute("ID", $this->apiValidationNumber);
 
 		$companyNameNode = $requestNode->addChild("CompanyName");
-		$companyNameNode->addAttribute("Code",self::DEFAULT_CONSUMER_PRODUCT);
-		$companyNameNode->addAttribute("CodeContext",$this->apiConsumerProductCode);
+		$companyNameNode->addAttribute("Code", self::DEFAULT_CONSUMER_PRODUCT);
+		$companyNameNode->addAttribute("CodeContext", $this->apiConsumerProductCode);
 
 		return $xml;	
 	}
