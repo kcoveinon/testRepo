@@ -316,10 +316,6 @@ class HZ extends SupplierApi
 		curl_close($curlHandler);
 
 		return new SimpleXMLElement($response);		
-
-
-		$response[0]['executionTime'] = ((time() - $timeStart) . ' seconds');
-		return $response;
 	}
 
 	/**
