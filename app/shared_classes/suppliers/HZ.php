@@ -196,8 +196,10 @@ class HZ extends SupplierApi
 
 	/**
 	 * Returns the details for a particular locationCode
+	 * 
 	 * @param  string $locationCode
 	 * @param  string $countryCode
+	 * 
 	 * @return object
 	 */
 	private function otaVehLocDetailRQ($locationCode, $countryCode)
@@ -498,8 +500,10 @@ class HZ extends SupplierApi
 
 	/**
 	 * Returns XMl for get location depots
+	 * 
 	 * @param  string $locationCode
 	 * @param  string $countryCode
+	 * 
 	 * @return XML
 	 */
 	public function getXmlForGetLocationDepots($locationCode, $countryCode)
@@ -608,8 +612,10 @@ class HZ extends SupplierApi
 
 	/**
 	 * Returns XML request for getDepotDetails
+	 * 
 	 * @param  string $locationCode
 	 * @param  string $countryCode
+	 * 
 	 * @return XML
 	 */
 	public function getXmlForDepotDetails($locationCode, $countryCode)
@@ -843,8 +849,10 @@ class HZ extends SupplierApi
 
 	/**
 	 * Returns default datetime format
+	 * 
 	 * @param  date $date
 	 * @param  time $time
+	 * 
 	 * @return DATE object
 	 */
 	private function convertToDateTimeDefaultFormat($date, $time)
