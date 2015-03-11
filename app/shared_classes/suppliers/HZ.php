@@ -295,7 +295,6 @@ class HZ extends SupplierApi
 								   $countryCode, 
 								   $driverAge)
 	{	
-		$timeStart = time();
 		ini_set('max_execution_time', 120);
 
 		$curlMultiHandler = curl_multi_init();
