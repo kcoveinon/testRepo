@@ -49,7 +49,6 @@ class HZ extends SupplierApi
 	/*
 	 * The cURL headers
 	 */
-	
 	private $headers;
 
 	public function __construct()
