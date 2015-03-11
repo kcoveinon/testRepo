@@ -77,6 +77,98 @@ class HZ extends SupplierApi
 		);
 	}
 
+	public function getLocationDepots($locationCode, $countryCode)
+	{
+		return $this->otaVehLocSearchRQ($locationCode, $countryCode);
+	}
+
+	public function getDepotDetails($locationCode, $countryCode)
+	{
+		return $this->otaVehLocDetailRQ($locationCode, $countryCode);
+	}
+
+	public function cancelBooking($bookingId, $countryCode)
+	{
+		return $this->otaVehCancelRQ($bookingId, $countryCode);
+	}
+
+	public function modifyBooking(
+		$bookingId, 
+		$pickUpDate, 
+		$pickUpTime, 
+		$returnDate, 
+		$returnTime, 
+		$pickUpLocationId, 
+		$returnLocationId, 
+		$countryCode, 
+		$vehCategory, 
+		$vehClass
+	) {
+		return $this->otaVehModifyRQ(
+					$bookingId, 
+					$pickUpDate, 
+					$pickUpTime, 
+					$returnDate, 
+					$returnTime, 
+					$pickUpLocationId, 
+					$returnLocationId, 
+					$countryCode, 
+					$vehCategory, 
+					$vehClass
+				);
+	}
+
+	public function getBookingDetails($bookingId, $countryCode)
+	{
+		return $this->otaVehRetResRQ($bookingId, $countryCode);
+	}
+
+	public function searchVehicles(
+		$pickUpDate, 
+		$pickUpTime, 
+		$returnDate, 
+		$returnTime, 
+		$pickUpLocationCode,
+		$returnLocationCode,
+		$countryCode, 
+		$driverAge
+	) {	
+		return $this->otaVehAvailRateRQ(
+					$pickUpDate, 
+					$pickUpTime, 
+					$returnDate, 
+					$returnTime, 
+					$pickUpLocationCode,
+					$returnLocationCode,
+					$countryCode, 
+					$driverAge
+				);
+	}
+
+	public function doBooking(
+		$pickUpDate, 
+		$pickUpTime, 
+		$returnDate, 
+		$returnTime, 
+		$pickUpLocationId,
+		$returnLocationId,
+		$countryCode, 
+		$vehCategory,
+		$vehClass
+	) {	
+		return $this->otaVehResRQ(
+				$pickUpDate, 
+				$pickUpTime, 
+				$returnDate, 
+				$returnTime, 
+				$pickUpLocationId,
+				$returnLocationId,
+				$countryCode, 
+				$vehCategory,
+				$vehClass
+			);
+	}
+
 	/**
 	 * Returns location depots
 	 * 
@@ -85,7 +177,7 @@ class HZ extends SupplierApi
 	 * @return XML Object
 	 * 
 	 */
-	public function getLocationDepots($locationCode, $countryCode)
+	private function otaVehLocSearchRQ($locationCode, $countryCode)
 	{
 		ini_set('max_execution_time', 120);
 		$curlOptions = $this->defaultCurlOptions;
@@ -108,7 +200,7 @@ class HZ extends SupplierApi
 	 * @param  string $countryCode
 	 * @return object
 	 */
-	public function getDepotDetails($locationCode, $countryCode)
+	private function otaVehLocDetailRQ($locationCode, $countryCode)
 	{
 		ini_set('max_execution_time', 120);
 		$curlOptions = $this->defaultCurlOptions;
@@ -133,7 +225,7 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML Object
 	 */
-	public function cancelBooking($bookingId, $countryCode)
+	private function otaVehCancelRQ($bookingId, $countryCode)
 	{
 		ini_set('max_execution_time', 120);
 		$bookingIdArray[] = $bookingId;
@@ -185,8 +277,18 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML Object
 	 */
-	public function modifyBooking($bookingId, $pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $vehCategory, $vehClass)
-	{
+	private function otaVehModifyRQ(
+		$bookingId, 
+		$pickUpDate, 
+		$pickUpTime, 
+		$returnDate, 
+		$returnTime, 
+		$pickUpLocationId, 
+		$returnLocationId, 
+		$countryCode, 
+		$vehCategory, 
+		$vehClass
+	) {
 		ini_set('max_execution_time', 120);
 		$bookingIdArray[] = $bookingId;
 
@@ -237,7 +339,7 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML Object
 	 */
-	public function getBookingDetails($bookingId, $countryCode)
+	private function otaVehRetResRQ($bookingId, $countryCode)
 	{
 		ini_set('max_execution_time', 120);
 		$bookingIdArray[] = $bookingId;
@@ -286,7 +388,7 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML Object
 	 */
-	public function searchVehicles(
+	private function otaVehAvailRateRQ(
 		$pickUpDate, 
 		$pickUpTime, 
 		$returnDate, 
@@ -334,7 +436,7 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML Object
 	 */
-	public function doBooking(
+	public function otaVehResRQ(
 		$pickUpDate, 
 		$pickUpTime, 
 		$returnDate, 
