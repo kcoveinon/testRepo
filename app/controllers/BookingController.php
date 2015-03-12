@@ -2,6 +2,7 @@
 
 class BookingController extends BaseController 
 {
+	
 	public function modifyBooking($bookingId, $pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $vehCategory, $vehClass)
 	{
 		$result = [];

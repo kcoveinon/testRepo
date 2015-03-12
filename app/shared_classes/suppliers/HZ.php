@@ -499,22 +499,18 @@ class HZ extends SupplierApi
 		$pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
 		$returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
 
-		$depotObject = $this->getLocationDepots("BNE","AU");
-		$depotArray  = [];	
+		$depotObject = $this->returnDepotByLocationId($pickUpLocationId, $returnLocationId);
 
-		foreach ($depotObject->VehMatchedLocs->VehMatchedLoc as $value) {
-			$attribut         = $value->LocationDetail->attributes();
-			$depotArray[] =  $test->Code;
-		}
+		$depotArray  = [];	
 
 		$curlOptions = $this->defaultCurlOptions;
 
-		foreach ($depotArray as $key => $value) {
+		foreach ($depotObject as $key => $value) {
  			$xmlRequest = $this->getXmlForBooking(
 							$pickUpDateTime,
 							$returnDateTime,
-							$value,
-							$value,
+							$value->getDepotCode(),
+							$value->getDepotCode(),
 							$countryCode,
 							$vehicleCategory,
 							$vehicleClass
