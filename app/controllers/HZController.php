@@ -13,14 +13,14 @@ class HZController extends BaseController
 	public function getLocationDepots($locationCode, $countryCode)
 	{
 		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
-		$result = $hertApi->getLocationDepots($locationCode, $countryCode);
+		$result = $hertzApi->getLocationDepots($locationCode, $countryCode);
 		return Response::json($result);
 	}
 
 	public function getDepotDetails($locationCode, $countryCode)
 	{
 		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
-		$result = $hertApi->getDepotDetails($locationCode, $countryCode);
+		$result = $hertzApi->getDepotDetails($locationCode, $countryCode);
 		return Response::json($result);
 	}
 
