@@ -134,20 +134,22 @@ class HZ extends SupplierApi
 		$driverAge
 	) {	
 		if($this->validateDate($pickUpDate, $pickUpTime) && $this->validateDate($returnDate, $returnTime)) {
-			return $this->otaVehAvailRateRQ(
-						$pickUpDate, 
-						$pickUpTime, 
-						$returnDate, 
-						$returnTime, 
-						$pickUpLocationCode,
-						$returnLocationCode,
-						$countryCode, 
-						$driverAge
-					);
+			$response =  $this->otaVehAvailRateRQ(
+							$pickUpDate, 
+							$pickUpTime, 
+							$returnDate, 
+							$returnTime, 
+							$pickUpLocationCode,
+							$returnLocationCode,
+							$countryCode, 
+							$driverAge
+						 );
 		}
 		else {
-			return json_encode(["result" => "Invalid Parameters"]);
+			$response =  ["result" => "Invalid Parameters"];
 		}
+
+		return $response;
 	}
 
 	public function doBooking(
@@ -161,21 +163,21 @@ class HZ extends SupplierApi
 		$vehicleClass
 	) {	
 		if($this->validateDate($pickUpDate, $pickUpTime) && $this->validateDate($returnDate, $returnTime)) {
-			return $this->otaVehResRQ(
-					$pickUpDate, 
-					$pickUpTime, 
-					$returnDate, 
-					$returnTime, 
-					$supplierPickUpDepotCode,
-					$countryCode, 
-					$vehicleCategory,
-					$vehicleClass
-				);
+			$response =  $this->otaVehResRQ(
+							$pickUpDate, 
+							$pickUpTime, 
+							$returnDate, 
+							$returnTime, 
+							$supplierPickUpDepotCode,
+							$countryCode, 
+							$vehicleCategory,
+							$vehicleClass
+						);
 		}
 		else {
-			return json_encode(["result" => "Invalid Parameters"]);
+			$response = ["result" => "Invalid Parameters"];
 		}
-
+		return $response;
 	}
 
 	/**
@@ -446,26 +448,26 @@ class HZ extends SupplierApi
 
 			$result['status'][] = "Success";
 			$result['data'][] = array(
-	            'hasAirCondition' => $carDetails->attributes()->AirConditionInd,
-	            'transmission'    => $carDetails->attributes()->TransmissionType,
+	            'hasAirCondition' => (string) $carDetails->attributes()->AirConditionInd,
+	            'transmission'    => (string) $carDetails->attributes()->TransmissionType,
 	            'baggageQty'      => 'N/A',
 	            'co2Qty'          => 'N/A',
-	            'categoryCode'    => $carDetails->attributes()->Code,
-	            'doorCount'       => $carDetails->VehType->attributes()->DoorCount,
-	            'name'            => $carDetails->VehMakeModel->attributes()->Name,
-	            'seats'           => $carDetails->VehClass->attributes()->Size,
+	            'categoryCode'    => (string) $carDetails->attributes()->Code,
+	            'doorCount'       => (string) $carDetails->VehType->attributes()->DoorCount,
+	            'name'            => (string) $carDetails->VehMakeModel->attributes()->Name,
+	            'seats'           => (string) $carDetails->VehClass->attributes()->Size,
 	            'vehicleStatus'   => array(
 	                'code'        => 'N/A',
 	                'description' => 'N/A',
 	            ),
-	            'rateId'    => $vehRsCore->VehAvails->VehAvail->VehAvailCore->Reference->attributes()->ID,
-	            'basePrice' => $rentalDetails->VehicleCharges->VehicleCharge->attributes()->Amount,
-	            'currency'  => $rentalDetails->VehicleCharges->VehicleCharge->attributes()->CurrencyCode,
+	            'rateId'    => (string) $vehRsCore->VehAvails->VehAvail->VehAvailCore->Reference->attributes()->ID,
+	            'basePrice' => (string) $rentalDetails->VehicleCharges->VehicleCharge->attributes()->Amount,
+	            'currency'  => (string) $rentalDetails->VehicleCharges->VehicleCharge->attributes()->CurrencyCode,
 	            'bookingCurrencyOfTotalRateEstimate' => 'N/A',
-	            'xrsBasePrice'                       =>  'N/A',
-	            'xrsBasePriceInBookingCurrency'      =>  'N/A',
-	            'totalRateEstimate'                  =>  $vehRsCore->VehAvails->VehAvail->VehAvailCore->TotalCharge->attributes()->EstimatedTotalAmount,
-	            'totalRateEstimateInBookingCurrency' =>  'N/A',
+	            'xrsBasePrice'                       => 'N/A',
+	            'xrsBasePriceInBookingCurrency'      => 'N/A',
+	            'totalRateEstimate'                  => (string) $vehRsCore->VehAvails->VehAvail->VehAvailCore->TotalCharge->attributes()->EstimatedTotalAmount,
+	            'totalRateEstimateInBookingCurrency' => 'N/A',
 	        );
 		}
 

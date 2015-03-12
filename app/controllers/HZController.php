@@ -27,7 +27,7 @@ class HZController extends BaseController
 	public function searchVehicles($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $countryCode, $driverAge)
 	{
 		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
-      	$result = $hertApi->searchVehicles($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $countryCode, $driverAge);
+      	$result = $hertzApi->searchVehicles($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $countryCode, $driverAge);
 
         return Response::json($result);
 	}
