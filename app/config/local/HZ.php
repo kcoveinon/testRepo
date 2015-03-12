@@ -1,7 +1,7 @@
 <?php
 
 $testUrl =  "https://vv.xqual.hertz.com/DirectLinkWEB/handlers/DirectLinkHandler?id=ota2007a";
-$prodUrl = "https://vv.xnet.hertz.com/DirectLinkWEB/handlers/DirectLinkHandler?id=ota2007a";
+// $prodUrl = "https://vv.xnet.hertz.com/DirectLinkWEB/handlers/DirectLinkHandler?id=ota2007a";
 return array(
 	'api' => array(
 		'url'              => $testUrl,

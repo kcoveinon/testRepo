@@ -439,7 +439,7 @@ class HZ extends SupplierApi
 
 		if (isset($xmlObject->Errors)) {
 			$result['status'] =  "Failed";
-			$result['data'][] = (string) $xmlObject->Errors->Error->attributes()->ShortText;
+			$result['data'] = (string) $xmlObject->Errors->Error->attributes()->ShortText;
 		} 
 
 		else {
