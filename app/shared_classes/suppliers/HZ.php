@@ -133,16 +133,21 @@ class HZ extends SupplierApi
 		$countryCode, 
 		$driverAge
 	) {	
-		return $this->otaVehAvailRateRQ(
-					$pickUpDate, 
-					$pickUpTime, 
-					$returnDate, 
-					$returnTime, 
-					$pickUpLocationCode,
-					$returnLocationCode,
-					$countryCode, 
-					$driverAge
-				);
+		if($this->validateDate($pickUpDate, $pickUpTime) && $this->validateDate($returnDate, $returnTime)) {
+			return $this->otaVehAvailRateRQ(
+						$pickUpDate, 
+						$pickUpTime, 
+						$returnDate, 
+						$returnTime, 
+						$pickUpLocationCode,
+						$returnLocationCode,
+						$countryCode, 
+						$driverAge
+					);
+		}
+		else {
+			return json_encode(["result" => "Invalid Parameters"]);
+		}
 	}
 
 	public function doBooking(
@@ -155,16 +160,22 @@ class HZ extends SupplierApi
 		$vehicleCategory,
 		$vehicleClass
 	) {	
-		return $this->otaVehResRQ(
-				$pickUpDate, 
-				$pickUpTime, 
-				$returnDate, 
-				$returnTime, 
-				$supplierPickUpDepotCode,
-				$countryCode, 
-				$vehicleCategory,
-				$vehicleClass
-			);
+		if($this->validateDate($pickUpDate, $pickUpTime) && $this->validateDate($returnDate, $returnTime)) {
+			return $this->otaVehResRQ(
+					$pickUpDate, 
+					$pickUpTime, 
+					$returnDate, 
+					$returnTime, 
+					$supplierPickUpDepotCode,
+					$countryCode, 
+					$vehicleCategory,
+					$vehicleClass
+				);
+		}
+		else {
+			return json_encode(["result" => "Invalid Parameters"]);
+		}
+
 	}
 
 	/**
@@ -298,6 +309,7 @@ class HZ extends SupplierApi
 
 		$pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
 		$returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
+
 		$iterableArray = is_array($bookingId) ? reset($bookingIdArray) : $bookingIdArray;
 
 		foreach ($iterableArray as $key => $value) {
@@ -866,8 +878,22 @@ class HZ extends SupplierApi
 	private function convertToDateTimeDefaultFormat($date, $time)
 	{
 		$date =  new \DateTime($date." ".$time);
+		$result = $date->format('Y-m-d H:i:s');
 
-		return $date->format('Y-m-d H:i:s');
+		return $result;
+	}
+
+	/**
+	 * Functions that validates time and date
+	 * @param  date $date
+	 * @param  time $time
+	 * @return bool
+	 */
+	private function validateDate($date, $time)
+	{
+		$dateTime = $date. " " . $time . ":00";
+	    $d = DateTime::createFromFormat('Y-m-d H:i:s', $dateTime);
+	    return $d && $d->format('Y-m-d H:i:s') == $dateTime;
 	}
 }
 
