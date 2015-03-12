@@ -442,32 +442,34 @@ class HZ extends SupplierApi
 
 		else {
 			$vehRsCore = $xmlObject->VehAvailRSCore->VehVendorAvails->VehVendorAvail;
-			$carDetails = $vehRsCore->VehAvails->VehAvail->VehAvailCore->Vehicle;
-			$rentalDetails = $vehRsCore->VehAvails->VehAvail->VehAvailCore->RentalRate;
-
 			$result['status'][] = "Success";
-			$result['data'][] = array(
-	            'hasAirCondition' => (string) $carDetails->attributes()->AirConditionInd,
-	            'transmission'    => (string) $carDetails->attributes()->TransmissionType,
-	            'baggageQty'      => 'N/A',
-	            'co2Qty'          => 'N/A',
-	            'categoryCode'    => (string) $carDetails->attributes()->Code,
-	            'doorCount'       => (string) $carDetails->VehType->attributes()->DoorCount,
-	            'name'            => (string) $carDetails->VehMakeModel->attributes()->Name,
-	            'seats'           => (string) $carDetails->VehClass->attributes()->Size,
-	            'vehicleStatus'   => array(
-	                'code'        => 'N/A',
-	                'description' => 'N/A',
-	            ),
-	            'rateId'    => (string) $vehRsCore->VehAvails->VehAvail->VehAvailCore->Reference->attributes()->ID,
-	            'basePrice' => (string) $rentalDetails->VehicleCharges->VehicleCharge->attributes()->Amount,
-	            'currency'  => (string) $rentalDetails->VehicleCharges->VehicleCharge->attributes()->CurrencyCode,
-	            'bookingCurrencyOfTotalRateEstimate' => 'N/A',
-	            'xrsBasePrice'                       => 'N/A',
-	            'xrsBasePriceInBookingCurrency'      => 'N/A',
-	            'totalRateEstimate'                  => (string) $vehRsCore->VehAvails->VehAvail->VehAvailCore->TotalCharge->attributes()->EstimatedTotalAmount,
-	            'totalRateEstimateInBookingCurrency' => 'N/A',
-	        );
+
+			foreach ($vehRsCore->VehAvails->VehAvail as $key => $value) {
+				$carDetails = $value->VehAvailCore->Vehicle;
+				$rentalDetails = $value->VehAvailCore->RentalRate;				
+				$result['data'][] = array(
+		            'hasAirCondition' => (string) $carDetails->attributes()->AirConditionInd,
+		            'transmission'    => (string) $carDetails->attributes()->TransmissionType,
+		            'baggageQty'      => 'N/A',
+		            'co2Qty'          => 'N/A',
+		            'categoryCode'    => (string) $carDetails->attributes()->Code,
+		            'doorCount'       => (string) $carDetails->VehType->attributes()->DoorCount,
+		            'name'            => (string) $carDetails->VehMakeModel->attributes()->Name,
+		            'seats'           => (string) $carDetails->VehClass->attributes()->Size,
+		            'vehicleStatus'   => array(
+		                'code'        => 'N/A',
+		                'description' => 'N/A',
+		            ),
+		            'rateId'    => (string) $value->VehAvailCore->Reference->attributes()->ID,
+		            'basePrice' => (string) $rentalDetails->VehicleCharges->VehicleCharge->attributes()->Amount,
+		            'currency'  => (string) $rentalDetails->VehicleCharges->VehicleCharge->attributes()->CurrencyCode,
+		            'bookingCurrencyOfTotalRateEstimate' => 'N/A',
+		            'xrsBasePrice'                       => 'N/A',
+		            'xrsBasePriceInBookingCurrency'      => 'N/A',
+		            'totalRateEstimate'                  => (string) $value->VehAvailCore->TotalCharge->attributes()->EstimatedTotalAmount,
+		            'totalRateEstimateInBookingCurrency' => 'N/A',
+		        );
+			}
 		}
 
 		return $result;		
@@ -882,7 +884,8 @@ class HZ extends SupplierApi
 		$date =  new \DateTime($date." ".$time);
 		$result = $date->format('Y-m-d H:i:s');
 
-		return $result;
+		return str_replace(" ", "T", $result);
+
 	}
 
 	/**
