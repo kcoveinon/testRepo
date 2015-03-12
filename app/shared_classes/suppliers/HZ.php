@@ -437,7 +437,7 @@ class HZ extends SupplierApi
 
 		if (isset($xmlObject->Errors)) {
 			$result['status'] =  "Failed";
-			$result['data'][] = $xmlObject->Errors->Error->attributes()->ShortText;
+			$result['data'][] = (string) $xmlObject->Errors->Error->attributes()->ShortText;
 		} 
 
 		else {
@@ -576,7 +576,7 @@ class HZ extends SupplierApi
 		
 		$vehModifyRQCore    = $xml->addChild("VehModifyRQCore");
 		$vehModifyRQCore->addAttribute("Status", "Confirmed");
-		$vehModifyRQCore->addAttribute("ModifyType", "Quote");
+		$vehModifyRQCore->addAttribute("ModifyType", "Book");
 		
 		$uniqueIDNode       = $vehModifyRQCore->addChild("UniqueID");
 		$uniqueIDNode->addAttribute("Type", "14");
