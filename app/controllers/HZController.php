@@ -12,7 +12,7 @@ class HZController extends BaseController
 
 	public function getLocationDepots($locationCode, $countryCode)
 	{
-		$hertApi = App::make("HZ");
+		$hertApi = App::make(self::DEFAULT_SUPPLIER_CODE);
 		
 		$result = $hertApi->getLocationDepots($locationCode, $countryCode);
 
@@ -21,68 +21,17 @@ class HZController extends BaseController
 
 	public function getDepotDetails($locationCode, $countryCode)
 	{
-		$hertApi = App::make("HZ");
+		$hertApi = App::make(self::DEFAULT_SUPPLIER_CODE);
 		
 		$result = $hertApi->getDepotDetails($locationCode, $countryCode);
 
 		return Response::json($result);
 	}
 
-	public function search($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $driverAge)
+	public function searchVehicles($pickUpDate, $pickUpTime, $returnDate, $returnTime, $returnLocationCode, $returnLocationId, $countryCode, $driverAge)
 	{
-		$result = array();
-
-        $pickUpDepots = DB::select(DB::raw(
-	            "SELECT 
-	                d.depotCode,
-	                s.supplierCode
-	            FROM 
-	                phpvroom.locationdepot AS ld, 
-	                phpvroom.depot AS d,
-	                phpvroom.supplier AS s
-	            WHERE 
-	                ld.depotID = d.depotID AND
-	                d.supplierID = s.supplierID AND
-	                ld.locationID = :pickUpId"
-        	),array( "pickUpId" => $pickUpLocationId));
-
-        foreach ($pickUpDepots as $pickUpDepot) {
-            if (!isset($supplierPickUpDepotCodes[$pickUpDepot->supplierCode])) {
-                $supplierPickUpDepotCodes[$pickUpDepot->supplierCode] = $pickUpDepot->depotCode;
-            }
-        }
-
-        if ($returnLocationId == $pickUpLocationId) {
-            $supplierReturnDepotCodes = $supplierPickUpDepotCodes;
-        } else {
-            $returnDepots = DB::select(DB::raw(
-            	"SELECT 
-                    d.depotCode,
-                    s.supplierCode
-                FROM 
-                    phpvroom.locationdepot AS ld, 
-                    phpvroom.depot AS d,
-                    phpvroom.supplier AS s
-                WHERE 
-                    ld.depotID = d.depotID AND
-                    d.supplierID = s.supplierID AND
-                    ld.locationID = :returnIds"
-            ),array( "pickUpId" => $pickUpLocationId));
-
-            foreach ($returnDepots as $returnDepot) {
-                if (!isset($supplierReturnDepotCodes[$returnDepot->supplierCode])) {
-                    $supplierReturnDepotCodes[$returnDepot->supplierCode] = $returnDepot->depotCode;
-                }
-            }
-        }
-
-        foreach ($this->supplierCodes as $supplierCode) {
-            if (isset($supplierPickUpDepotCodes[$supplierCode]) && isset($supplierReturnDepotCodes[$supplierCode])) {
-                $supplierApi = App::make($supplierCode);
-
-                $result = $supplierApi->searchVehicles($pickUpDate, $pickUpTime, $returnDate, $returnTime, $supplierPickUpDepotCodes[$supplierCode], $supplierReturnDepotCodes[$supplierCode], $countryCode, $driverAge);
-            }
-        }
+		$hertApi = App::make(self::DEFAULT_SUPPLIER_CODE);
+      	$result = $hertApi->searchVehicles($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationId, $countryCode, $driverAge);
 
         return Response::json($result);
 	}

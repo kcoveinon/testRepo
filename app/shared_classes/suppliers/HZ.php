@@ -835,6 +835,7 @@ class HZ extends SupplierApi
 		$xml->addAttribute("xsi:schemaLocation", self::DEFAULT_XMLNS. " " . $xmlAction . ".xsd");
 		$xml->addAttribute("Version", self::DEFAULT_VERSION);
 		$xml->addAttribute("SequenceNmbr", self::DEFAULT_SEQUENCENUMBER);
+		$xml->addAttribute("MaxResponses", self::DEFAULT_MAXRESPONSE);		
 
 		$posNode = $xml->addChild("POS");
 		$sourceNode = $posNode->addChild("Source");
