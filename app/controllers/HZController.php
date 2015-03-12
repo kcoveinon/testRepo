@@ -28,10 +28,10 @@ class HZController extends BaseController
 		return Response::json($result);
 	}
 
-	public function searchVehicles($pickUpDate, $pickUpTime, $returnDate, $returnTime, $returnLocationCode, $returnLocationId, $countryCode, $driverAge)
+	public function searchVehicles($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $countryCode, $driverAge)
 	{
 		$hertApi = App::make(self::DEFAULT_SUPPLIER_CODE);
-      	$result = $hertApi->searchVehicles($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationId, $countryCode, $driverAge);
+      	$result = $hertApi->searchVehicles($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $countryCode, $driverAge);
 
         return Response::json($result);
 	}
