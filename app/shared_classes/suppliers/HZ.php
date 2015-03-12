@@ -133,7 +133,7 @@ class HZ extends SupplierApi
 		$countryCode, 
 		$driverAge
 	) {	
-		if($this->validateDate($pickUpDate, $pickUpTime) && $this->validateDate($returnDate, $returnTime)) {
+		if ($this->validateDate($pickUpDate, $pickUpTime) && $this->validateDate($returnDate, $returnTime)) {
 			$response =  $this->otaVehAvailRateRQ(
 							$pickUpDate, 
 							$pickUpTime, 
@@ -162,7 +162,7 @@ class HZ extends SupplierApi
 		$vehicleCategory,
 		$vehicleClass
 	) {	
-		if($this->validateDate($pickUpDate, $pickUpTime) && $this->validateDate($returnDate, $returnTime)) {
+		if ($this->validateDate($pickUpDate, $pickUpTime) && $this->validateDate($returnDate, $returnTime)) {
 			$response =  $this->otaVehResRQ(
 							$pickUpDate, 
 							$pickUpTime, 
@@ -177,6 +177,7 @@ class HZ extends SupplierApi
 		else {
 			$response = ["result" => "Invalid Parameters"];
 		}
+		
 		return $response;
 	}
 
