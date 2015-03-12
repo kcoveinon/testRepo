@@ -484,7 +484,8 @@ class HZ extends SupplierApi
 	 * @param datetime $pickUpTime  
 	 * @param datetime $returnDate   
 	 * @param datetime $returnTime      
-	 * @param string $supplierPickUpDepotCode
+	 * @param int $pickUplocationCode
+	 * @param int $returnLocationCode
 	 * @param int $countryCode      
 	 * @param string $vehicleCategory
 	 * @param string $vehicleClass
