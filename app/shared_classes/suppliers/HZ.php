@@ -177,7 +177,7 @@ class HZ extends SupplierApi
 		else {
 			$response = ["result" => "Invalid Parameters"];
 		}
-		
+
 		return $response;
 	}
 
@@ -191,7 +191,7 @@ class HZ extends SupplierApi
 	 */
 	private function otaVehLocSearchRQ($locationCode, $countryCode)
 	{
-		ini_set('max_execution_time', 120);
+
 		$curlOptions = $this->defaultCurlOptions;
 		$xmlRequest  = $this->getXmlForGetLocationDepots(
 								$locationCode,
@@ -216,7 +216,7 @@ class HZ extends SupplierApi
 	 */
 	private function otaVehLocDetailRQ($locationCode, $countryCode)
 	{
-		ini_set('max_execution_time', 120);
+
 		$curlOptions = $this->defaultCurlOptions;
 		$xmlRequest  = $this->getXmlForDepotDetails(
 								$locationCode,
@@ -241,7 +241,7 @@ class HZ extends SupplierApi
 	 */
 	private function otaVehCancelRQ($bookingId, $countryCode)
 	{
-		ini_set('max_execution_time', 120);
+
 		$bookingIdArray[] = $bookingId;
 
 		$curlMultiHandler = curl_multi_init();
@@ -303,7 +303,7 @@ class HZ extends SupplierApi
 		$vehicleCategory, 
 		$vehicleClass
 	) {
-		ini_set('max_execution_time', 120);
+
 		$bookingIdArray[] = $bookingId;
 
 		$curlMultiHandler = curl_multi_init();
@@ -356,7 +356,7 @@ class HZ extends SupplierApi
 	 */
 	private function otaVehRetResRQ($bookingId, $countryCode)
 	{
-		ini_set('max_execution_time', 120);
+	
 		$bookingIdArray[] = $bookingId;
 
 		$curlMultiHandler = curl_multi_init();
@@ -414,8 +414,6 @@ class HZ extends SupplierApi
 		$countryCode, 
 		$driverAge
 	) {	
-		
-		ini_set('max_execution_time', 120);
 
 		$curlMultiHandler = curl_multi_init();
 		$curlHandlers     = array();	
