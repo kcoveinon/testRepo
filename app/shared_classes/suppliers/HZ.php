@@ -150,8 +150,7 @@ class HZ extends SupplierApi
 		$pickUpTime, 
 		$returnDate, 
 		$returnTime, 
-		$pickUpLocationId,
-		$returnLocationId,
+		$supplierPickUpDepotCode,
 		$countryCode, 
 		$vehicleCategory,
 		$vehicleClass
@@ -161,8 +160,7 @@ class HZ extends SupplierApi
 				$pickUpTime, 
 				$returnDate, 
 				$returnTime, 
-				$pickUpLocationId,
-				$returnLocationId,
+				$supplierPickUpDepotCode,
 				$countryCode, 
 				$vehicleCategory,
 				$vehicleClass
@@ -469,8 +467,7 @@ class HZ extends SupplierApi
 	 * @param datetime $pickUpTime  
 	 * @param datetime $returnDate   
 	 * @param datetime $returnTime      
-	 * @param int $pickUpLocationId
-	 * @param int $returnLocationId 
+	 * @param string $supplierPickUpDepotCode
 	 * @param int $countryCode      
 	 * @param string $vehicleCategory
 	 * @param string $vehicleClass
@@ -482,57 +479,32 @@ class HZ extends SupplierApi
 		$pickUpTime, 
 		$returnDate, 
 		$returnTime, 
-		$pickUpLocationId,
-		$returnLocationId,
+		$supplierPickUpDepotCode,
 		$countryCode, 
 		$vehicleCategory,
 		$vehicleClass
 	) {	
 
-		$curlMultiHandler = curl_multi_init();
-		$curlHandlers     = array();
-
-		ini_set('max_execution_time', 120);
-		$curlMultiHandler = curl_multi_init();
-		$curlHandlers     = array();	
-
 		$pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
 		$returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
 
-		$depotObject = $this->returnDepotByLocationId($pickUpLocationId, $returnLocationId);
-
-		$depotArray  = [];	
-
 		$curlOptions = $this->defaultCurlOptions;
+		$xmlRequest = $this->getXmlForBooking(
+						$pickUpDateTime,
+						$returnDateTime,
+						$supplierPickUpDepotCode,
+						$countryCode,
+						$vehicleCategory,
+						$vehicleClass
+					  );
+		$curlOptions[CURLOPT_POSTFIELDS] = 	$xmlRequest->asXML();
+		$curlHandler = curl_init();
+		curl_setopt_array($curlHandler, $curlOptions);
+		$response = curl_exec($curlHandler);
+		curl_close($curlHandler);
 
-		foreach ($depotObject as $key => $value) {
- 			$xmlRequest = $this->getXmlForBooking(
-							$pickUpDateTime,
-							$returnDateTime,
-							$value->getDepotCode(),
-							$value->getDepotCode(),
-							$countryCode,
-							$vehicleCategory,
-							$vehicleClass
-						);
- 			$curlOptions[CURLOPT_POSTFIELDS] = $xmlRequest->asXML();
-		    $curlHandlers[$key] = curl_init();
-		    curl_setopt_array($curlHandlers[$key], $curlOptions);
-		    curl_multi_add_handle($curlMultiHandler, $curlHandlers[$key]);
-		}
+		return new SimpleXMLElement($response);
 
-		do {
-			curl_multi_select($curlMultiHandler);
-		    curl_multi_exec($curlMultiHandler, $isRunning);
-		} while ($isRunning > 0);
-
-		foreach ($curlHandlers as $stationCode => $curlHandler) {
-		    $response[$stationCode] = new SimpleXMLElement(curl_multi_getcontent($curlHandler));
-		    curl_multi_remove_handle($curlMultiHandler, $curlHandler);
-		}
-
-		curl_multi_close($curlMultiHandler);
-		return $response;
 	}		
 
 	/**
@@ -727,8 +699,7 @@ class HZ extends SupplierApi
 	 * @param datetime $pickUpTime  
 	 * @param datetime $returnDate   
 	 * @param datetime $returnTime      
-	 * @param int $pickUpLocationId
-	 * @param int $returnLocationId 
+	 * @param string $supplierPickUpDepotCode
 	 * @param int $vehicleCategory      
 	 * @param int $vehicleClass
 	 * 
@@ -737,8 +708,7 @@ class HZ extends SupplierApi
 	public function getXmlForBooking(
 		$pickUpDateTime,
 		$returnDateTime,
-		$pickUplocationCode,
-		$returnLocationCode,
+		$supplierPickUpDepotCode,
 		$countryCode,
 		$vehicleCategory,
 		$vehicleClass
@@ -755,11 +725,11 @@ class HZ extends SupplierApi
 
 		$pickUplocationNode = $vehRentalCoreNode->addChild("PickUpLocation");
 		$pickUplocationNode->addAttribute("CodeContext", self::DEFAULT_CODE_CONTEXT);
-		$pickUplocationNode->addAttribute("LocationCode", $pickUplocationCode);
+		$pickUplocationNode->addAttribute("LocationCode", $supplierPickUpDepotCode);
 
 		$returnLocationNode = $vehRentalCoreNode->addChild("ReturnLocation");
 		$returnLocationNode->addAttribute("CodeContext", self::DEFAULT_CODE_CONTEXT);
-		$returnLocationNode->addAttribute("LocationCode", $returnLocationCode);
+		$returnLocationNode->addAttribute("LocationCode", $supplierPickUpDepotCode);
 
 		$customerNode = $vehRsCore->addChild("Customer");
 		$primaryNode = $customerNode->addChild("Primary");

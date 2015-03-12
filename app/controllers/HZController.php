@@ -44,7 +44,6 @@ class HZController extends BaseController
 	                ld.locationID = :pickUpId"
         	),array( "pickUpId" => $pickUpLocationId));
 
-
         foreach ($pickUpDepots as $pickUpDepot) {
             if (!isset($supplierPickUpDepotCodes[$pickUpDepot->supplierCode])) {
                 $supplierPickUpDepotCodes[$pickUpDepot->supplierCode] = $pickUpDepot->depotCode;
@@ -86,14 +85,12 @@ class HZController extends BaseController
         return Response::json($result);
 	}
 
-
-	
-	public function modifyBooking($bookingId, $pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $vehCategory, $vehClass)
+	public function modifyBooking($bookingId, $pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $vehicleCategory, $vehicleClass)
 	{
 		$result = [];
 		foreach ($this->supplierCodes as $supplierCode) {
 			$supplierApi = App::make($supplierCode);
-			$result[] = $supplierApi->modifyBooking($bookingId, $pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $vehCategory, $vehClass);
+			$result[] = $supplierApi->modifyBooking($bookingId, $pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $vehicleCategory, $vehicleClass);
 
 		}
 		return Response::json($result);	
@@ -121,10 +118,56 @@ class HZController extends BaseController
 		return Response::json($result);	
 	}
 
-	public function book($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $vehCategory, $vehClass)
+	public function book($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $vehicleCategory, $vehicleClass)
 	{
+		$supplierCode = "HZ";
 		$result = [];
-		foreach ($this->supplierCodes as $supplierCode) {
+            $pickUpDepot = DB::select(
+                "SELECT 
+                    d.depotCode,
+                    s.supplierCode
+                FROM 
+                    phpvroom.locationdepot AS ld, 
+                    phpvroom.depot AS d,
+                    phpvroom.supplier AS s
+                WHERE 
+                    ld.depotID = d.depotID AND
+                    d.supplierID = s.supplierID AND
+                    ld.locationID = '" . $pickUpLocationId. "' AND
+                    s.supplierCode = '" . $supplierCode . "'
+                LIMIT 1"
+            );
+
+            if (empty($pickUpDepot)) {
+                die('no pick up depot available');
+            }
+
+            $supplierPickUpDepotCode = $pickUpDepot[0]->depotCode;
+
+            if ($returnLocationId == $pickUpLocationId) {
+                $supplierReturnDepotCode = $supplierPickUpDepotCode;
+            } else {
+                $returnDepot = DB::select(
+                "SELECT 
+                        d.depotCode,
+                        s.supplierCode
+                    FROM 
+                        phpvroom.locationdepot AS ld, 
+                        phpvroom.depot AS d,
+                        phpvroom.supplier AS s
+                    WHERE 
+                        ld.depotID = d.depotID AND
+                        d.supplierID = s.supplierID AND
+                        ld.locationID = '" . $returnLocationId. "'"
+                );
+
+                if (empty($returnDepot)) {
+                    die('no return depot');
+                }
+
+                $supplierReturnDepotCode = $returnDepot[0]->depotCode;
+            }
+
 			$supplierApi = App::make($supplierCode);
 
 			$result[] = $supplierApi->doBooking(
@@ -132,13 +175,12 @@ class HZController extends BaseController
 							$pickUpTime, 
 							$returnDate, 
 							$returnTime, 
-							$pickUpLocationId, 
-							$returnLocationId,
+							$supplierPickUpDepotCode, 
 							$countryCode, 
-							$vehCategory, 
-							$vehClass
+							$vehicleCategory, 
+							$vehicleClass
 						);
-		}
+
 		return Response::json($result);		
 	}
 
