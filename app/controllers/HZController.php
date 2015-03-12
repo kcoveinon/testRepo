@@ -3,7 +3,7 @@
 class HZController extends BaseController
 {
 
-	self::DEFAULT_SUPPLIER_CODE = "HZ";
+	const DEFAULT_SUPPLIER_CODE = "HZ";
 
 	public function __construct()
 	{
