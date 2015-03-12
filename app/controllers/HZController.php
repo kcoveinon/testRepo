@@ -48,7 +48,7 @@ class HZController extends BaseController
 
 	public function getBookingInfo($bookingId, $countryCode)
 	{
-		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);= App::make($supplierCode);
+		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
 		$result = $hertzApi->getBookingDetails($bookingId, $countryCode);
 		return Response::json($result);	
 	}
