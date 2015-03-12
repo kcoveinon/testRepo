@@ -12,25 +12,21 @@ class HZController extends BaseController
 
 	public function getLocationDepots($locationCode, $countryCode)
 	{
-		$hertApi = App::make(self::DEFAULT_SUPPLIER_CODE);
-		
+		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
 		$result = $hertApi->getLocationDepots($locationCode, $countryCode);
-
 		return Response::json($result);
 	}
 
 	public function getDepotDetails($locationCode, $countryCode)
 	{
-		$hertApi = App::make(self::DEFAULT_SUPPLIER_CODE);
-		
+		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
 		$result = $hertApi->getDepotDetails($locationCode, $countryCode);
-
 		return Response::json($result);
 	}
 
 	public function searchVehicles($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $countryCode, $driverAge)
 	{
-		$hertApi = App::make(self::DEFAULT_SUPPLIER_CODE);
+		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
       	$result = $hertApi->searchVehicles($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $countryCode, $driverAge);
 
         return Response::json($result);
@@ -38,34 +34,22 @@ class HZController extends BaseController
 
 	public function modifyBooking($bookingId, $pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $vehicleCategory, $vehicleClass)
 	{
-		$result = [];
-		foreach ($this->supplierCodes as $supplierCode) {
-			$supplierApi = App::make($supplierCode);
-			$result[] = $supplierApi->modifyBooking($bookingId, $pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $vehicleCategory, $vehicleClass);
-
-		}
+		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
+		$result = $hertzApi->modifyBooking($bookingId, $pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $vehicleCategory, $vehicleClass);
 		return Response::json($result);	
 	}
 
 	public function cancelBooking($bookingId, $countryCode)
 	{
-		$result = [];
-		foreach ($this->supplierCodes as $supplierCode) {
-			$supplierApi = App::make($supplierCode);
-			$result[] = $supplierApi->cancelBooking($bookingId, $countryCode);
-
-		}
+		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
+		$result = $hertzApi->cancelBooking($bookingId, $countryCode);
 		return Response::json($result);	
 	}
 
 	public function getBookingInfo($bookingId, $countryCode)
 	{
-		$result = [];
-		foreach ($this->supplierCodes as $supplierCode) {
-			$supplierApi = App::make($supplierCode);
-			$result[] = $supplierApi->getBookingDetails($bookingId, $countryCode);
-
-		}
+		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);= App::make($supplierCode);
+		$result = $hertzApi->getBookingDetails($bookingId, $countryCode);
 		return Response::json($result);	
 	}
 
@@ -117,7 +101,7 @@ class HZController extends BaseController
             $supplierReturnDepotCode = $returnDepot[0]->depotCode;
         }
 
-		$supplierApi = App::make($supplierCode);
+		$supplierApi = App::make(self::DEFAULT_SUPPLIER_CODE);
 
 		$result = $supplierApi->doBooking(
 						$pickUpDate, 
