@@ -53,54 +53,8 @@ class HZController extends BaseController
 		return Response::json($result);	
 	}
 
-	public function book($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationId, $returnLocationId, $countryCode, $vehicleCategory, $vehicleClass)
+	public function book($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $countryCode, $vehicleCategory, $vehicleClass)
 	{
-        $pickUpDepot = DB::select(
-            "SELECT 
-                d.depotCode,
-                s.supplierCode
-            FROM 
-                phpvroom.locationdepot AS ld, 
-                phpvroom.depot AS d,
-                phpvroom.supplier AS s
-            WHERE 
-                ld.depotID = d.depotID AND
-                d.supplierID = s.supplierID AND
-                ld.locationID = '" . $pickUpLocationId. "' AND
-                s.supplierCode = '" . self::DEFAULT_SUPPLIER_CODE . "'
-            LIMIT 1"
-        );
-
-        if (empty($pickUpDepot)) {
-            die('no pick up depot available');
-        }
-
-        $supplierPickUpDepotCode = $pickUpDepot[0]->depotCode;
-
-        if ($returnLocationId == $pickUpLocationId) {
-            $supplierReturnDepotCode = $supplierPickUpDepotCode;
-        } else {
-            $returnDepot = DB::select(
-            "SELECT 
-                    d.depotCode,
-                    s.supplierCode
-                FROM 
-                    phpvroom.locationdepot AS ld, 
-                    phpvroom.depot AS d,
-                    phpvroom.supplier AS s
-                WHERE 
-                    ld.depotID = d.depotID AND
-                    d.supplierID = s.supplierID AND
-                    ld.locationID = '" . $returnLocationId. "'"
-            );
-
-            if (empty($returnDepot)) {
-                die('no return depot');
-            }
-
-            $supplierReturnDepotCode = $returnDepot[0]->depotCode;
-        }
-
 		$supplierApi = App::make(self::DEFAULT_SUPPLIER_CODE);
 
 		$result = $supplierApi->doBooking(
@@ -108,7 +62,8 @@ class HZController extends BaseController
 						$pickUpTime, 
 						$returnDate, 
 						$returnTime, 
-						$supplierPickUpDepotCode, 
+						$pickUpLocationCode,
+						$returnLocationCode,
 						$countryCode, 
 						$vehicleCategory, 
 						$vehicleClass

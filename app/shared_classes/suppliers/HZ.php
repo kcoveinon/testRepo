@@ -157,7 +157,8 @@ class HZ extends SupplierApi
 		$pickUpTime, 
 		$returnDate, 
 		$returnTime, 
-		$supplierPickUpDepotCode,
+		$pickUpLocationCode,
+		$returnLocationCode,
 		$countryCode, 
 		$vehicleCategory,
 		$vehicleClass
@@ -168,7 +169,8 @@ class HZ extends SupplierApi
 							$pickUpTime, 
 							$returnDate, 
 							$returnTime, 
-							$supplierPickUpDepotCode,
+							$pickUpLocationCode,
+							$returnLocationCode,
 							$countryCode, 
 							$vehicleCategory,
 							$vehicleClass
@@ -494,7 +496,8 @@ class HZ extends SupplierApi
 		$pickUpTime, 
 		$returnDate, 
 		$returnTime, 
-		$supplierPickUpDepotCode,
+		$pickUplocationCode,
+		$returnLocationCode,
 		$countryCode, 
 		$vehicleCategory,
 		$vehicleClass
@@ -507,7 +510,8 @@ class HZ extends SupplierApi
 		$xmlRequest = $this->getXmlForBooking(
 						$pickUpDateTime,
 						$returnDateTime,
-						$supplierPickUpDepotCode,
+						$pickUplocationCode,
+						$returnLocationCode,
 						$countryCode,
 						$vehicleCategory,
 						$vehicleClass
@@ -723,7 +727,8 @@ class HZ extends SupplierApi
 	public function getXmlForBooking(
 		$pickUpDateTime,
 		$returnDateTime,
-		$supplierPickUpDepotCode,
+		$pickUplocationCode,
+		$returnLocationCode,
 		$countryCode,
 		$vehicleCategory,
 		$vehicleClass
@@ -740,11 +745,11 @@ class HZ extends SupplierApi
 
 		$pickUplocationNode = $vehRentalCoreNode->addChild("PickUpLocation");
 		$pickUplocationNode->addAttribute("CodeContext", self::DEFAULT_CODE_CONTEXT);
-		$pickUplocationNode->addAttribute("LocationCode", $supplierPickUpDepotCode);
+		$pickUplocationNode->addAttribute("LocationCode", $pickUplocationCode);
 
 		$returnLocationNode = $vehRentalCoreNode->addChild("ReturnLocation");
 		$returnLocationNode->addAttribute("CodeContext", self::DEFAULT_CODE_CONTEXT);
-		$returnLocationNode->addAttribute("LocationCode", $supplierPickUpDepotCode);
+		$returnLocationNode->addAttribute("LocationCode", $returnLocationCode);
 
 		$customerNode = $vehRsCore->addChild("Customer");
 		$primaryNode = $customerNode->addChild("Primary");
