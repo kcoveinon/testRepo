@@ -98,8 +98,8 @@ class HZ extends SupplierApi
 		$pickUpTime, 
 		$returnDate, 
 		$returnTime, 
-		$pickUpLocationId, 
-		$returnLocationId, 
+		$pickUplocationCode, 
+		$returnLocationCode, 
 		$countryCode, 
 		$vehicleCategory, 
 		$vehicleClass
@@ -110,8 +110,8 @@ class HZ extends SupplierApi
 					$pickUpTime, 
 					$returnDate, 
 					$returnTime, 
-					$pickUpLocationId, 
-					$returnLocationId, 
+					$pickUplocationCode, 
+					$returnLocationCode, 
 					$countryCode, 
 					$vehicleCategory, 
 					$vehicleClass
@@ -299,8 +299,8 @@ class HZ extends SupplierApi
 		$pickUpTime, 
 		$returnDate, 
 		$returnTime, 
-		$pickUpLocationId, 
-		$returnLocationId, 
+		$pickUplocationCode, 
+		$returnLocationCode, 
 		$countryCode, 
 		$vehicleCategory, 
 		$vehicleClass
@@ -322,8 +322,8 @@ class HZ extends SupplierApi
 						      $value,
 						      $pickUpDateTime,
 						      $returnDateTime, 
-						      $pickUpLocationId,
-						      $returnLocationId, 
+						      $pickUplocationCode,
+						      $returnLocationCode, 
 						      $countryCode, 
 						      $vehicleCategory, 
 						      $vehicleClass
@@ -785,7 +785,7 @@ class HZ extends SupplierApi
 		$vehTypeNode = $vehPrefNode->addChild("VehType");
 		$vehTypeNode->addAttribute("VehicleCategory", $vehicleCategory);
 		$vehicleClassNode = $vehPrefNode->addChild("vehicleClass");
-		$vehicleClassNode = $vehicleClassNode->addAttribute("Size", $vehicleCategory);
+		$vehicleClassNode->addAttribute("Size", $vehicleCategory);
 
 		return $xml;
 	}	
@@ -848,7 +848,6 @@ class HZ extends SupplierApi
 
 		$posNode = $xml->addChild("POS");
 		$sourceNode = $posNode->addChild("Source");
-		$sourceNode->addAttribute("PseudoCityCode", "BNE");
 		$sourceNode->addAttribute("ISOCountry", $countryCode);
 		$sourceNode->addAttribute("AgentDutyCode", $this->apiValidationCode);
 
