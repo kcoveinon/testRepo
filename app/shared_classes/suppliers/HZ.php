@@ -444,7 +444,7 @@ class HZ extends SupplierApi
 
 		else {
 			$vehRsCore = $xmlObject->VehAvailRSCore->VehVendorAvails->VehVendorAvail;
-			$result['status'][] = "OK";
+			$result['status'] = "OK";
 
 			foreach ($vehRsCore->VehAvails->VehAvail as $key => $value) {
 				$carDetails = $value->VehAvailCore->Vehicle;
