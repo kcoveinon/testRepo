@@ -12,3 +12,11 @@ return array(
 	),
 );
 
+/**
+ * Credential of Vroom
+ * 
+ * 'validationCode'         => '11V04R77M05',
+ * 'validationNumber'         => 'T695',
+ * 'consumerProductCode'         => 'XM03',
+ */
+
