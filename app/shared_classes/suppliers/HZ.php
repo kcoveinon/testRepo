@@ -356,7 +356,7 @@ class HZ extends SupplierApi
 			$curlOptions[CURLOPT_POSTFIELDS] = 	$xmlRequest->asXML();
 			$curlHandler = curl_init();
 			curl_setopt_array($curlHandler, $curlOptions);
-			$response = curl_exec($curlHandler);
+			$response = new SimpleXMLElement(curl_exec($curlHandler));
 			curl_close($curlHandler);
 		}
 
