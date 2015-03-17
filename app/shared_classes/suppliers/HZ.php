@@ -258,9 +258,9 @@ class HZ extends SupplierApi
 
 		foreach ($iterableArray as $key => $value) {
 			$xmlRequest = $this->getBookingDetailsXML(
-									$value,
-									$countryCode
-								);			
+							$value,
+							$countryCode
+						  );			
 			$curlOptions[CURLOPT_POSTFIELDS] =  $xmlRequest->asXML();
 		    $curlHandlers[$key] = curl_init();
 		    curl_setopt_array($curlHandlers[$key], $curlOptions);
@@ -397,7 +397,7 @@ class HZ extends SupplierApi
 							$pickUpLocationCode,
 							$returnLocationCode,
 							$countryCode
-						);
+					   );
 		$curlOptions[CURLOPT_POSTFIELDS] = $xmlRequest->asXML();
 		$curlHandler = curl_init();
 		curl_setopt_array($curlHandler, $curlOptions);
@@ -409,7 +409,7 @@ class HZ extends SupplierApi
 
 		if (isset($xmlObject->Errors)) {
 			$result['status'] =  "Failed";
-			$result['data'] = (string) $xmlObject->Errors->Error->attributes()->ShortText;
+			$result['data']   = (string) $xmlObject->Errors->Error->attributes()->ShortText;
 		} 
 
 		else {
@@ -596,12 +596,12 @@ class HZ extends SupplierApi
 
 		$vehCancelRQCore = $xml->addChild("VehCancelRQCore");
 		$vehCancelRQCore->addAttribute("CancelType", "Book");
-
-		$uniqueIDNode = $vehCancelRQCore->addChild("UniqueID");
+		
+		$uniqueIDNode    = $vehCancelRQCore->addChild("UniqueID");
 		$uniqueIDNode->addAttribute("Type", "14");
 		$uniqueIDNode->addAttribute("ID", (string) $bookingId);
-
-		$personNameNode = $vehCancelRQCore->addChild("PersonName");
+		
+		$personNameNode  = $vehCancelRQCore->addChild("PersonName");
 		$personNameNode->addChild("Surname", "Testing");	
 		
 		return $xml;
