@@ -77,123 +77,16 @@ class HZ extends SupplierApi
 		);
 	}
 
-	public function getLocationDepots($locationCode, $countryCode)
-	{
-		return $this->otaVehLocSearchRQ($locationCode, $countryCode);
-	}
-
-	public function getDepotDetails($locationCode, $countryCode)
-	{
-		return $this->otaVehLocDetailRQ($locationCode, $countryCode);
-	}
-
-	public function cancelBooking($bookingId, $countryCode)
-	{
-		return $this->otaVehCancelRQ($bookingId, $countryCode);
-	}
-
-	public function modifyBooking(
-		$bookingId, 
-		$pickUpDate, 
-		$pickUpTime, 
-		$returnDate, 
-		$returnTime, 
-		$pickUplocationCode, 
-		$returnLocationCode, 
-		$countryCode, 
-		$vehicleCategory, 
-		$vehicleClass
-	) {
-		return $this->otaVehModifyRQ(
-					$bookingId, 
-					$pickUpDate, 
-					$pickUpTime, 
-					$returnDate, 
-					$returnTime, 
-					$pickUplocationCode, 
-					$returnLocationCode, 
-					$countryCode, 
-					$vehicleCategory, 
-					$vehicleClass
-				);
-	}
-
-	public function getBookingDetails($bookingId, $countryCode)
-	{
-		return $this->otaVehRetResRQ($bookingId, $countryCode);
-	}
-
-	public function searchVehicles(
-		$pickUpDate, 
-		$pickUpTime, 
-		$returnDate, 
-		$returnTime, 
-		$pickUpLocationCode,
-		$returnLocationCode,
-		$countryCode, 
-		$driverAge
-	) {	
-		if ($this->validateDate($pickUpDate, $pickUpTime) && $this->validateDate($returnDate, $returnTime)) {
-			$response =  $this->otaVehAvailRateRQ(
-							$pickUpDate, 
-							$pickUpTime, 
-							$returnDate, 
-							$returnTime, 
-							$pickUpLocationCode,
-							$returnLocationCode,
-							$countryCode, 
-							$driverAge
-						 );
-		}
-		else {
-			$response =  ["result" => "Invalid Parameters"];
-		}
-
-		return $response;
-	}
-
-	public function doBooking(
-		$pickUpDate, 
-		$pickUpTime, 
-		$returnDate, 
-		$returnTime, 
-		$pickUpLocationCode,
-		$returnLocationCode,
-		$countryCode, 
-		$vehicleCategory,
-		$vehicleClass
-	) {	
-		if ($this->validateDate($pickUpDate, $pickUpTime) && $this->validateDate($returnDate, $returnTime)) {
-			$response =  $this->otaVehResRQ(
-							$pickUpDate, 
-							$pickUpTime, 
-							$returnDate, 
-							$returnTime, 
-							$pickUpLocationCode,
-							$returnLocationCode,
-							$countryCode, 
-							$vehicleCategory,
-							$vehicleClass
-						);
-		}
-		else {
-			$response = ["result" => "Invalid Parameters"];
-		}
-
-		return $response;
-	}
-
 	/**
 	 * Returns location depots
 	 * 
 	 * @param  string $locationCode
 	 * @param  string $countryCode
-	 * @return XML Object
 	 * 
+	 * @return XML Object
 	 */
-	private function otaVehLocSearchRQ($locationCode, $countryCode)
+	private function getLocationDepots($locationCode, $countryCode)
 	{
-
 		$curlOptions = $this->defaultCurlOptions;
 		$xmlRequest  = $this->getXmlForGetLocationDepots(
 								$locationCode,
@@ -216,9 +109,8 @@ class HZ extends SupplierApi
 	 * 
 	 * @return object
 	 */
-	private function otaVehLocDetailRQ($locationCode, $countryCode)
+	private function getDepotDetails($locationCode, $countryCode)
 	{
-
 		$curlOptions = $this->defaultCurlOptions;
 		$xmlRequest  = $this->getXmlForDepotDetails(
 								$locationCode,
@@ -241,9 +133,8 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML Object
 	 */
-	private function otaVehCancelRQ($bookingId, $countryCode)
+	private function cancelBooking($bookingId, $countryCode)
 	{
-
 		$bookingIdArray[] = $bookingId;
 
 		$curlMultiHandler = curl_multi_init();
@@ -275,7 +166,7 @@ class HZ extends SupplierApi
 
 		curl_multi_close($curlMultiHandler);
 		return $response;	
-	}	
+	}
 
 	/**
 	 * Function that handles the modify booking action
@@ -293,7 +184,7 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML Object
 	 */
-	private function otaVehModifyRQ(
+	private function modifyBooking(
 		$bookingId, 
 		$pickUpDate, 
 		$pickUpTime, 
@@ -305,7 +196,6 @@ class HZ extends SupplierApi
 		$vehicleCategory, 
 		$vehicleClass
 	) {
-
 		$bookingIdArray[] = $bookingId;
 
 		$curlMultiHandler = curl_multi_init();
@@ -356,9 +246,8 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML Object
 	 */
-	private function otaVehRetResRQ($bookingId, $countryCode)
+	private function getBookingDetails($bookingId, $countryCode)
 	{
-	
 		$bookingIdArray[] = $bookingId;
 
 		$curlMultiHandler = curl_multi_init();
@@ -392,6 +281,89 @@ class HZ extends SupplierApi
 		return $response;	
 	}
 
+	public function searchVehicles(
+		$pickUpDate, 
+		$pickUpTime, 
+		$returnDate, 
+		$returnTime, 
+		$pickUpLocationCode,
+		$returnLocationCode,
+		$countryCode, 
+		$driverAge
+	) {	
+		if ($this->validateDate($pickUpDate, $pickUpTime) && $this->validateDate($returnDate, $returnTime)) {
+			$response =  $this->otaVehAvailRateRQ(
+							$pickUpDate, 
+							$pickUpTime, 
+							$returnDate, 
+							$returnTime, 
+							$pickUpLocationCode,
+							$returnLocationCode,
+							$countryCode, 
+							$driverAge
+						 );
+		}
+		else {
+			$response =  ["result" => "Invalid Parameters"];
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Function that handles the booking action
+	 * 
+	 * @param datetime $pickUpDate
+	 * @param datetime $pickUpTime  
+	 * @param datetime $returnDate   
+	 * @param datetime $returnTime      
+	 * @param int $pickUplocationCode
+	 * @param int $returnLocationCode
+	 * @param int $countryCode      
+	 * @param string $vehicleCategory
+	 * @param string $vehicleClass
+	 * 
+	 * @return XML Object
+	 */
+	public function doBooking(
+		$pickUpDate, 
+		$pickUpTime, 
+		$returnDate, 
+		$returnTime, 
+		$pickUplocationCode,
+		$returnLocationCode,
+		$countryCode, 
+		$vehicleCategory,
+		$vehicleClass
+	) {	
+		if (!$this->validateDate($pickUpDate, $pickUpTime) && !$this->validateDate($returnDate, $returnTime)) {
+			$response = ["result" => "Invalid Parameters"];
+		}
+		else {
+			$pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
+			$returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
+
+			$curlOptions = $this->defaultCurlOptions;
+			$xmlRequest = $this->getXmlForBooking(
+							$pickUpDateTime,
+							$returnDateTime,
+							$pickUplocationCode,
+							$returnLocationCode,
+							$countryCode,
+							$vehicleCategory,
+							$vehicleClass
+						  );
+			$curlOptions[CURLOPT_POSTFIELDS] = 	$xmlRequest->asXML();
+			$curlHandler = curl_init();
+			curl_setopt_array($curlHandler, $curlOptions);
+			$response = curl_exec($curlHandler);
+			curl_close($curlHandler);
+		}
+
+		return $response;
+	}		
+
+
 	/**
 	 * Function that handles the data pull for search
 	 * 
@@ -416,7 +388,6 @@ class HZ extends SupplierApi
 		$countryCode, 
 		$driverAge
 	) {	
-
 		$curlMultiHandler = curl_multi_init();
 		$curlHandlers     = array();	
 
@@ -476,56 +447,6 @@ class HZ extends SupplierApi
 
 		return $result;		
 	}
-
-	/**
-	 * Function that handles the booking action
-	 * 
-	 * @param datetime $pickUpDate
-	 * @param datetime $pickUpTime  
-	 * @param datetime $returnDate   
-	 * @param datetime $returnTime      
-	 * @param int $pickUplocationCode
-	 * @param int $returnLocationCode
-	 * @param int $countryCode      
-	 * @param string $vehicleCategory
-	 * @param string $vehicleClass
-	 * 
-	 * @return XML Object
-	 */
-	public function otaVehResRQ(
-		$pickUpDate, 
-		$pickUpTime, 
-		$returnDate, 
-		$returnTime, 
-		$pickUplocationCode,
-		$returnLocationCode,
-		$countryCode, 
-		$vehicleCategory,
-		$vehicleClass
-	) {	
-
-		$pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
-		$returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
-
-		$curlOptions = $this->defaultCurlOptions;
-		$xmlRequest = $this->getXmlForBooking(
-						$pickUpDateTime,
-						$returnDateTime,
-						$pickUplocationCode,
-						$returnLocationCode,
-						$countryCode,
-						$vehicleCategory,
-						$vehicleClass
-					  );
-		$curlOptions[CURLOPT_POSTFIELDS] = 	$xmlRequest->asXML();
-		$curlHandler = curl_init();
-		curl_setopt_array($curlHandler, $curlOptions);
-		$response = curl_exec($curlHandler);
-		curl_close($curlHandler);
-
-		return new SimpleXMLElement($response);
-
-	}		
 
 	/**
 	 * Returns XMl for get location depots
