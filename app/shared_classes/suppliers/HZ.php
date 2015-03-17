@@ -85,7 +85,7 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML Object
 	 */
-	private function getLocationDepots($locationCode, $countryCode)
+	public function getLocationDepots($locationCode, $countryCode)
 	{
 		$curlOptions = $this->defaultCurlOptions;
 		$xmlRequest  = $this->getXmlForGetLocationDepots(
@@ -109,7 +109,7 @@ class HZ extends SupplierApi
 	 * 
 	 * @return object
 	 */
-	private function getDepotDetails($locationCode, $countryCode)
+	public function getDepotDetails($locationCode, $countryCode)
 	{
 		$curlOptions = $this->defaultCurlOptions;
 		$xmlRequest  = $this->getXmlForDepotDetails(
@@ -133,7 +133,7 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML Object
 	 */
-	private function cancelBooking($bookingId, $countryCode)
+	public function cancelBooking($bookingId, $countryCode)
 	{
 		$bookingIdArray[] = $bookingId;
 
@@ -184,7 +184,7 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML Object
 	 */
-	private function modifyBooking(
+	public function modifyBooking(
 		$bookingId, 
 		$pickUpDate, 
 		$pickUpTime, 
@@ -246,7 +246,7 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML Object
 	 */
-	private function getBookingDetails($bookingId, $countryCode)
+	public function getBookingDetails($bookingId, $countryCode)
 	{
 		$bookingIdArray[] = $bookingId;
 
