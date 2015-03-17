@@ -361,8 +361,7 @@ class HZ extends SupplierApi
 		}
 
 		return $response;
-	}		
-
+	}
 
 	/**
 	 * Function that handles the data pull for search
