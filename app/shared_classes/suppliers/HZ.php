@@ -87,7 +87,6 @@ class HZ extends SupplierApi
 	 * Returns location depots
 	 * 
 	 * @param  string $locationCode
-	 * @param  string $countryCode
 	 * 
 	 * @return XML Object
 	 */
@@ -102,7 +101,6 @@ class HZ extends SupplierApi
 	 * Returns the details for a particular locationCode
 	 * 
 	 * @param  string $locationCode
-	 * @param  string $countryCode
 	 * 
 	 * @return object
 	 */
@@ -117,7 +115,6 @@ class HZ extends SupplierApi
 	 * Handles the cancel booking action
 	 * 
 	 * @param  int/array $bookingId
-	 * @param  string $countryCode
 	 * 
 	 * @return XML Object
 	 */
@@ -138,7 +135,6 @@ class HZ extends SupplierApi
 	 * @param datetime $returnTime      
 	 * @param int $pickUpLocationId
 	 * @param int $returnLocationId 
-	 * @param int $countryCode      
 	 * @param string $vehicleCategory
 	 * @param string $vehicleClass
 	 * 
@@ -172,7 +168,6 @@ class HZ extends SupplierApi
 	 * Retrieves booking details of a particular booking Id or an array of booking IDs
 	 * 
 	 * @param  int/array $bookingId
-	 * @param  string $countryCode
 	 * 
 	 * @return XML Object
 	 */
@@ -182,6 +177,20 @@ class HZ extends SupplierApi
 		return $this->executeCurl($xmlRequest->asXML());	
 	}
 
+	/**
+	 * Executes Search functionality
+	 * 
+	 * @param  date $pickUpDate         
+	 * @param  time $pickUpTime         
+	 * @param  date $returnDate         
+	 * @param  time $returnTime         
+	 * @param  string $pickUpLocationCode 
+	 * @param  string $returnLocationCode 
+	 * @param  string $countryCode        
+	 * @param  int $driverAge    
+	 *       
+	 * @return MIXED
+	 */
 	public function searchVehicles(
 		$pickUpDate, 
 		$pickUpTime, 
@@ -337,7 +346,6 @@ class HZ extends SupplierApi
 	 * Returns XMl for get location depots
 	 * 
 	 * @param  string $locationCode
-	 * @param  string $countryCode
 	 * 
 	 * @return XML
 	 */
@@ -363,9 +371,8 @@ class HZ extends SupplierApi
 	 * @param datetime $pickUpTime  
 	 * @param datetime $returnDate   
 	 * @param datetime $returnTime      
-	 * @param int $pickUpLocationId
-	 * @param int $returnLocationId 
-	 * @param int $countryCode      
+	 * @param int $pickUplocationCode
+	 * @param int $returnLocationCode 
 	 * @param string $vehicleCategory
 	 * @param string $vehicleClass
 	 * 
@@ -447,7 +454,6 @@ class HZ extends SupplierApi
 	 * Returns XML request for getDepotDetails
 	 * 
 	 * @param  string $locationCode
-	 * @param  string $countryCode
 	 * 
 	 * @return XML
 	 */
@@ -465,7 +471,6 @@ class HZ extends SupplierApi
 	 * Returns the needed XML request for modify booking action
 	 * 
 	 * @param  int $bookingId
-	 * @param  string $countryCode
 	 * 
 	 * @return XML
 	 */
@@ -492,7 +497,6 @@ class HZ extends SupplierApi
 	 * Returns the needed XML request for booking details
 	 * 
 	 * @param  int $bookingId
-	 * @param $countryCode
 	 * 
 	 * @return XML
 	 */
@@ -516,11 +520,11 @@ class HZ extends SupplierApi
 	/**
 	 * Returns the needed XML request for booking action
 	 * 
-	 * @param datetime $pickUpDate
-	 * @param datetime $pickUpTime  
-	 * @param datetime $returnDate   
-	 * @param datetime $returnTime      
-	 * @param string $supplierPickUpDepotCode
+	 * @param datetime $pickUpDateTime
+	 * @param datetime $returnDateTime      
+	 * @param string $pickUplocationCode
+	 * @param string $returnLocationCode
+	 * @param string $countryCode
 	 * @param int $vehicleCategory      
 	 * @param int $vehicleClass
 	 * 
@@ -682,7 +686,9 @@ class HZ extends SupplierApi
 
 	/**
 	 * Executes cURL
+	 * 
 	 * @param  xml $postField
+	 * 
 	 * @return XML Object
 	 */
 	public function executeCurl($postField)
