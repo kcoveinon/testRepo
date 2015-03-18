@@ -51,12 +51,18 @@ class HZ extends SupplierApi
 	 */
 	private $headers;
 
+	/**
+	 * The Supplier Code
+	 */
+	private $supplierCode;
+
 	public function __construct()
 	{
-		$this->apiUrl                 = Config::get(get_class() . '.api.url');
-		$this->apiValidationCode      = Config::get(get_class() . '.api.validationCode');
-		$this->apiValidationNumber    = Config::get(get_class() . '.api.validationNumber');
-		$this->apiConsumerProductCode = Config::get(get_class() . '.api.consumerProductCode');
+		$this->supplierCode 		  = get_class();
+		$this->apiUrl                 = Config::get($this->supplierCode  . '.api.url');
+		$this->apiValidationCode      = Config::get($this->supplierCode  . '.api.validationCode');
+		$this->apiValidationNumber    = Config::get($this->supplierCode  . '.api.validationNumber');
+		$this->apiConsumerProductCode = Config::get($this->supplierCode  . '.api.consumerProductCode');
 
 		$this->headers = array(
 		    "Content-type: text/xml;charset=\"utf-8\"",
@@ -387,13 +393,12 @@ class HZ extends SupplierApi
 		$countryCode, 
 		$driverAge
 	) {	
-		$curlMultiHandler = curl_multi_init();
-		$curlHandlers     = array();	
-
+		$pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
+		$returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);		
 		$curlOptions = $this->defaultCurlOptions;
 		$xmlRequest  = $this->getSearchVehicleXML(
-							$this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime),
-							$this->convertToDateTimeDefaultFormat($returnDate, $returnTime),
+							$pickUpDateTime,
+							$returnDateTime,
 							$pickUpLocationCode,
 							$returnLocationCode,
 							$countryCode
@@ -403,14 +408,13 @@ class HZ extends SupplierApi
 		curl_setopt_array($curlHandler, $curlOptions);
 		$response = curl_exec($curlHandler);
 		curl_close($curlHandler);
-		
 		$xmlObject = new SimpleXMLElement($response);
-		$result = [];
 
+		$result = [];
 		if (isset($xmlObject->Errors)) {
 			$result['status'] =  "Failed";
 			$result['data']   = (string) $xmlObject->Errors->Error->attributes()->ShortText;
-		} 
+		}
 
 		else {
 			$vehRsCore = $xmlObject->VehAvailRSCore->VehVendorAvails->VehVendorAvail;
@@ -420,14 +424,15 @@ class HZ extends SupplierApi
 				$carDetails = $value->VehAvailCore->Vehicle;
 				$rentalDetails = $value->VehAvailCore->RentalRate;				
 				$result['data'][] = array(
+					'supplierCode'    => $this->supplierCode,
 		            'hasAirCondition' => (string) $carDetails->attributes()->AirConditionInd,
 		            'transmission'    => (string) $carDetails->attributes()->TransmissionType,
-		            'baggageQty'      => 'N/A',
+		            'baggageQty'      => (string) $carDetails->attributes()->BaggageQuantity,
 		            'co2Qty'          => 'N/A',
 		            'categoryCode'    => (string) $carDetails->attributes()->Code,
 		            'doorCount'       => (string) $carDetails->VehType->attributes()->DoorCount,
 		            'name'            => (string) $carDetails->VehMakeModel->attributes()->Name,
-		            'seats'           => (string) $carDetails->VehClass->attributes()->Size,
+		            'seats'           => (string) $carDetails->attributes()->PassengerQuantity,
 		            'vehicleStatus'   => array(
 		                'code'        => 'N/A',
 		                'description' => 'N/A',
@@ -728,10 +733,11 @@ class HZ extends SupplierApi
 		$returnLocationId,
 		$countryCode
 	) {
+
 		$xml = $this->getXMLCredentialNode(self::SEARCH_VEHICLE_ACTION, $countryCode);
 
 		$vehAvailRQCoreNode = $xml->addChild("VehAvailRQCore");
-		$vehAvailRQCoreNode->addAttribute("Status", self::DEFAULT_REQUEST_STATUS);
+		$vehAvailRQCoreNode->addAttribute("Status", self::DEFAULT_REQUEST_STATUS);	
 
 		$vehRentalCoreNode = $vehAvailRQCoreNode->addChild("VehRentalCore");
 		$vehRentalCoreNode->addAttribute("PickUpDateTime", $pickUpDateTime);
@@ -745,9 +751,24 @@ class HZ extends SupplierApi
 		$returnLocationNode->addAttribute("CodeContext", self::DEFAULT_CODE_CONTEXT);
 		$returnLocationNode->addAttribute("LocationCode", $returnLocationId);
 
+        $vehAvailRQInfoNode = $xml->addChild("VehAvailRQInfo");
+        $customerNode       = $vehAvailRQInfoNode->addChild("Customer");
+        $primaryNode        = $customerNode->addChild("Primary");
+        $primaryNode->addAttribute("BirthDate", "1970-06-13");
+        $primaryNode->addChild("Email", "saford@hertz");
+
+        $addressNode = $primaryNode->addChild("Address");
+        $addressNode->addChild("AddressLine", "5601 NW 20th");
+        $addressNode->addChild("AddressLine", "Apt 207");
+        $addressNode->addChild("CityName", "OKLAHOMA CITY");
+        $addressNode->addChild("PostalCode", "73112");
+        $stateProveNode     = $addressNode->addChild("StateProv");
+        $stateProveNode->addAttribute("StateCode", "OK");
+        $countryNode = $addressNode->addChild("CountryName");
+        $countryNode->addAttribute("Code", "AU");  
+
 		return $xml;
 	}	
-
 	/**
 	 * Returns POS credential node
 	 * 
