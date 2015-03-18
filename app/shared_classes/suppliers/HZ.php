@@ -393,6 +393,7 @@ class HZ extends SupplierApi
 		$countryCode, 
 		$driverAge
 	) {	
+		$timeStart = time();			
 		$pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
 		$returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);		
 		$curlOptions = $this->defaultCurlOptions;
@@ -417,14 +418,14 @@ class HZ extends SupplierApi
 		}
 
 		else {
+		
 			$vehRsCore = $xmlObject->VehAvailRSCore->VehVendorAvails->VehVendorAvail;
-			$result['status'] = "OK";
+			$result['status'] = "OK";	
 
 			foreach ($vehRsCore->VehAvails->VehAvail as $key => $value) {
 				$carDetails = $value->VehAvailCore->Vehicle;
 				$rentalDetails = $value->VehAvailCore->RentalRate;				
 				$result['data'][] = array(
-					'supplierCode'    => $this->supplierCode,
 		            'hasAirCondition' => (string) $carDetails->attributes()->AirConditionInd,
 		            'transmission'    => (string) $carDetails->attributes()->TransmissionType,
 		            'baggageQty'      => (string) $carDetails->attributes()->BaggageQuantity,
@@ -448,6 +449,8 @@ class HZ extends SupplierApi
 		        );
 			}
 		}
+		$result['executionTime'] = time() - $timeStart;
+		$result['supplierCode']  = $this->supplierCode;		
 
 		return $result;		
 	}
