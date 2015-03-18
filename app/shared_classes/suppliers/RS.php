@@ -61,15 +61,7 @@ class RS extends SupplierApi
 
     public function search()
     {
-        $curlOptions = $this->defaultCurlOptions;;
-
-        $curlOptions[CURLOPT_POSTFIELDS] = trim($this->getXml());
-        $curlHandler = curl_init();
-        curl_setopt_array($curlHandler, $curlOptions);
-        $response = curl_exec($curlHandler);
-        curl_close($curlHandler);
-
-        return new SimpleXMLElement($response);
+        return $this->executeCurl($this->getXml());
     }
 
     public function getXml()
@@ -87,5 +79,25 @@ class RS extends SupplierApi
             ';
 
     }
+
+    /**
+     * Executes cURL
+     * 
+     * @param  xml $postField
+     * 
+     * @return XML Object
+     */
+    public function executeCurl($postField)
+    {
+        $curlOptions = $this->defaultCurlOptions;
+
+        $curlOptions[CURLOPT_POSTFIELDS] = $postField;
+        $curlHandler = curl_init();
+        curl_setopt_array($curlHandler, $curlOptions);
+        $response = new SimpleXMLElement(curl_exec($curlHandler));
+        curl_close($curlHandler);
+
+        return $response;
+    }    
 }
 
