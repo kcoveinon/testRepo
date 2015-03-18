@@ -10,7 +10,7 @@ class RS extends SupplierApi
     /*
      * The API URL
      */ 
-    protected $apiUrl;
+    protected $apiUrl;  
 
     /*
      * The API Username
@@ -62,6 +62,48 @@ class RS extends SupplierApi
     public function search()
     {
         return $this->executeCurl($this->getXml());
+    }
+
+    public function cancelBooking()
+    {
+        return $this->executeCurl($this->getXMLForCancelBooking());
+    }
+
+    public function doBooking()
+    {
+        return $this->executeCurl($this->getXMLForBooking()); 
+    }
+
+    public function getXMLForBooking()
+    {
+        return '
+            <Request version="1.3" referenceNumber="r1263272805888" xmlns="http://www.thermeon.com/webXG/xml/webxml/">
+              <NewReservationRequest confirmAvailability="true">
+                <Pickup locationCode="ADL" dateTime="2015-05-01T12:00:00"/>
+                <Return locationCode="BNE" dateTime="2015-05-05T12:00:00"/>
+                <Source confirmationNumber="123ABC456" countryCode="AU"/> corporateRateID="CDBGWHEL">
+                <Vehicle classCode="CDAR"/>
+                <Renter>
+                  <RenterName firstName="test" lastName="test"/>
+                  <Address>
+                    <Email>info@redspotcars.com.au</Email>
+                    <HomeTelephoneNumber>0283032222</HomeTelephoneNumber>
+                  </Address>
+                </Renter>
+                <QuotedRate rateID="11030115055333CDAR" classCode="CDAR"/>
+                <Flight airlineCode="QF" flightNumber="142"/>
+              </NewReservationRequest>
+            </Request>
+            ';
+    }
+
+    public function getXMLForCancelBooking()
+    {
+        return '<?xml version="1.0" encoding="UTF-8"?>
+            <Request xmlns="http://www.thermeon.com/webXG/xml/webxml/" referenceNumber="r1263372689587" version="2.2202">
+              <CancelReservationRequest reservationNumber="asdasdasdasdasd"/>
+            </Request>
+            ';
     }
 
     public function getXml()

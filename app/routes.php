@@ -89,6 +89,8 @@ Route::group(array('prefix' => 'HZ/'), function()
 Route::group(array('prefix' => 'RS/'), function()
 {
     Route::any('search', 'RSController@searchVehicles');
+    Route::any('cancel-booking', 'RSController@cancelBooking');
+    Route::any('book', 'RSController@doBooking');
 
 });
 
