@@ -10,17 +10,17 @@ class HZController extends BaseController
 		parent::__construct();
 	}
 
-	public function getLocationDepots($locationCode, $countryCode)
+	public function getLocationDepots($locationCode)
 	{
 		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
-		$result = $hertzApi->getLocationDepots($locationCode, $countryCode);
+		$result = $hertzApi->getLocationDepots($locationCode);
 		return Response::json($result);
 	}
 
-	public function getDepotDetails($locationCode, $countryCode)
+	public function getDepotDetails($locationCode)
 	{
 		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
-		$result = $hertzApi->getDepotDetails($locationCode, $countryCode);
+		$result = $hertzApi->getDepotDetails($locationCode);
 		return Response::json($result);
 	}
 
@@ -32,24 +32,24 @@ class HZController extends BaseController
         return Response::json($result);
 	}
 
-	public function modifyBooking($bookingId, $pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $countryCode, $vehicleCategory, $vehicleClass)
+	public function modifyBooking($bookingId, $pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $vehicleCategory, $vehicleClass)
 	{
 		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
-		$result = $hertzApi->modifyBooking($bookingId, $pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $countryCode, $vehicleCategory, $vehicleClass);
+		$result = $hertzApi->modifyBooking($bookingId, $pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $vehicleCategory, $vehicleClass);
 		return Response::json($result);	
 	}
 
-	public function cancelBooking($bookingId, $countryCode)
+	public function cancelBooking($bookingId)
 	{
 		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
-		$result = $hertzApi->cancelBooking($bookingId, $countryCode);
+		$result = $hertzApi->cancelBooking($bookingId);
 		return Response::json($result);	
 	}
 
-	public function getBookingInfo($bookingId, $countryCode)
+	public function getBookingInfo($bookingId)
 	{
 		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
-		$result = $hertzApi->getBookingDetails($bookingId, $countryCode);
+		$result = $hertzApi->getBookingDetails($bookingId);
 		return Response::json($result);	
 	}
 

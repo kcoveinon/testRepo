@@ -91,13 +91,10 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML Object
 	 */
-	public function getLocationDepots($locationCode, $countryCode)
+	public function getLocationDepots($locationCode)
 	{
 		$curlOptions = $this->defaultCurlOptions;
-		$xmlRequest  = $this->getXmlForGetLocationDepots(
-								$locationCode,
-								$countryCode
-							);
+		$xmlRequest  = $this->getXmlForGetLocationDepots($locationCode);
 		$curlOptions[CURLOPT_POSTFIELDS] = 	$xmlRequest->asXML();
 		$curlHandler = curl_init();
 		curl_setopt_array($curlHandler, $curlOptions);
@@ -115,13 +112,10 @@ class HZ extends SupplierApi
 	 * 
 	 * @return object
 	 */
-	public function getDepotDetails($locationCode, $countryCode)
+	public function getDepotDetails($locationCode)
 	{
 		$curlOptions = $this->defaultCurlOptions;
-		$xmlRequest  = $this->getXmlForDepotDetails(
-								$locationCode,
-								$countryCode
-							);
+		$xmlRequest  = $this->getXmlForDepotDetails($locationCode);
 		$curlOptions[CURLOPT_POSTFIELDS] = 	$xmlRequest->asXML();
 		$curlHandler = curl_init();
 		curl_setopt_array($curlHandler, $curlOptions);
@@ -139,7 +133,7 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML Object
 	 */
-	public function cancelBooking($bookingId, $countryCode)
+	public function cancelBooking($bookingId)
 	{
 		$bookingIdArray[] = $bookingId;
 
@@ -150,10 +144,7 @@ class HZ extends SupplierApi
 		$iterableArray = is_array($bookingId) ? reset($bookingIdArray) : $bookingIdArray;
 
 		foreach ($iterableArray as $key => $value) {
-			$xmlRequest = $this->getCancelBookingXml(
-							$value,
-							$countryCode
-						  );
+			$xmlRequest = $this->getCancelBookingXml($value);
 			$curlOptions[CURLOPT_POSTFIELDS] =  $xmlRequest->asXML();
 		    $curlHandlers[$key] = curl_init();
 		    curl_setopt_array($curlHandlers[$key], $curlOptions);
@@ -198,7 +189,6 @@ class HZ extends SupplierApi
 		$returnTime, 
 		$pickUplocationCode, 
 		$returnLocationCode, 
-		$countryCode, 
 		$vehicleCategory, 
 		$vehicleClass
 	) {
@@ -220,7 +210,6 @@ class HZ extends SupplierApi
 						      $returnDateTime, 
 						      $pickUplocationCode,
 						      $returnLocationCode, 
-						      $countryCode, 
 						      $vehicleCategory, 
 						      $vehicleClass
 						  );
@@ -252,7 +241,7 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML Object
 	 */
-	public function getBookingDetails($bookingId, $countryCode)
+	public function getBookingDetails($bookingId)
 	{
 		$bookingIdArray[] = $bookingId;
 
@@ -263,10 +252,7 @@ class HZ extends SupplierApi
 		$iterableArray = is_array($bookingId) ? reset($bookingIdArray) : $bookingIdArray;
 
 		foreach ($iterableArray as $key => $value) {
-			$xmlRequest = $this->getBookingDetailsXML(
-							$value,
-							$countryCode
-						  );			
+			$xmlRequest = $this->getBookingDetailsXML($value);			
 			$curlOptions[CURLOPT_POSTFIELDS] =  $xmlRequest->asXML();
 		    $curlHandlers[$key] = curl_init();
 		    curl_setopt_array($curlHandlers[$key], $curlOptions);
@@ -463,11 +449,11 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML
 	 */
-	public function getXmlForGetLocationDepots($locationCode, $countryCode)
+	public function getXmlForGetLocationDepots($locationCode)
 	{
 		$xmlAction = self::GET_LOCATION_DEPOTS;
 
-		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
+		$xml = $this->getXMLCredentialNode($xmlAction);
 
 		$vehLocSearchCriterionNode = $xml->addChild("VehLocSearchCriterion");
 		$codeRefNode = $vehLocSearchCriterionNode->addChild("CodeRef");
@@ -501,13 +487,12 @@ class HZ extends SupplierApi
 		$returnDateTime,
 		$pickUplocationCode,
 		$returnLocationCode,
-		$countryCode,
 		$vehicleCategory,
 		$vehicleClass	
 	) {
 		$xmlAction = self::MODIFY_BOOKING_ACTION;
 		
-		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
+		$xml = $this->getXMLCredentialNode($xmlAction);
 		
 		$vehModifyRQCore    = $xml->addChild("VehModifyRQCore");
 		$vehModifyRQCore->addAttribute("Status", "Confirmed");
@@ -576,11 +561,11 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML
 	 */
-	public function getXmlForDepotDetails($locationCode, $countryCode)
+	public function getXmlForDepotDetails($locationCode)
 	{
 		$xmlAction = self::GET_DEPOT_DETAILS_ACTION;
 
-		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
+		$xml = $this->getXMLCredentialNode($xmlAction);
 
 		$locationNode = $xml->addChild("Location");
 		$locationNode->addAttribute("LocationCode", $locationCode);
@@ -596,11 +581,11 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML
 	 */
-	public function getCancelBookingXml($bookingId, $countryCode)
+	public function getCancelBookingXml($bookingId)
 	{
 		$xmlAction = self::CANCEL_BOOKING_ACTION;
 
-		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
+		$xml = $this->getXMLCredentialNode($xmlAction);
 
 		$vehCancelRQCore = $xml->addChild("VehCancelRQCore");
 		$vehCancelRQCore->addAttribute("CancelType", "Book");
@@ -623,11 +608,11 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML
 	 */
-	public function getBookingDetailsXML($bookingId, $countryCode)
+	public function getBookingDetailsXML($bookingId)
 	{
 		$xmlAction = self::GET_BOOKING_INFO_ACTION;
 
-		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
+		$xml = $this->getXMLCredentialNode($xmlAction);
 
 		$vehRetResRQCoreNode = $xml->addChild("VehRetResRQCore");
 		$uniqueIDNode = $vehRetResRQCoreNode->addChild("UniqueID");
@@ -780,7 +765,7 @@ class HZ extends SupplierApi
 	 * 
 	 * @return XML
 	 */
-	public function getXMLCredentialNode($xmlAction, $countryCode)
+	public function getXMLCredentialNode($xmlAction, $countryCode = "AU")
 	{
 		$xml = new SimpleXMLElement('<' . $xmlAction . '></' . $xmlAction . '>');
 		$xml->addAttribute("xmlns", self::DEFAULT_XMLNS);
