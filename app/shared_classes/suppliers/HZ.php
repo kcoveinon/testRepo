@@ -93,15 +93,9 @@ class HZ extends SupplierApi
 	 */
 	public function getLocationDepots($locationCode)
 	{
-		$curlOptions = $this->defaultCurlOptions;
 		$xmlRequest  = $this->getXmlForGetLocationDepots($locationCode);
-		$curlOptions[CURLOPT_POSTFIELDS] = 	$xmlRequest->asXML();
-		$curlHandler = curl_init();
-		curl_setopt_array($curlHandler, $curlOptions);
-		$response = curl_exec($curlHandler);
-		curl_close($curlHandler);
 
-		return new SimpleXMLElement($response);
+		return $this->executeCurl($xmlRequest->asXML());
 	}
 
 	/**
@@ -114,55 +108,24 @@ class HZ extends SupplierApi
 	 */
 	public function getDepotDetails($locationCode)
 	{
-		$curlOptions = $this->defaultCurlOptions;
 		$xmlRequest  = $this->getXmlForDepotDetails($locationCode);
-		$curlOptions[CURLOPT_POSTFIELDS] = 	$xmlRequest->asXML();
-		$curlHandler = curl_init();
-		curl_setopt_array($curlHandler, $curlOptions);
-		$response = curl_exec($curlHandler);
-		curl_close($curlHandler);
 
-		return new SimpleXMLElement($response);
+		return $this->executeCurl($xmlRequest->asXML());
 	}
 
 	/**
 	 * Handles the cancel booking action
 	 * 
-	 * @param  int/array $bookingId (You can pass here an array of Ids or just a single booking ID)
+	 * @param  int/array $bookingId
 	 * @param  string $countryCode
 	 * 
 	 * @return XML Object
 	 */
 	public function cancelBooking($bookingId)
 	{
-		$bookingIdArray[] = $bookingId;
+		$response = $this->getCancelBookingXml($bookingId);
 
-		$curlMultiHandler = curl_multi_init();
-		$curlHandlers     = array();
-		$curlOptions      = $this->defaultCurlOptions;
-
-		$iterableArray = is_array($bookingId) ? reset($bookingIdArray) : $bookingIdArray;
-
-		foreach ($iterableArray as $key => $value) {
-			$xmlRequest = $this->getCancelBookingXml($value);
-			$curlOptions[CURLOPT_POSTFIELDS] =  $xmlRequest->asXML();
-		    $curlHandlers[$key] = curl_init();
-		    curl_setopt_array($curlHandlers[$key], $curlOptions);
-		    curl_multi_add_handle($curlMultiHandler, $curlHandlers[$key]);
-		}
-		
-		do {
-			curl_multi_select($curlMultiHandler);
-		    curl_multi_exec($curlMultiHandler, $isRunning);
-		} while ($isRunning > 0);
-
-		foreach ($curlHandlers as $key => $curlHandler) {
-		    $response[$key] = new SimpleXMLElement(curl_multi_getcontent($curlHandler));
-		    curl_multi_remove_handle($curlMultiHandler, $curlHandler);
-		}
-
-		curl_multi_close($curlMultiHandler);
-		return $response;	
+		return $this->executeCurl($response);	
 	}
 
 	/**
@@ -192,85 +155,31 @@ class HZ extends SupplierApi
 		$vehicleCategory, 
 		$vehicleClass
 	) {
-		$bookingIdArray[] = $bookingId;
+		$xmlRequest = $this->getModifyBookingXml(
+					      $bookingId,
+					      $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime),
+					      $this->convertToDateTimeDefaultFormat($returnDate, $returnTime), 
+					      $pickUplocationCode,
+					      $returnLocationCode, 
+					      $vehicleCategory, 
+					      $vehicleClass
+					  );
 
-		$curlMultiHandler = curl_multi_init();
-		$curlHandlers     = array();	
-		$curlOptions      = $this->defaultCurlOptions;
-
-		$pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
-		$returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
-
-		$iterableArray = is_array($bookingId) ? reset($bookingIdArray) : $bookingIdArray;
-
-		foreach ($iterableArray as $key => $value) {
-			$xmlRequest = $this->getModifyBookingXml(
-						      $value,
-						      $pickUpDateTime,
-						      $returnDateTime, 
-						      $pickUplocationCode,
-						      $returnLocationCode, 
-						      $vehicleCategory, 
-						      $vehicleClass
-						  );
-			$curlOptions[CURLOPT_POSTFIELDS] =  $xmlRequest->asXML();
-		    $curlHandlers[$key] = curl_init();
-		    curl_setopt_array($curlHandlers[$key], $curlOptions);
-		    curl_multi_add_handle($curlMultiHandler, $curlHandlers[$key]);
-		}
-
-		do {
-			curl_multi_select($curlMultiHandler);
-		    curl_multi_exec($curlMultiHandler, $isRunning);
-		} while ($isRunning > 0);
-
-		foreach ($curlHandlers as $key => $curlHandler) {
-		    $response[$key] = new SimpleXMLElement(curl_multi_getcontent($curlHandler));
-		    curl_multi_remove_handle($curlMultiHandler, $curlHandler);
-		}
-
-		curl_multi_close($curlMultiHandler);
-		return $response;	
+		return $this->executeCurl($xmlRequest->asXML());	
 	}
 
 	/**
 	 * Retrieves booking details of a particular booking Id or an array of booking IDs
 	 * 
-	 * @param  int/array $bookingId (You can pass here an array of Ids or just a single booking ID)
+	 * @param  int/array $bookingId
 	 * @param  string $countryCode
 	 * 
 	 * @return XML Object
 	 */
 	public function getBookingDetails($bookingId)
 	{
-		$bookingIdArray[] = $bookingId;
-
-		$curlMultiHandler = curl_multi_init();
-		$curlHandlers     = array();	
-		$curlOptions      = $this->defaultCurlOptions;
-
-		$iterableArray = is_array($bookingId) ? reset($bookingIdArray) : $bookingIdArray;
-
-		foreach ($iterableArray as $key => $value) {
-			$xmlRequest = $this->getBookingDetailsXML($value);			
-			$curlOptions[CURLOPT_POSTFIELDS] =  $xmlRequest->asXML();
-		    $curlHandlers[$key] = curl_init();
-		    curl_setopt_array($curlHandlers[$key], $curlOptions);
-		    curl_multi_add_handle($curlMultiHandler, $curlHandlers[$key]);
-		}
-
-		do {
-			curl_multi_select($curlMultiHandler);
-		    curl_multi_exec($curlMultiHandler, $isRunning);
-		} while ($isRunning > 0);
-
-		foreach ($curlHandlers as $key => $curlHandler) {
-		    $response[$key] = new SimpleXMLElement(curl_multi_getcontent($curlHandler));
-		    curl_multi_remove_handle($curlMultiHandler, $curlHandler);
-		}
-
-		curl_multi_close($curlMultiHandler);
-		return $response;	
+		$xmlRequest = $this->getBookingDetailsXML($value);
+		return $this->executeCurl($xmlRequest->asXML());	
 	}
 
 	public function searchVehicles(
@@ -294,8 +203,7 @@ class HZ extends SupplierApi
 							$countryCode, 
 							$driverAge
 						 );
-		}
-		else {
+		} else {
 			$response =  ["result" => "Invalid Parameters"];
 		}
 
@@ -330,26 +238,19 @@ class HZ extends SupplierApi
 	) {	
 		if (!$this->validateDate($pickUpDate, $pickUpTime) && !$this->validateDate($returnDate, $returnTime)) {
 			$response = ["result" => "Invalid Parameters"];
-		}
-		else {
-			$pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
-			$returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
-
+		} else {
 			$curlOptions = $this->defaultCurlOptions;
 			$xmlRequest = $this->getXmlForBooking(
-							$pickUpDateTime,
-							$returnDateTime,
+							$this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime),
+							$this->convertToDateTimeDefaultFormat($returnDate, $returnTime),
 							$pickUplocationCode,
 							$returnLocationCode,
 							$countryCode,
 							$vehicleCategory,
 							$vehicleClass
 						  );
-			$curlOptions[CURLOPT_POSTFIELDS] = 	$xmlRequest->asXML();
-			$curlHandler = curl_init();
-			curl_setopt_array($curlHandler, $curlOptions);
-			$response = new SimpleXMLElement(curl_exec($curlHandler));
-			curl_close($curlHandler);
+
+			$response = $this->executeCurl($xmlRequest->asXML());
 		}
 
 		return $response;
@@ -380,30 +281,21 @@ class HZ extends SupplierApi
 		$driverAge
 	) {	
 		$timeStart = time();			
-		$pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
-		$returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);		
-		$curlOptions = $this->defaultCurlOptions;
 		$xmlRequest  = $this->getSearchVehicleXML(
-							$pickUpDateTime,
-							$returnDateTime,
+							$this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime),
+							$this->convertToDateTimeDefaultFormat($returnDate, $returnTime),
 							$pickUpLocationCode,
 							$returnLocationCode,
 							$countryCode
 					   );
-		$curlOptions[CURLOPT_POSTFIELDS] = $xmlRequest->asXML();
-		$curlHandler = curl_init();
-		curl_setopt_array($curlHandler, $curlOptions);
-		$response = curl_exec($curlHandler);
-		curl_close($curlHandler);
-		$xmlObject = new SimpleXMLElement($response);
+
+		$xmlObject = $this->executeCurl($xmlRequest->asXML());
 
 		$result = [];
 		if (isset($xmlObject->Errors)) {
 			$result['status'] =  "Failed";
 			$result['data']   = (string) $xmlObject->Errors->Error->attributes()->ShortText;
-		}
-
-		else {
+		} else {
 		
 			$vehRsCore = $xmlObject->VehAvailRSCore->VehVendorAvails->VehVendorAvail;
 			$result['status'] = "OK";	
@@ -452,16 +344,14 @@ class HZ extends SupplierApi
 	public function getXmlForGetLocationDepots($locationCode)
 	{
 		$xmlAction = self::GET_LOCATION_DEPOTS;
-
 		$xml = $this->getXMLCredentialNode($xmlAction);
-
 		$vehLocSearchCriterionNode = $xml->addChild("VehLocSearchCriterion");
 		$codeRefNode = $vehLocSearchCriterionNode->addChild("CodeRef");
 		$codeRefNode->addAttribute("LocationCode", $locationCode);
 
 		$vendorNode = $xml->addChild("Vendor");
 		$vendorNode->addAttribute("Code", "ZE");
-		
+
 		return $xml;
 	}	
 
@@ -564,9 +454,7 @@ class HZ extends SupplierApi
 	public function getXmlForDepotDetails($locationCode)
 	{
 		$xmlAction = self::GET_DEPOT_DETAILS_ACTION;
-
 		$xml = $this->getXMLCredentialNode($xmlAction);
-
 		$locationNode = $xml->addChild("Location");
 		$locationNode->addAttribute("LocationCode", $locationCode);
 		
@@ -757,6 +645,7 @@ class HZ extends SupplierApi
 
 		return $xml;
 	}	
+
 	/**
 	 * Returns POS credential node
 	 * 
@@ -792,6 +681,24 @@ class HZ extends SupplierApi
 	}
 
 	/**
+	 * Executes cURL
+	 * @param  xml $postField
+	 * @return XML Object
+	 */
+	public function executeCurl($postField)
+	{
+		$curlOptions = $this->defaultCurlOptions;
+
+		$curlOptions[CURLOPT_POSTFIELDS] = $postField;
+		$curlHandler = curl_init();
+		curl_setopt_array($curlHandler, $curlOptions);
+		$response = new SimpleXMLElement(curl_exec($curlHandler));
+		curl_close($curlHandler);
+
+		return $response;
+	}
+
+	/**
 	 * Returns depots per location IDs
 	 * 
 	 * @param int $pickUpLocationId
@@ -819,7 +726,6 @@ class HZ extends SupplierApi
 		$result = $date->format('Y-m-d H:i:s');
 
 		return str_replace(" ", "T", $result);
-
 	}
 
 	/**
