@@ -57,7 +57,7 @@ class RS extends SupplierApi
             "Pragma: no-cache"
         );
 
-        $this->defaultCurlOptions = array(
+        $this->defaultCurlOptions  = array(
             CURLOPT_URL            => $this->apiUrl,
             CURLOPT_POST           => true,
             CURLOPT_SSL_VERIFYHOST => false,
