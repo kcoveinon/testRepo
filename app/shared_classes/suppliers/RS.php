@@ -97,7 +97,7 @@ class RS extends SupplierApi
         $countryCode
     ) {
         $fleetObject = new SimpleXMLElement(file_get_contents($this->feelUrl));
-        $xmlRequest = $this->getSearchVehicleXML(
+        $xmlRequest  = $this->getSearchVehicleXML(
                             $pickUpDate, 
                             $pickUpTime, 
                             $returnDate, 
@@ -107,17 +107,19 @@ class RS extends SupplierApi
                             $vehicleClass, 
                             $countryCode 
                        );
-        $xmlCurlResponse = $this->executeCurl($xmlRequest->asXML());
+        $xmlCurlResponse  = $this->executeCurl($xmlRequest->asXML());
         $mappedCarDetails = $this->mapVehicleDetails($xmlCurlResponse, $fleetObject);
-        $result = [];        
+        $result           = array();        
         $result['status'] = "Failed";
 
-        if((string) $xmlCurlResponse->ResRates->attributes()->success === "true") {
-            $acrissHelper = new AcrissHelper();
+        if ((string) $xmlCurlResponse->ResRates->attributes()->success === "true") {
+            $acrissHelper     = new AcrissHelper();
             $result['status'] = "OK";
-            $counter = 0;
+            $counter          = 0;
+
             foreach ($xmlCurlResponse->ResRates->Rate as $value) {
-                if(!empty($mappedCarDetails[$counter])) {
+
+                if (!empty($mappedCarDetails[$counter])) {
                     $result['data'][] = array(
                         'hasAirCondition' => (string) 'N/A',
                         'transmission'    => (string) $mappedCarDetails[$counter]->gearbox,
@@ -158,9 +160,11 @@ class RS extends SupplierApi
     {
         preg_match_all('!\d+!', $str, $matches);
         $sum = 0;
+
         foreach (reset($matches) as $value) {
             $sum += $value;
         }
+
         return $sum;
     }
 
@@ -175,7 +179,7 @@ class RS extends SupplierApi
         $mapCarDetails = array();
 
         foreach ($xml->ResRates->Rate as $key => $value) {
-            $detail = $fleetObject->xpath($value->Class);
+            $detail          = $fleetObject->xpath($value->Class);
             $mapCarDetails[] = reset($detail);
         }
 
@@ -361,7 +365,7 @@ class RS extends SupplierApi
      */
     private function convertToDateTimeDefaultFormat($date, $time)
     {
-        $date =  new \DateTime($date." ".$time);
+        $date   =  new DateTime($date." ".$time);
         $result = $date->format('Y-m-d H:i:s');
 
         return str_replace(" ", "T", $result);
@@ -392,7 +396,6 @@ class RS extends SupplierApi
     private function executeCurl($postField)
     {
         $curlOptions = $this->defaultCurlOptions;
-
         $curlOptions[CURLOPT_POSTFIELDS] = $postField;
         $curlHandler = curl_init();
         curl_setopt_array($curlHandler, $curlOptions);
