@@ -97,7 +97,6 @@ class RS extends SupplierApi
         $vehicleClass, 
         $countryCode 
     ) {
-
         $xml = new SimpleXMLElement(file_get_contents($this->feelUrl));
 
         $xmlRequest = $this->getSearchVehicleXML(
@@ -112,7 +111,6 @@ class RS extends SupplierApi
                        );
         return $this->executeCurl($xmlRequest->asXML());
     }
-
 
     /**
      * Handles the API request for Cancel Boooking
@@ -303,7 +301,7 @@ class RS extends SupplierApi
      * 
      * @return XML Object
      */
-    public function createRootRequestNode()
+    private function createRootRequestNode()
     {
         $xml = new SimpleXMLElement('<Request></Request>');
         $xml->addAttribute("xmlns", self::DEFAULT_XMLNS);
@@ -320,7 +318,7 @@ class RS extends SupplierApi
      * 
      * @return XML Object
      */
-    public function executeCurl($postField)
+    private function executeCurl($postField)
     {
         $curlOptions = $this->defaultCurlOptions;
 
