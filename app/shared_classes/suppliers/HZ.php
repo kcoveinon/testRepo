@@ -297,10 +297,9 @@ class HZ extends SupplierApi
 							$returnLocationCode,
 							$countryCode
 					   );
-
 		$xmlObject = $this->executeCurl($xmlRequest->asXML());
-
 		$result = [];
+
 		if (isset($xmlObject->Errors)) {
 			$result['status'] =  "Failed";
 			$result['data']   = (string) $xmlObject->Errors->Error->attributes()->ShortText;
@@ -615,7 +614,6 @@ class HZ extends SupplierApi
 		$returnLocationId,
 		$countryCode
 	) {
-
 		$xml = $this->getXMLCredentialNode(self::SEARCH_VEHICLE_ACTION, $countryCode);
 
 		$vehAvailRQCoreNode = $xml->addChild("VehAvailRQCore");
@@ -717,6 +715,7 @@ class HZ extends SupplierApi
 	public function returnDepotByLocationId($pickUpLocationId, $returnLocationId)
 	{
 		$pickUpObj = Location::find($pickUpLocationId);
+
 		return $pickUpObj ? Depot::getGroupedDepotCode($pickUpObj->getCity())->get() : false;
 	}
 
@@ -746,6 +745,7 @@ class HZ extends SupplierApi
 	{
 		$dateTime = $date. " " . $time . ":00";
 	    $d = DateTime::createFromFormat('Y-m-d H:i:s', $dateTime);
+
 	    return $d && $d->format('Y-m-d H:i:s') == $dateTime;
 	}
 }
