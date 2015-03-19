@@ -122,13 +122,13 @@ class RS extends SupplierApi
                     $result['data'][] = array(
                         'hasAirCondition' => (string) 'N/A',
                         'transmission'    => (string) $mappedCarDetails[$counter]->gearbox,
-                        'baggageQty'      => (string) $mappedCarDetails[$counter]->storage,
+                        'baggageQty'      => $this->getSumOfNumbersFromString($mappedCarDetails[$counter]->storage),
                         'co2Qty'          => 'N/A',
                         'categoryCode'    => (string) $value->Class,
                         'expandedCode'    => $acrissHelper->expandCode((string) $value->Class),                    
-                        'doorCount'       => (string) $mappedCarDetails[$counter]->doors,
+                        'doorCount'       => $this->getSumOfNumbersFromString($mappedCarDetails[$counter]->doors),
                         'name'            => (string) $mappedCarDetails[$counter]->make . " " . $mappedCarDetails[$counter]->model,
-                        'seats'           => (string) $mappedCarDetails[$counter]->capacity,
+                        'seats'           => $this->getSumOfNumbersFromString($mappedCarDetails[$counter]->capacity),
                         'vehicleStatus'   => array(
                             'code'        => 'N/A',
                             'description' => 'N/A',
@@ -147,6 +147,21 @@ class RS extends SupplierApi
             }
         }
         return $result;
+    }
+
+    /**
+     * Strips numbers from a string and get their sum
+     * @param  string $str
+     * @return int
+     */
+    public function getSumOfNumbersFromString($str)
+    {
+        preg_match_all('!\d+!', $str, $matches);
+        $sum = 0;
+        foreach (reset($matches) as $value) {
+            $sum += $value;
+        }
+        return $sum;
     }
 
     /**
