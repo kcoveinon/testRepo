@@ -270,7 +270,7 @@ class RS extends SupplierApi
         $returnLocationNode = $resRatesnode->addChild("Return");
         $returnLocationNode->addAttribute("locationCode", $returnLocationCode);
         $returnLocationNode->addAttribute("dateTime", $this->convertToDateTimeDefaultFormat($returnDate, $returnTime));        
-        $resRatesnode->addChild("Class", $vehicleClass);
+        // $resRatesnode->addChild("Class", $vehicleClass);
         $sourceNode = $resRatesnode->addChild("Source");
         $sourceNode->addAttribute("countryCode", $countryCode);
 
