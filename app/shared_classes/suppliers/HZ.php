@@ -314,6 +314,7 @@ class HZ extends SupplierApi
 				$carDetails = $value->VehAvailCore->Vehicle;
 				$rentalDetails = $value->VehAvailCore->RentalRate;				
 				$result['data'][] = array(
+					'supplierCode'	  => (string) $this->supplierCode,
 		            'hasAirCondition' => (string) $carDetails->attributes()->AirConditionInd,
 		            'transmission'    => (string) $carDetails->attributes()->TransmissionType,
 		            'baggageQty'      => (string) $carDetails->attributes()->BaggageQuantity,

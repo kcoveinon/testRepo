@@ -111,35 +111,40 @@ class RS extends SupplierApi
         $xmlCurlResponse = $this->executeCurl($xmlRequest->asXML());
         $mappedCarDetails = $this->mapVehicleDetails($xmlCurlResponse, $fleetObject);
 
-        $result = [];
-        $result['status'] = "OK";
-        $counter = 0;
-        foreach ($xmlCurlResponse->ResRates->Rate as $value) {
-            if(!empty($mappedCarDetails[$counter])) {
-                $result['data'][] = array(
-                    'hasAirCondition' => (string) 'N/A',
-                    'transmission'    => (string) $mappedCarDetails[$counter]->gearbox,
-                    'baggageQty'      => (string) $mappedCarDetails[$counter]->storage,
-                    'co2Qty'          => 'N/A',
-                    'categoryCode'    => (string) $value->Class,
-                    'doorCount'       => (string) $mappedCarDetails[$counter]->doors,
-                    'name'            => (string) $mappedCarDetails[$counter]->make . " " . $mappedCarDetails[$counter]->model,
-                    'seats'           => (string) $mappedCarDetails[$counter]->capacity,
-                    'vehicleStatus'   => array(
-                        'code'        => 'N/A',
-                        'description' => 'N/A',
-                    ),
-                    'rateId'    => (string) $value->RateID,
-                    'basePrice' => (string) $value->RateOnlyEstimate,
-                    'currency'  => (string) $value->CurrencyCode,
-                    'bookingCurrencyOfTotalRateEstimate' => 'N/A',
-                    'xrsBasePrice'                       => 'N/A',
-                    'xrsBasePriceInBookingCurrency'      => 'N/A',
-                    'totalRateEstimate'                  => (string) $value->Estimate,
-                    'totalRateEstimateInBookingCurrency' => 'N/A',
-                );
+        $result['status'] = "Failed";
+        if((string) $xmlCurlResponse->ResRates->attributes()->success === "true") {
+            $acrissHelper = new AcrissHelper();
+            $result = [];
+            $result['status'] = "OK";
+            $counter = 0;
+            foreach ($xmlCurlResponse->ResRates->Rate as $value) {
+                if(!empty($mappedCarDetails[$counter])) {
+                    $result['data'][] = array(
+                        'hasAirCondition' => (string) 'N/A',
+                        'transmission'    => (string) $mappedCarDetails[$counter]->gearbox,
+                        'baggageQty'      => (string) $mappedCarDetails[$counter]->storage,
+                        'co2Qty'          => 'N/A',
+                        'categoryCode'    => (string) $value->Class,
+                        'expandedCode'    => $acrissHelper->expandCode((string) $value->Class),                    
+                        'doorCount'       => (string) $mappedCarDetails[$counter]->doors,
+                        'name'            => (string) $mappedCarDetails[$counter]->make . " " . $mappedCarDetails[$counter]->model,
+                        'seats'           => (string) $mappedCarDetails[$counter]->capacity,
+                        'vehicleStatus'   => array(
+                            'code'        => 'N/A',
+                            'description' => 'N/A',
+                        ),
+                        'rateId'    => (string) $value->RateID,
+                        'basePrice' => (string) $value->RateOnlyEstimate,
+                        'currency'  => (string) $value->CurrencyCode,
+                        'bookingCurrencyOfTotalRateEstimate' => 'N/A',
+                        'xrsBasePrice'                       => 'N/A',
+                        'xrsBasePriceInBookingCurrency'      => 'N/A',
+                        'totalRateEstimate'                  => (string) $value->Estimate,
+                        'totalRateEstimateInBookingCurrency' => 'N/A',
+                    );
+                }
+                $counter++;
             }
-            $counter++;
         }
         return $result;
     }
