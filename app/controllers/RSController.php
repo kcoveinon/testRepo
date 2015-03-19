@@ -37,9 +37,28 @@ class RSController extends BaseController
         return Response::json($this->supplierApi->cancelBooking($bookingId));
     }
 
-    public function doBooking()
-    {
-        return Response::json($this->supplierApi->doBooking());        
+    public function doBooking(
+        $pickUpDate,
+        $pickUpTime,
+        $returnDate,
+        $returnTime,
+        $pickUpLocationCode, 
+        $returnLocationCode,
+        $vehicleClass,
+        $rateId,
+        $countryCode 
+    ) {
+        return Response::json($this->supplierApi->doBooking(
+                                $pickUpDate,
+                                $pickUpTime,
+                                $returnDate,
+                                $returnTime,
+                                $pickUpLocationCode, 
+                                $returnLocationCode,
+                                $vehicleClass,
+                                $rateId,
+                                $countryCode 
+                            ));
     }
 
 }

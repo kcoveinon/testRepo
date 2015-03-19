@@ -5,59 +5,53 @@ class HZController extends BaseController
 
 	const DEFAULT_SUPPLIER_CODE = "HZ";
 
+    private $supplierApi;
+
 	public function __construct()
 	{
 		parent::__construct();
+        $this->supplierApi = App::make(self::DEFAULT_SUPPLIER_CODE);		
 	}
 
 	public function getLocationDepots($locationCode)
 	{
-		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
-		$result = $hertzApi->getLocationDepots($locationCode);
+		$result = $this->supplierApi->getLocationDepots($locationCode);
 		return Response::json($result);
 	}
 
 	public function getDepotDetails($locationCode)
 	{
-		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
-		$result = $hertzApi->getDepotDetails($locationCode);
+		$result = $this->supplierApi->getDepotDetails($locationCode);
 		return Response::json($result);
 	}
 
 	public function searchVehicles($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $countryCode, $driverAge)
 	{
-		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
-      	$result = $hertzApi->searchVehicles($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $countryCode, $driverAge);
-
+      	$result = $this->supplierApi->searchVehicles($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $countryCode, $driverAge);
         return Response::json($result);
 	}
 
 	public function modifyBooking($bookingId, $pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $vehicleCategory, $vehicleClass)
 	{
-		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
-		$result = $hertzApi->modifyBooking($bookingId, $pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $vehicleCategory, $vehicleClass);
+		$result = $this->supplierApi->modifyBooking($bookingId, $pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $vehicleCategory, $vehicleClass);
 		return Response::json($result);	
 	}
 
 	public function cancelBooking($bookingId)
 	{
-		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
-		$result = $hertzApi->cancelBooking($bookingId);
+		$result = $this->supplierApi->cancelBooking($bookingId);
 		return Response::json($result);	
 	}
 
 	public function getBookingInfo($bookingId)
 	{
-		$hertzApi = App::make(self::DEFAULT_SUPPLIER_CODE);
-		$result = $hertzApi->getBookingDetails($bookingId);
+		$result = $this->supplierApi->getBookingDetails($bookingId);
 		return Response::json($result);	
 	}
 
 	public function book($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $countryCode, $vehicleCategory, $vehicleClass)
 	{
-		$supplierApi = App::make(self::DEFAULT_SUPPLIER_CODE);
-
-		$result = $supplierApi->doBooking(
+		$result = $this->supplierApi->doBooking(
 						$pickUpDate, 
 						$pickUpTime, 
 						$returnDate, 

@@ -10,6 +10,8 @@ class RS extends SupplierApi
 
     const DEFAULT_XMLNS = "http://www.thermeon.com/webXG/xml/webxml/";
     const DEFAULT_XML_VERSION = "2.2202";
+    const DEFAULT_CONFIRMATION_NUMBER = "123ABC456";
+    const DEFAULT_CORPORATE_ID = "CDBGWHEL";
 
     /*
      * The API URL
@@ -118,46 +120,106 @@ class RS extends SupplierApi
         return $this->executeCurl($xmlRequest->asXML());
     }
 
-    public function doBooking()
-    {
-        return $this->executeCurl(trim($this->getXMLForBooking())); 
+    /**
+     * Handles the API request for Booking Request
+     * 
+     * @param  date $pickUpDate
+     * @param  time $pickUpTime
+     * @param  date $returnDate
+     * @param  time $returnTime
+     * @param  string $pickUpLocationCode
+     * @param  string $returnLocationCode
+     * @param  string $vehicleClass
+     * @param  int $rateId
+     * @param  string $countryCode
+     * 
+     * @return XML
+     */
+    public function doBooking(
+        $pickUpDate,
+        $pickUpTime,
+        $returnDate,
+        $returnTime,
+        $pickUpLocationCode, 
+        $returnLocationCode,
+        $vehicleClass,
+        $rateId,
+        $countryCode 
+    ) {
+        $xmlRequest = $this->getXMLForBooking(
+                        $pickUpDate,
+                        $pickUpTime,
+                        $returnDate,
+                        $returnTime,
+                        $pickUpLocationCode, 
+                        $returnLocationCode,
+                        $vehicleClass,
+                        $rateId,
+                        $countryCode 
+                       );
+        return $this->executeCurl($xmlRequest->asXML()); 
     }
 
-    public function getXMLForBooking()
-    {
-        return '<?xml version="1.0" encoding="UTF-8"?>
-        <Request version="1.3" referenceNumber="r1263272805888" xmlns="http://www.thermeon.com/webXG/xml/webxml/">
-          <NewReservationRequest confirmAvailability="true">
-            <Pickup locationCode="ADL" dateTime="2015-05-01T10:00:00"/>
-            <Return locationCode="BNE" dateTime="2015-05-05T10:00:00"/>
-            <Source confirmationNumber="123ABC456" countryCode="AU"/> corporateRateID="CDBGWHEL">
-            <Vehicle classCode="CDAR"/>
-            <Renter>
-              <RenterName firstName="test" lastName="test"/>
-              <Address>
-                <Email>info@redspotcars.com.au</Email>
-                <HomeTelephoneNumber>0283032222</HomeTelephoneNumber>
-              </Address>
-            </Renter>
-            <QuotedRate rateID="11030115055333CDAR" classCode="CDAR"/>
-            <Flight airlineCode="QF" flightNumber="142"/>
-           <Option>
-              <Code>BCAPS</Code>
-              <Price>10.0</Price>
-              <Qty>1</Qty>
-            </Option>
-            <Option>
-              <Code>BOOST</Code>
-              <Price>10.0</Price>
-              <Qty>2</Qty>
-            </Option>
-            <Option>
-              <Code>SATNV</Code>
-              <Price>10.0</Price>
-              <Qty>1</Qty>
-            </Option>
-          </NewReservationRequest>
-        </Request>';
+    /**
+     * Creates the XML Request for Book Vehicles
+     * 
+     * @param  date $pickUpDate
+     * @param  time $pickUpTime
+     * @param  date $returnDate
+     * @param  time $returnTime
+     * @param  string $pickUpLocationCode
+     * @param  string $returnLocationCode
+     * @param  string $vehicleClass
+     * @param  int $rateId
+     * @param  string $countryCode
+     * 
+     * @return XML
+     */
+    public function getXMLForBooking(
+        $pickUpDate,
+        $pickUpTime,
+        $returnDate,
+        $returnTime,
+        $pickUpLocationCode, 
+        $returnLocationCode,
+        $vehicleClass,
+        $rateId,
+        $countryCode        
+    ) {
+        $xml = $this->createRootRequestNode();
+        $newReservationRequestNode = $xml->addChild("NewReservationRequest");
+        $newReservationRequestNode->addAttribute("confirmAvailability", "true");
+
+        $pickUpLocationNode = $newReservationRequestNode->addChild("Pickup");
+        $pickUpLocationNode->addAttribute("locationCode", $pickUpLocationCode);
+        $pickUpLocationNode->addAttribute("dateTime", $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime));
+        $returnLocationNode = $newReservationRequestNode->addChild("Return");
+        $returnLocationNode->addAttribute("locationCode", $returnLocationCode);
+        $returnLocationNode->addAttribute("dateTime", $this->convertToDateTimeDefaultFormat($returnDate, $returnTime));        
+
+        $sourceNode = $newReservationRequestNode->addChild("Source");
+        $sourceNode->addAttribute("confirmationNumber", self::DEFAULT_CONFIRMATION_NUMBER);
+        $sourceNode->addAttribute("countryCode", $countryCode);
+        $sourceNode->addAttribute("corporateRateID", self::DEFAULT_CORPORATE_ID);
+        $newReservationRequestNode->addChild("Vehicle")->addAttribute("classCode", $vehicleClass);
+
+        $renterNode = $newReservationRequestNode->addChild("Renter");
+        $renterNameNode = $renterNode->addChild("RenterName");
+        $renterNameNode->addAttribute("firstName", "test");
+        $renterNameNode->addAttribute("lastName", "test");
+        $addressNode = $renterNode->addChild("Address");
+        $addressNode->addChild("Email", "info@redspotcars.com.au");
+        $addressNode->addChild("HomeTelephoneNumber", "0283032222");
+
+        $quotedRateNode = $newReservationRequestNode->addChild("QuotedRate");
+        $quotedRateNode->addAttribute("rateID", $rateId);
+        $quotedRateNode->addAttribute("classCode", $vehicleClass);
+
+        $flightNode = $newReservationRequestNode->addChild("Flight");
+        $flightNode->addAttribute("airlineCode", "QF");
+        $flightNode->addAttribute("flightNumber", "142");
+
+        return $xml;
     }
 
     /**
@@ -231,7 +293,11 @@ class RS extends SupplierApi
         return str_replace(" ", "T", $result);
     }
 
-
+    /**
+     * Creates the Request Node
+     * 
+     * @return XML Object
+     */
     public function createRootRequestNode()
     {
         $xml = new SimpleXMLElement('<Request></Request>');
