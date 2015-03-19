@@ -49,6 +49,7 @@ class RS extends SupplierApi
         $this->apiUrl       = Config::get($this->supplierCode  . '.api.url');
         $this->apiUsername  = Config::get($this->supplierCode  . '.api.username');
         $this->apiPassword  = Config::get($this->supplierCode  . '.api.password');
+        $this->feelUrl      = Config::get($this->supplierCode  . '.api.fleetUrl');
 
         $this->headers = array(
             "Content-type: text/xml;charset=\"utf-8\"",
@@ -96,6 +97,9 @@ class RS extends SupplierApi
         $vehicleClass, 
         $countryCode 
     ) {
+
+        $xml = new SimpleXMLElement(file_get_contents($this->feelUrl));
+
         $xmlRequest = $this->getSearchVehicleXML(
                             $pickUpDate, 
                             $pickUpTime, 
@@ -108,6 +112,7 @@ class RS extends SupplierApi
                        );
         return $this->executeCurl($xmlRequest->asXML());
     }
+
 
     /**
      * Handles the API request for Cancel Boooking
