@@ -1,4 +1,3 @@
-
 <?php
 
 $testUrl =  "https://www.thermeon.com.au/webXG/redspot-test/xml/webxml/";

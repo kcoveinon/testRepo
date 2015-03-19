@@ -96,7 +96,7 @@ class RS extends SupplierApi
         $vehicleClass, 
         $countryCode 
     ) {
-        $xml = new SimpleXMLElement(file_get_contents($this->feelUrl));
+        $fleetObject = new SimpleXMLElement(file_get_contents($this->feelUrl));
 
         $xmlRequest = $this->getSearchVehicleXML(
                             $pickUpDate, 
@@ -108,7 +108,50 @@ class RS extends SupplierApi
                             $vehicleClass, 
                             $countryCode 
                        );
-        return $this->executeCurl($xmlRequest->asXML());
+        $xmlCurlResponse = $this->executeCurl($xmlRequest->asXML());
+        $mappedCarDetails = $this->mapVehicleDetails($xmlCurlResponse, $fleetObject);
+
+        $result = [];
+        $result['status'] = "OK";
+        $counter = 0;
+        foreach ($xmlCurlResponse->ResRates->Rate as $value) {
+            if(!empty($mappedCarDetails[$counter])) {
+                $result['data'][] = array(
+                    'hasAirCondition' => (string) 'N/A',
+                    'transmission'    => (string) $mappedCarDetails[$counter]->gearbox,
+                    'baggageQty'      => (string) $mappedCarDetails[$counter]->storage,
+                    'co2Qty'          => 'N/A',
+                    'categoryCode'    => (string) $value->Class,
+                    'doorCount'       => (string) $mappedCarDetails[$counter]->doors,
+                    'name'            => (string) $mappedCarDetails[$counter]->make . " " . $mappedCarDetails[$counter]->model,
+                    'seats'           => (string) $mappedCarDetails[$counter]->capacity,
+                    'vehicleStatus'   => array(
+                        'code'        => 'N/A',
+                        'description' => 'N/A',
+                    ),
+                    'rateId'    => (string) $value->RateID,
+                    'basePrice' => (string) $value->RateOnlyEstimate,
+                    'currency'  => (string) $value->CurrencyCode,
+                    'bookingCurrencyOfTotalRateEstimate' => 'N/A',
+                    'xrsBasePrice'                       => 'N/A',
+                    'xrsBasePriceInBookingCurrency'      => 'N/A',
+                    'totalRateEstimate'                  => (string) $value->Estimate,
+                    'totalRateEstimateInBookingCurrency' => 'N/A',
+                );
+            }
+            $counter++;
+        }
+        return $result;
+    }
+
+    public function mapVehicleDetails($xml, $fleetObject)
+    {
+        $mapCarDetails = array();
+        foreach ($xml->ResRates->Rate as $key => $value) {
+            $detail = $fleetObject->xpath($value->Class);
+            $mapCarDetails[] = reset($detail);
+        }
+        return $mapCarDetails;
     }
 
     /**
