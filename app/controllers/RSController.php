@@ -32,9 +32,9 @@ class RSController extends BaseController
                         )); 
     }
 
-    public function cancelBooking()
+    public function cancelBooking($bookingId)
     {
-        return Response::json($this->supplierApi->cancelBooking());
+        return Response::json($this->supplierApi->cancelBooking($bookingId));
     }
 
     public function doBooking()

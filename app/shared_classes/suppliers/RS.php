@@ -70,6 +70,20 @@ class RS extends SupplierApi
         $this->referenceNumber = "r" . date_format(date_create(), "U");
     }
 
+    /**
+     * Handles the cURL request for the get vehicle rates
+     * 
+     * @param  date $pickUpDate
+     * @param  time $pickUpTime
+     * @param  date $returnDate
+     * @param  time $returnTime
+     * @param  string $pickUpLocationCode
+     * @param  string $returnLocationCode
+     * @param  string $vehicleClass
+     * @param  string $countryCode
+     * 
+     * @return XML
+     */
     public function search(
         $pickUpDate, 
         $pickUpTime, 
@@ -93,9 +107,15 @@ class RS extends SupplierApi
         return $this->executeCurl($xmlRequest->asXML());
     }
 
-    public function cancelBooking()
+    /**
+     * Handles the API request for Cancel Boooking
+     * @param  int $bookingId
+     * @return XML Object
+     */
+    public function cancelBooking($bookingId)
     {
-        return $this->executeCurl($this->getXMLForCancelBooking());
+        $xmlRequest = $this->getXMLForCancelBooking($bookingId);
+        return $this->executeCurl($xmlRequest->asXML());
     }
 
     public function doBooking()
@@ -110,7 +130,6 @@ class RS extends SupplierApi
               <NewReservationRequest confirmAvailability="true">
                 <Pickup locationCode="ADL" dateTime="2015-05-01T12:00:00"/>
                 <Return locationCode="BNE" dateTime="2015-05-05T12:00:00"/>
-                <Source confirmationNumber="123ABC456" countryCode="AU"/> corporateRateID="CDBGWHEL">
                 <Vehicle classCode="CDAR"/>
                 <Renter>
                   <RenterName firstName="test" lastName="test"/>
@@ -119,33 +138,53 @@ class RS extends SupplierApi
                     <HomeTelephoneNumber>0283032222</HomeTelephoneNumber>
                   </Address>
                 </Renter>
-                <QuotedRate rateID="11030115055333CDAR" classCode="CDAR"/>
+
                 <Flight airlineCode="QF" flightNumber="142"/>
               </NewReservationRequest>
             </Request>
             ';
     }
 
-    public function getXMLForCancelBooking()
+    /**
+     * Creates the XML Request for Cancel Booking
+     * 
+     * @param  int $bookingId
+     * 
+     * @return XML Object
+     */
+    public function getXMLForCancelBooking($bookingId)
     {
-        return '
-            <Request xmlns="http://www.thermeon.com/webXG/xml/webxml/" referenceNumber="r1263372689587" version="2.2202">
-              <CancelReservationRequest reservationNumber="RRTL67"/>
-            </Request>
-            ';
+        $xml = $this->createRootRequestNode();
+        $cancelReservationRequestNode = $xml->addChild("CancelReservationRequest");
+        $cancelReservationRequestNode->addAttribute("reservationNumber", $bookingId);
+
+        return $xml;
     }
 
+    /**
+     * Creates the XML Request for Search Vehicles
+     * 
+     * @param  date $pickUpDate
+     * @param  time $pickUpTime
+     * @param  date $returnDate
+     * @param  time $returnTime
+     * @param  string $pickUpLocationCode
+     * @param  string $returnLocationCode
+     * @param  string $vehicleClass
+     * @param  string $countryCode
+     * 
+     * @return XML
+     */
     public function getSearchVehicleXML(
-        $pickUpDate, 
-        $pickUpTime, 
-        $returnDate, 
+        $pickUpDate,
+        $pickUpTime,
+        $returnDate,
         $returnTime,
         $pickUpLocationCode, 
-        $returnLocationCode, 
-        $vehicleClass, 
-        $countryCode 
+        $returnLocationCode,
+        $vehicleClass,
+        $countryCode
     ) {
-
         $xml = $this->createRootRequestNode();
         $resRatesnode = $xml->addChild("ResRates");
         $pickUpLocationNode = $resRatesnode->addChild("Pickup");
@@ -159,7 +198,6 @@ class RS extends SupplierApi
         $sourceNode->addAttribute("countryCode", $countryCode);
 
         return $xml;
-
     }
 
     /**
