@@ -120,29 +120,44 @@ class RS extends SupplierApi
 
     public function doBooking()
     {
-        return $this->executeCurl($this->getXMLForBooking()); 
+        return $this->executeCurl(trim($this->getXMLForBooking())); 
     }
 
     public function getXMLForBooking()
     {
-        return '
-            <Request version="1.3" referenceNumber="r1263272805888" xmlns="http://www.thermeon.com/webXG/xml/webxml/">
-              <NewReservationRequest confirmAvailability="true">
-                <Pickup locationCode="ADL" dateTime="2015-05-01T12:00:00"/>
-                <Return locationCode="BNE" dateTime="2015-05-05T12:00:00"/>
-                <Vehicle classCode="CDAR"/>
-                <Renter>
-                  <RenterName firstName="test" lastName="test"/>
-                  <Address>
-                    <Email>info@redspotcars.com.au</Email>
-                    <HomeTelephoneNumber>0283032222</HomeTelephoneNumber>
-                  </Address>
-                </Renter>
-                <QuotedRate rateID="11030115055333CDAR" classCode="CDAR"/>
-                <Flight airlineCode="QF" flightNumber="142"/>
-              </NewReservationRequest>
-            </Request>
-            ';
+        return '<?xml version="1.0" encoding="UTF-8"?>
+        <Request version="1.3" referenceNumber="r1263272805888" xmlns="http://www.thermeon.com/webXG/xml/webxml/">
+          <NewReservationRequest confirmAvailability="true">
+            <Pickup locationCode="ADL" dateTime="2015-05-01T10:00:00"/>
+            <Return locationCode="BNE" dateTime="2015-05-05T10:00:00"/>
+            <Source confirmationNumber="123ABC456" countryCode="AU"/> corporateRateID="CDBGWHEL">
+            <Vehicle classCode="CDAR"/>
+            <Renter>
+              <RenterName firstName="test" lastName="test"/>
+              <Address>
+                <Email>info@redspotcars.com.au</Email>
+                <HomeTelephoneNumber>0283032222</HomeTelephoneNumber>
+              </Address>
+            </Renter>
+            <QuotedRate rateID="11030115055333CDAR" classCode="CDAR"/>
+            <Flight airlineCode="QF" flightNumber="142"/>
+           <Option>
+              <Code>BCAPS</Code>
+              <Price>10.0</Price>
+              <Qty>1</Qty>
+            </Option>
+            <Option>
+              <Code>BOOST</Code>
+              <Price>10.0</Price>
+              <Qty>2</Qty>
+            </Option>
+            <Option>
+              <Code>SATNV</Code>
+              <Price>10.0</Price>
+              <Qty>1</Qty>
+            </Option>
+          </NewReservationRequest>
+        </Request>';
     }
 
     /**
