@@ -10,9 +10,26 @@ class RSController extends BaseController
     {
         $this->supplierApi = App::make(self::DEFAULT_SUPPLIER_CODE);
     }
-    public function searchVehicles()
-    {
-        return Response::json($this->supplierApi->search()); 
+    public function searchVehicles(
+        $pickUpDate, 
+        $pickUpTime, 
+        $returnDate, 
+        $returnTime,
+        $pickUpLocationCode, 
+        $returnLocationCode, 
+        $vehicleClass, 
+        $countryCode        
+    ) {
+        return Response::json($this->supplierApi->search(
+                                $pickUpDate, 
+                                $pickUpTime, 
+                                $returnDate, 
+                                $returnTime,
+                                $pickUpLocationCode, 
+                                $returnLocationCode, 
+                                $vehicleClass, 
+                                $countryCode  
+                        )); 
     }
 
     public function cancelBooking()

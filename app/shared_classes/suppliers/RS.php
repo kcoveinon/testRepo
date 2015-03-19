@@ -7,6 +7,10 @@
  */
 class RS extends SupplierApi
 {
+
+    const DEFAULT_XMLNS = "http://www.thermeon.com/webXG/xml/webxml/";
+    const DEFAULT_XML_VERSION = "2.2202";
+
     /*
      * The API URL
      */ 
@@ -30,7 +34,12 @@ class RS extends SupplierApi
     /*
      * The cURL headers
      */
-    protected $headers;     
+    protected $headers;
+
+    /**
+     * The Request Reference Number
+     */
+    private $referenceNumber;
 
     public function __construct()
     {
@@ -57,11 +66,31 @@ class RS extends SupplierApi
             CURLOPT_USERPWD        => $this->apiUsername . ":" . $this->apiPassword,
             CURLOPT_HTTPHEADER     => $this->headers
         );
+
+        $this->referenceNumber = "r" . date_format(date_create(), "U");
     }
 
-    public function search()
-    {
-        return $this->executeCurl($this->getXml());
+    public function search(
+        $pickUpDate, 
+        $pickUpTime, 
+        $returnDate, 
+        $returnTime,
+        $pickUpLocationCode, 
+        $returnLocationCode, 
+        $vehicleClass, 
+        $countryCode 
+    ) {
+        $xmlRequest = $this->getSearchVehicleXML(
+                            $pickUpDate, 
+                            $pickUpTime, 
+                            $returnDate, 
+                            $returnTime,
+                            $pickUpLocationCode, 
+                            $returnLocationCode, 
+                            $vehicleClass, 
+                            $countryCode 
+                       );
+        return $this->executeCurl($xmlRequest->asXML());
     }
 
     public function cancelBooking()
@@ -99,27 +128,65 @@ class RS extends SupplierApi
 
     public function getXMLForCancelBooking()
     {
-        return '<?xml version="1.0" encoding="UTF-8"?>
+        return '
             <Request xmlns="http://www.thermeon.com/webXG/xml/webxml/" referenceNumber="r1263372689587" version="2.2202">
-              <CancelReservationRequest reservationNumber="asdasdasdasdasd"/>
+              <CancelReservationRequest reservationNumber="RRTL67"/>
             </Request>
             ';
     }
 
-    public function getXml()
+    public function getSearchVehicleXML(
+        $pickUpDate, 
+        $pickUpTime, 
+        $returnDate, 
+        $returnTime,
+        $pickUpLocationCode, 
+        $returnLocationCode, 
+        $vehicleClass, 
+        $countryCode 
+    ) {
+
+        $xml = $this->createRootRequestNode();
+        $resRatesnode = $xml->addChild("ResRates");
+        $pickUpLocationNode = $resRatesnode->addChild("Pickup");
+        $pickUpLocationNode->addAttribute("locationCode", $pickUpLocationCode);
+        $pickUpLocationNode->addAttribute("dateTime", $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime));
+        $returnLocationNode = $resRatesnode->addChild("Return");
+        $returnLocationNode->addAttribute("locationCode", $returnLocationCode);
+        $returnLocationNode->addAttribute("dateTime", $this->convertToDateTimeDefaultFormat($returnDate, $returnTime));        
+        $resRatesnode->addChild("Class", $vehicleClass);
+        $sourceNode = $resRatesnode->addChild("Source");
+        $sourceNode->addAttribute("countryCode", $countryCode);
+
+        return $xml;
+
+    }
+
+    /**
+     * Returns default datetime format
+     * 
+     * @param  date $date
+     * @param  time $time
+     * 
+     * @return DATE object
+     */
+    private function convertToDateTimeDefaultFormat($date, $time)
     {
-        return '<?xml version="1.0" encoding="UTF-8"?>
-            <Request xmlns="http://www.thermeon.com/webXG/xml/webxml/" referenceNumber="r1263372689587" version="2.2202">
-              <ResRates>
-                <Pickup locationCode="ADL" dateTime="2015-05-01T12:00:00"/>
-                <Return locationCode="BNE" dateTime="2015-05-05T12:00:00"/>
-                <Class>CDAR</Class>
-                <Source countryCode="AU" />
-              </ResRates>
-            </Request>
+        $date =  new \DateTime($date." ".$time);
+        $result = $date->format('Y-m-d H:i:s');
 
-            ';
+        return str_replace(" ", "T", $result);
+    }
 
+
+    public function createRootRequestNode()
+    {
+        $xml = new SimpleXMLElement('<Request></Request>');
+        $xml->addAttribute("xmlns", self::DEFAULT_XMLNS);
+        $xml->addAttribute("referenceNumber", $this->referenceNumber);
+        $xml->addAttribute("version", self::DEFAULT_XML_VERSION);
+
+        return $xml;
     }
 
     /**
