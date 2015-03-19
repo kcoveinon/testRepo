@@ -138,7 +138,7 @@ class RS extends SupplierApi
                     <HomeTelephoneNumber>0283032222</HomeTelephoneNumber>
                   </Address>
                 </Renter>
-
+                <QuotedRate rateID="11030115055333CDAR" classCode="CDAR"/>
                 <Flight airlineCode="QF" flightNumber="142"/>
               </NewReservationRequest>
             </Request>
