@@ -308,6 +308,7 @@ class HZ extends SupplierApi
 		
 			$vehRsCore = $xmlObject->VehAvailRSCore->VehVendorAvails->VehVendorAvail;
 			$result['status'] = "OK";	
+			$acrissHelper = new AcrissHelper();
 
 			foreach ($vehRsCore->VehAvails->VehAvail as $key => $value) {
 				$carDetails = $value->VehAvailCore->Vehicle;
@@ -318,6 +319,7 @@ class HZ extends SupplierApi
 		            'baggageQty'      => (string) $carDetails->attributes()->BaggageQuantity,
 		            'co2Qty'          => 'N/A',
 		            'categoryCode'    => (string) $carDetails->attributes()->Code,
+		            'expandedCode'	  => $acrissHelper->expandCode((string) $carDetails->attributes()->Code),
 		            'doorCount'       => (string) $carDetails->VehType->attributes()->DoorCount,
 		            'name'            => (string) $carDetails->VehMakeModel->attributes()->Name,
 		            'seats'           => (string) $carDetails->attributes()->PassengerQuantity,
