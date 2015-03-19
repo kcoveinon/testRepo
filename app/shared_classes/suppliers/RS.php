@@ -7,7 +7,6 @@
  */
 class RS extends SupplierApi
 {
-
     const DEFAULT_XMLNS = "http://www.thermeon.com/webXG/xml/webxml/";
     const DEFAULT_XML_VERSION = "2.2202";
     const DEFAULT_CONFIRMATION_NUMBER = "123ABC456";
