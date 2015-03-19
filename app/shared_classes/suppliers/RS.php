@@ -109,11 +109,11 @@ class RS extends SupplierApi
                        );
         $xmlCurlResponse = $this->executeCurl($xmlRequest->asXML());
         $mappedCarDetails = $this->mapVehicleDetails($xmlCurlResponse, $fleetObject);
+        $result = [];        
         $result['status'] = "Failed";
 
         if((string) $xmlCurlResponse->ResRates->attributes()->success === "true") {
             $acrissHelper = new AcrissHelper();
-            $result = [];
             $result['status'] = "OK";
             $counter = 0;
             foreach ($xmlCurlResponse->ResRates->Rate as $value) {
