@@ -94,7 +94,7 @@ class RS extends SupplierApi
         $pickUpLocationCode, 
         $returnLocationCode, 
         $vehicleClass, 
-        $countryCode 
+        $countryCode
     ) {
         $fleetObject = new SimpleXMLElement(file_get_contents($this->feelUrl));
 
