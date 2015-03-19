@@ -97,7 +97,6 @@ class RS extends SupplierApi
         $countryCode
     ) {
         $fleetObject = new SimpleXMLElement(file_get_contents($this->feelUrl));
-
         $xmlRequest = $this->getSearchVehicleXML(
                             $pickUpDate, 
                             $pickUpTime, 
@@ -110,8 +109,8 @@ class RS extends SupplierApi
                        );
         $xmlCurlResponse = $this->executeCurl($xmlRequest->asXML());
         $mappedCarDetails = $this->mapVehicleDetails($xmlCurlResponse, $fleetObject);
-
         $result['status'] = "Failed";
+        
         if((string) $xmlCurlResponse->ResRates->attributes()->success === "true") {
             $acrissHelper = new AcrissHelper();
             $result = [];
