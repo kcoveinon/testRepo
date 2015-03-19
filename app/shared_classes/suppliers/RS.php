@@ -110,7 +110,7 @@ class RS extends SupplierApi
         $xmlCurlResponse = $this->executeCurl($xmlRequest->asXML());
         $mappedCarDetails = $this->mapVehicleDetails($xmlCurlResponse, $fleetObject);
         $result['status'] = "Failed";
-        
+
         if((string) $xmlCurlResponse->ResRates->attributes()->success === "true") {
             $acrissHelper = new AcrissHelper();
             $result = [];
@@ -172,10 +172,12 @@ class RS extends SupplierApi
     public function mapVehicleDetails($xml, $fleetObject)
     {
         $mapCarDetails = array();
+
         foreach ($xml->ResRates->Rate as $key => $value) {
             $detail = $fleetObject->xpath($value->Class);
             $mapCarDetails[] = reset($detail);
         }
+
         return $mapCarDetails;
     }
 
@@ -227,6 +229,7 @@ class RS extends SupplierApi
                         $rateId,
                         $countryCode 
                        );
+
         return $this->executeCurl($xmlRequest->asXML()); 
     }
 
