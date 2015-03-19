@@ -120,9 +120,9 @@ class HZ extends SupplierApi
 	 */
 	public function cancelBooking($bookingId)
 	{
-		$response = $this->getCancelBookingXml($bookingId);
+		$xmlRequest = $this->getCancelBookingXml($bookingId);
 
-		return $this->executeCurl($response);	
+		return $this->executeCurl($xmlRequest->asXML());	
 	}
 
 	/**
@@ -173,7 +173,7 @@ class HZ extends SupplierApi
 	 */
 	public function getBookingDetails($bookingId)
 	{
-		$xmlRequest = $this->getBookingDetailsXML($value);
+		$xmlRequest = $this->getBookingDetailsXML($bookingId);
 		return $this->executeCurl($xmlRequest->asXML());	
 	}
 
@@ -430,7 +430,6 @@ class HZ extends SupplierApi
 		$addressNode->addChild("PostalCode", "73112");
 		$stateProveNode     = $addressNode->addChild("StateProv");
 		$stateProveNode->addAttribute("StateCode", "OK");
-		$addressNode->addChild("CountryName")->addAttribute("Code", $countryCode);	
 		
 		$vehPrefNode        = $vehModifyRQCore->addChild("VehPref");
 		$vehPrefNode->addAttribute("AirConditionInd", "true");
