@@ -145,6 +145,7 @@ class RS extends SupplierApi
                 $counter++;
             }
         }
+
         return $result;
     }
 
