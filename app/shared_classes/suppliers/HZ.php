@@ -295,9 +295,11 @@ class HZ extends SupplierApi
 							$this->convertToDateTimeDefaultFormat($returnDate, $returnTime),
 							$pickUpLocationCode,
 							$returnLocationCode,
-							$countryCode
+							$countryCode,
+							$driverAge
 					   );
 		$xmlObject = $this->executeCurl($xmlRequest->asXML());
+		return $xmlObject;
 		$result = [];
 
 		if (isset($xmlObject->Errors)) {
@@ -604,6 +606,7 @@ class HZ extends SupplierApi
 	 * @param  string $pickUpLocationId 
 	 * @param  string $returnLocationId 
 	 * @param  string $countryCode      
+	 * @param  int $countryCode      
 	 *    
 	 * @return XML                   
 	 */
@@ -612,7 +615,8 @@ class HZ extends SupplierApi
 		$returnDateTime,
 		$pickUpLocationId,
 		$returnLocationId,
-		$countryCode
+		$countryCode,
+		$driverAge
 	) {
 		$xml = $this->getXMLCredentialNode(self::SEARCH_VEHICLE_ACTION, $countryCode);
 
@@ -634,7 +638,9 @@ class HZ extends SupplierApi
         $vehAvailRQInfoNode = $xml->addChild("VehAvailRQInfo");
         $customerNode       = $vehAvailRQInfoNode->addChild("Customer");
         $primaryNode        = $customerNode->addChild("Primary");
-        $primaryNode->addAttribute("BirthDate", "1970-06-13");
+
+        $newDriverAge = date("Y") - ((int) str_replace("+", "", $driverAge));
+        $primaryNode->addAttribute("BirthDate", $newDriverAge."-06-13");
         $primaryNode->addChild("Email", "saford@hertz");
 
         $addressNode = $primaryNode->addChild("Address");
