@@ -169,9 +169,11 @@ class RS extends SupplierApi
     }
 
     /**
-     * Map Car Details on the RedSpot's Object
+     * Map Car Details on the RedSpot's Fleet Object
+     * 
      * @param  xml $xml
      * @param  xml $fleetObject
+     * 
      * @return ARRAY
      */
     public function mapVehicleDetails($xml, $fleetObject)

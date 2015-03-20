@@ -6,7 +6,7 @@ $fleetUrl = "https://www.redspot.com.au/fleet.xml";
 
 return array(
     'api' => array(
-        'url'              => $prodUrl,
+        'url'              => $testUrl,
         'fleetUrl'         => $fleetUrl,
         'username'         => 'vroom',
         'password'         => 'B@R6A!N',
