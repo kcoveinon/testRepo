@@ -156,12 +156,12 @@ class RS extends SupplierApi
 
     /**
      * Strips numbers from a string and get their sum
-     * @param  string $str
+     * @param  string $stringWithNumber
      * @return int
      */
-    public function getSumOfNumbersFromString($str)
+    public function getSumOfNumbersFromString($stringWithNumber)
     {
-        preg_match_all('!\d+!', $str, $matches);
+        preg_match_all('!\d+!', $stringWithNumber, $matches);
         return array_sum($matches[0]);
     }
 
