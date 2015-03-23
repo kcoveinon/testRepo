@@ -10,6 +10,21 @@ class RSController extends BaseController
     {
         $this->supplierApi = App::make(self::DEFAULT_SUPPLIER_CODE);
     }
+
+    public function showAngularTutorial()
+    {
+        return View::make("angular");
+    }
+    public function doBookingWithEquipments()
+    {
+        echo '<pre>'; print_r(Input::all()); exit();
+    }
+
+    public function showBooking()
+    {
+        return View::make('rs-booking');
+    }
+
     public function searchVehicles(
         $pickUpDate, 
         $pickUpTime, 
