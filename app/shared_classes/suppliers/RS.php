@@ -7,10 +7,10 @@
  */
 class RS extends SupplierApi
 {
-    const DEFAULT_XMLNS = "http://www.thermeon.com/webXG/xml/webxml/";
-    const DEFAULT_XML_VERSION = "2.2202";
-    const DEFAULT_CONFIRMATION_NUMBER = "123ABC456";
-    const DEFAULT_CORPORATE_ID = "CDBGWHEL";
+    const DEFAULT_XMLNS = 'http://www.thermeon.com/webXG/xml/webxml/';
+    const DEFAULT_XML_VERSION = '2.2202';
+    const DEFAULT_CONFIRMATION_NUMBER = '123ABC456';
+    const DEFAULT_CORPORATE_ID = 'CDBGWHEL';
 
     /*
      * The API URL
@@ -51,10 +51,10 @@ class RS extends SupplierApi
         $this->feelUrl      = Config::get($this->supplierCode  . '.api.fleetUrl');
 
         $this->headers = array(
-            "Content-type: text/xml;charset=\"utf-8\"",
-            "Accept: text/xml",
-            "Cache-Control: no-cache",
-            "Pragma: no-cache"
+            'Content-type: text/xml;charset="utf-8"',
+            'Accept: text/xml',
+            'Cache-Control: no-cache',
+            'Pragma: no-cache'
         );
 
         $this->defaultCurlOptions  = array(
@@ -69,7 +69,8 @@ class RS extends SupplierApi
             CURLOPT_HTTPHEADER     => $this->headers
         );
 
-        $this->referenceNumber = "r" . date_format(date_create(), "U");
+        $this->referenceNumber = 'r' . date_format(date_create(), 'U');
+
     }
 
     /**
@@ -109,43 +110,45 @@ class RS extends SupplierApi
                        );
         $xmlCurlResponse  = $this->executeCurl($xmlRequest->asXML());
         $mappedCarDetails = $this->mapVehicleDetails($xmlCurlResponse, $fleetObject);
-        $result           = array();        
-        $result['status'] = "Failed";
+        $result           = array('status' => 'Failed');
 
-        if ((string) $xmlCurlResponse->ResRates->attributes()->success === "true") {
-            $acrissHelper     = new AcrissHelper();
-            $result['status'] = "OK";
-            $counter          = 0;
+        if ((string) $xmlCurlResponse->ResRates->attributes()->success !== 'true') {
+            $result['data'][] = isset($xmlCurlResponse->CriticalError) ? $xmlCurlResponse->CriticalError : 'Error';
+            return $result;
+        }
 
-            foreach ($xmlCurlResponse->ResRates->Rate as $value) {
+        $acrissHelper     = new AcrissHelper();
+        $result['status'] = 'OK';
+        $counter          = 0;
 
-                if (!empty($mappedCarDetails[$counter])) {
-                    $result['data'][] = array(
-                        'hasAirCondition' => (string) 'N/A',
-                        'transmission'    => (string) $mappedCarDetails[$counter]->gearbox,
-                        'baggageQty'      => $this->getSumOfNumbersFromString($mappedCarDetails[$counter]->storage),
-                        'co2Qty'          => 'N/A',
-                        'categoryCode'    => (string) $value->Class,
-                        'expandedCode'    => $acrissHelper->expandCode((string) $value->Class),                    
-                        'doorCount'       => $this->getSumOfNumbersFromString($mappedCarDetails[$counter]->doors),
-                        'name'            => (string) $mappedCarDetails[$counter]->make . " " . $mappedCarDetails[$counter]->model,
-                        'seats'           => $this->getSumOfNumbersFromString($mappedCarDetails[$counter]->capacity),
-                        'vehicleStatus'   => array(
-                            'code'        => 'N/A',
-                            'description' => 'N/A',
-                        ),
-                        'rateId'    => (string) $value->RateID,
-                        'basePrice' => (string) $value->RateOnlyEstimate,
-                        'currency'  => (string) $value->CurrencyCode,
-                        'bookingCurrencyOfTotalRateEstimate' => 'N/A',
-                        'xrsBasePrice'                       => 'N/A',
-                        'xrsBasePriceInBookingCurrency'      => 'N/A',
-                        'totalRateEstimate'                  => (string) $value->Estimate,
-                        'totalRateEstimateInBookingCurrency' => 'N/A',
-                    );
-                }
-                $counter++;
+        foreach ($xmlCurlResponse->ResRates->Rate as $value) {
+            if (!empty($mappedCarDetails[$counter])) {
+                $result['data'][] = array(
+                    'hasAirCondition' => (string) 'N/A',
+                    'transmission'    => (string) $mappedCarDetails[$counter]->gearbox,
+                    'baggageQty'      => $this->getSumOfNumbersFromString($mappedCarDetails[$counter]->storage),
+                    'co2Qty'          => 'N/A',
+                    'categoryCode'    => (string) $value->Class,
+                    'expandedCode'    => $acrissHelper->expandCode((string) $value->Class),                    
+                    'doorCount'       => $this->getSumOfNumbersFromString($mappedCarDetails[$counter]->doors),
+                    'name'            => (string) $mappedCarDetails[$counter]->make . " " . $mappedCarDetails[$counter]->model,
+                    'seats'           => $this->getSumOfNumbersFromString($mappedCarDetails[$counter]->capacity),
+                    'vehicleStatus'   => array(
+                        'code'        => 'N/A',
+                        'description' => 'N/A',
+                    ),
+                    'rateId'    => (string) $value->RateID,
+                    'basePrice' => (string) $value->RateOnlyEstimate,
+                    'currency'  => (string) $value->CurrencyCode,
+                    'bookingCurrencyOfTotalRateEstimate' => 'N/A',
+                    'xrsBasePrice'                       => 'N/A',
+                    'xrsBasePriceInBookingCurrency'      => 'N/A',
+                    'totalRateEstimate'                  => (string) $value->Estimate,
+                    'totalRateEstimateInBookingCurrency' => 'N/A',
+                );
             }
+
+            $counter++;
         }
 
         return $result;
@@ -159,13 +162,7 @@ class RS extends SupplierApi
     public function getSumOfNumbersFromString($str)
     {
         preg_match_all('!\d+!', $str, $matches);
-        $sum = 0;
-
-        foreach (reset($matches) as $value) {
-            $sum += $value;
-        }
-
-        return $sum;
+        return array_sum($matches[0]);
     }
 
     /**
@@ -180,7 +177,7 @@ class RS extends SupplierApi
     {
         $mapCarDetails = array();
 
-        foreach ($xml->ResRates->Rate as $key => $value) {
+        foreach ($xml->ResRates->Rate as $value) {
             $detail          = $fleetObject->xpath($value->Class);
             $mapCarDetails[] = reset($detail);
         }
@@ -226,15 +223,15 @@ class RS extends SupplierApi
         $countryCode 
     ) {
         $xmlRequest = $this->getXMLForBooking(
-                        $pickUpDate,
-                        $pickUpTime,
-                        $returnDate,
-                        $returnTime,
-                        $pickUpLocationCode, 
-                        $returnLocationCode,
-                        $vehicleClass,
-                        $rateId,
-                        $countryCode 
+                          $pickUpDate,
+                          $pickUpTime,
+                          $returnDate,
+                          $returnTime,
+                          $pickUpLocationCode, 
+                          $returnLocationCode,
+                          $vehicleClass,
+                          $rateId,
+                          $countryCode 
                        );
 
         return $this->executeCurl($xmlRequest->asXML()); 
@@ -267,37 +264,38 @@ class RS extends SupplierApi
         $countryCode        
     ) {
         $xml = $this->createRootRequestNode();
-        $newReservationRequestNode = $xml->addChild("NewReservationRequest");
-        $newReservationRequestNode->addAttribute("confirmAvailability", "true");
+        $newReservationRequestNode = $xml->addChild('NewReservationRequest');
+        $newReservationRequestNode->addAttribute('confirmAvailability', 'true');
 
-        $pickUpLocationNode = $newReservationRequestNode->addChild("Pickup");
-        $pickUpLocationNode->addAttribute("locationCode", $pickUpLocationCode);
-        $pickUpLocationNode->addAttribute("dateTime", $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime));
-        $returnLocationNode = $newReservationRequestNode->addChild("Return");
-        $returnLocationNode->addAttribute("locationCode", $returnLocationCode);
-        $returnLocationNode->addAttribute("dateTime", $this->convertToDateTimeDefaultFormat($returnDate, $returnTime));        
+        $pickUpLocationNode = $newReservationRequestNode->addChild('Pickup');
+        $pickUpLocationNode->addAttribute('locationCode', $pickUpLocationCode);
+        $pickUpLocationNode->addAttribute('dateTime', $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime));
+        $returnLocationNode = $newReservationRequestNode->addChild('Return');
+        $returnLocationNode->addAttribute('locationCode', $returnLocationCode);
+        $returnLocationNode->addAttribute('dateTime', $this->convertToDateTimeDefaultFormat($returnDate, $returnTime));        
 
-        $sourceNode = $newReservationRequestNode->addChild("Source");
-        $sourceNode->addAttribute("confirmationNumber", self::DEFAULT_CONFIRMATION_NUMBER);
-        $sourceNode->addAttribute("countryCode", $countryCode);
-        $sourceNode->addAttribute("corporateRateID", self::DEFAULT_CORPORATE_ID);
-        $newReservationRequestNode->addChild("Vehicle")->addAttribute("classCode", $vehicleClass);
+        $sourceNode = $newReservationRequestNode->addChild('Source');
+        $sourceNode->addAttribute('confirmationNumber', self::DEFAULT_CONFIRMATION_NUMBER);
+        $sourceNode->addAttribute('countryCode', $countryCode);
+        $sourceNode->addAttribute('corporateRateID', self::DEFAULT_CORPORATE_ID);
+        $newReservationRequestNode->addChild('Vehicle')->addAttribute('classCode', $vehicleClass);
 
-        $renterNode = $newReservationRequestNode->addChild("Renter");
-        $renterNameNode = $renterNode->addChild("RenterName");
-        $renterNameNode->addAttribute("firstName", "test");
-        $renterNameNode->addAttribute("lastName", "test");
-        $addressNode = $renterNode->addChild("Address");
-        $addressNode->addChild("Email", "info@redspotcars.com.au");
-        $addressNode->addChild("HomeTelephoneNumber", "0283032222");
+        $renterNode = $newReservationRequestNode->addChild('Renter');
+        $renterNameNode = $renterNode->addChild('RenterName');
+        $renterNameNode->addAttribute('firstName', 'test');
+        $renterNameNode->addAttribute('lastName', 'test');
 
-        $quotedRateNode = $newReservationRequestNode->addChild("QuotedRate");
-        $quotedRateNode->addAttribute("rateID", $rateId);
-        $quotedRateNode->addAttribute("classCode", $vehicleClass);
+        $addressNode = $renterNode->addChild('Address');
+        $addressNode->addChild('Email', 'info@redspotcars.com.au');
+        $addressNode->addChild('HomeTelephoneNumber', '0283032222');
 
-        $flightNode = $newReservationRequestNode->addChild("Flight");
-        $flightNode->addAttribute("airlineCode", "QF");
-        $flightNode->addAttribute("flightNumber", "142");
+        $quotedRateNode = $newReservationRequestNode->addChild('QuotedRate');
+        $quotedRateNode->addAttribute('rateID', $rateId);
+        $quotedRateNode->addAttribute('classCode', $vehicleClass);
+
+        $flightNode = $newReservationRequestNode->addChild('Flight');
+        $flightNode->addAttribute('airlineCode', 'QF');
+        $flightNode->addAttribute('flightNumber', '142');
 
         return $xml;
     }
@@ -312,8 +310,8 @@ class RS extends SupplierApi
     public function getXMLForCancelBooking($bookingId)
     {
         $xml = $this->createRootRequestNode();
-        $cancelReservationRequestNode = $xml->addChild("CancelReservationRequest");
-        $cancelReservationRequestNode->addAttribute("reservationNumber", $bookingId);
+        $cancelReservationRequestNode = $xml->addChild('CancelReservationRequest');
+        $cancelReservationRequestNode->addAttribute('reservationNumber', $bookingId);
 
         return $xml;
     }
@@ -343,16 +341,18 @@ class RS extends SupplierApi
         $countryCode
     ) {
         $xml = $this->createRootRequestNode();
-        $resRatesnode = $xml->addChild("ResRates");
-        $pickUpLocationNode = $resRatesnode->addChild("Pickup");
-        $pickUpLocationNode->addAttribute("locationCode", $pickUpLocationCode);
-        $pickUpLocationNode->addAttribute("dateTime", $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime));
-        $returnLocationNode = $resRatesnode->addChild("Return");
-        $returnLocationNode->addAttribute("locationCode", $returnLocationCode);
-        $returnLocationNode->addAttribute("dateTime", $this->convertToDateTimeDefaultFormat($returnDate, $returnTime));        
-        // $resRatesnode->addChild("Class", $vehicleClass);
-        $sourceNode = $resRatesnode->addChild("Source");
-        $sourceNode->addAttribute("countryCode", $countryCode);
+        $resRatesnode = $xml->addChild('ResRates');
+
+        $pickUpLocationNode = $resRatesnode->addChild('Pickup');
+        $pickUpLocationNode->addAttribute('locationCode', $pickUpLocationCode);
+        $pickUpLocationNode->addAttribute('dateTime', $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime));
+
+        $returnLocationNode = $resRatesnode->addChild('Return');
+        $returnLocationNode->addAttribute('locationCode', $returnLocationCode);
+        $returnLocationNode->addAttribute('dateTime', $this->convertToDateTimeDefaultFormat($returnDate, $returnTime));        
+        // $resRatesnode->addChild('Class', $vehicleClass);
+        $sourceNode = $resRatesnode->addChild('Source');
+        $sourceNode->addAttribute('countryCode', $countryCode);
 
         return $xml;
     }
@@ -367,10 +367,10 @@ class RS extends SupplierApi
      */
     private function convertToDateTimeDefaultFormat($date, $time)
     {
-        $date   =  new DateTime($date." ".$time);
+        $date   = new DateTime($date.' '.$time);
         $result = $date->format('Y-m-d H:i:s');
 
-        return str_replace(" ", "T", $result);
+        return str_replace(' ', 'T', $result);
     }
 
     /**
@@ -381,9 +381,9 @@ class RS extends SupplierApi
     private function createRootRequestNode()
     {
         $xml = new SimpleXMLElement('<Request></Request>');
-        $xml->addAttribute("xmlns", self::DEFAULT_XMLNS);
-        $xml->addAttribute("referenceNumber", $this->referenceNumber);
-        $xml->addAttribute("version", self::DEFAULT_XML_VERSION);
+        $xml->addAttribute('xmlns', self::DEFAULT_XMLNS);
+        $xml->addAttribute('referenceNumber', $this->referenceNumber);
+        $xml->addAttribute('version', self::DEFAULT_XML_VERSION);
 
         return $xml;
     }

@@ -6,9 +6,9 @@ $testUrl =  "https://vv.xqual.hertz.com/DirectLinkWEB/handlers/DirectLinkHandler
 return array(
 	'api' => array(
 		'url'              => $testUrl,
-		'validationCode'         => 'B2S19P16R18',
-		'validationNumber'         => 'T487',
-		'consumerProductCode'         => 'A9CF',
+		'validationCode'         => '11V04R77M05',
+		'validationNumber'         => 'T695',
+		'consumerProductCode'         => 'XM03',
 	),
 );
 
@@ -18,5 +18,13 @@ return array(
  * 'validationCode'         => '11V04R77M05',
  * 'validationNumber'         => 'T695',
  * 'consumerProductCode'         => 'XM03',
+ */
+
+/**
+ * Test Credentials
+ * 
+ * 'validationCode'         => 'B2S19P16R18',
+ * 'validationNumber'         => 'T487',
+ * 'consumerProductCode'         => 'A9CF',
  */
 
