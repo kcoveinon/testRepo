@@ -65,7 +65,7 @@ class RS extends SupplierApi
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT        => 10,
             CURLOPT_HTTPAUTH       => CURLAUTH_BASIC,
-            CURLOPT_USERPWD        => $this->apiUsername . ":" . $this->apiPassword,
+            CURLOPT_USERPWD        => $this->apiUsername . ':' . $this->apiPassword,
             CURLOPT_HTTPHEADER     => $this->headers
         );
 
