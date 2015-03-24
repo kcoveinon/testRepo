@@ -99,6 +99,14 @@
                 </table>
             </div>            
             <div class="ui blue button" ng-click="addBooking()">Submit</div>
+            <br/><br/>
+
+            <div class="ui positive message" ng-if='response.xml !== ""'>
+                <div class="header">
+                    Booking Response
+                </div>
+                <div><pre><% response.xml%></pre></div>
+            </div>            
         {{Form::close()}}
     </div>
 @stop
@@ -153,7 +161,7 @@
                     'quantityArray'      : new Array(10),
                     'bookingEquipments'  : []
                 };
-
+                $scope.response = { xml: '' };
                 $scope.addEquipments = function() {
                     if( $scope.bookingDetails.eqCode !== "" && $scope.bookingDetails.eqQty !== "") {
                         $scope.bookingDetails.bookingEquipments.push({name:$scope.bookingDetails.eqCode, qty:$scope.bookingDetails.eqQty, action:'Delete'})
@@ -189,10 +197,9 @@
                             type: 'json'
                         })
                         .success(function(data, status, headers, config) {
-                            console.log(data);
-                            console.log(status);
-                            console.log(headers);
-                            console.log(config);
+                            $scope.response = {
+                                xml : data
+                            }
                         })
                     };
             }]);
