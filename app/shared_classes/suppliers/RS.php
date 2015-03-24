@@ -49,6 +49,8 @@ class RS extends SupplierApi
         $this->apiUsername  = Config::get($this->supplierCode  . '.api.username');
         $this->apiPassword  = Config::get($this->supplierCode  . '.api.password');
         $this->feelUrl      = Config::get($this->supplierCode  . '.api.fleetUrl');
+        $this->locationsUrl = Config::get($this->supplierCode  . '.api.locationsUrl');
+        $this->optionsUrl   = Config::get($this->supplierCode  . '.api.optionsUrl');
 
         $this->headers = array(
             'Content-type: text/xml;charset="utf-8"',
@@ -97,7 +99,6 @@ class RS extends SupplierApi
         $vehicleClass, 
         $countryCode
     ) {
-        $fleetObject = new SimpleXMLElement(file_get_contents($this->feelUrl));
         $xmlRequest  = $this->getSearchVehicleXML(
                             $pickUpDate, 
                             $pickUpTime, 
@@ -109,7 +110,7 @@ class RS extends SupplierApi
                             $countryCode 
                        );
         $xmlCurlResponse  = $this->executeCurl($xmlRequest->asXML());
-        $mappedCarDetails = $this->mapVehicleDetails($xmlCurlResponse, $fleetObject);
+        $mappedCarDetails = $this->mapVehicleDetails($xmlCurlResponse);
         $result           = array('status' => 'Failed');
 
         if ((string) $xmlCurlResponse->ResRates->attributes()->success !== 'true') {
@@ -169,20 +170,28 @@ class RS extends SupplierApi
      * Map Car Details on the RedSpot's Fleet Object
      * 
      * @param  xml $xml
-     * @param  xml $fleetObject
      * 
      * @return ARRAY
      */
-    public function mapVehicleDetails($xml, $fleetObject)
+    public function mapVehicleDetails($xml)
     {
         $mapCarDetails = array();
-
+        $fleetObject = $this->getFleet();
         foreach ($xml->ResRates->Rate as $value) {
             $detail          = $fleetObject->xpath($value->Class);
             $mapCarDetails[] = reset($detail);
         }
 
         return $mapCarDetails;
+    }
+
+    /**
+     * Handles the cURL request for 
+     * @return XML
+     */
+    public function getFleet()
+    {
+        return new SimpleXMLElement(file_get_contents($this->feelUrl));
     }
 
     /**

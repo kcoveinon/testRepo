@@ -13,6 +13,11 @@ class HZController extends BaseController
         $this->supplierApi = App::make(self::DEFAULT_SUPPLIER_CODE);		
 	}
 
+	public function showBooking()
+	{
+		return View::make("hz-booking");
+	}
+
 	public function getLocationDepots($locationCode)
 	{
 		$result = $this->supplierApi->getLocationDepots($locationCode);

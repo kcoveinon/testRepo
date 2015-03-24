@@ -4,7 +4,7 @@
 @section('content')
     <div class="ui fixed inverted main menu">
         <a class="launch item">
-          <h1>RedSpot Booking Form</h1>
+          <h1>Hertz Booking Form</h1>
         </a>
     </div><br/><br/><br/>
     <div ng-app="BookingApp">
@@ -38,32 +38,35 @@
                     <label>Return Time</label>
                     <input placeholder="First Name" ng-model="bookingDetails.returnTime" type="text"/>
                 </div>                                   
-            </div>      
-            <div class='two fields'>
-                <div class="field">
-                    <label>Rate ID</label>
-                    <input placeholder="First Name" ng-model="bookingDetails.rateId" type="text"/>
-                </div>
-                <div class="field">
-                    <label>Country Code</label>
-                    <input placeholder="First Name" ng-model="bookingDetails.countryCode" type="text" value="AU"/>
-                </div>
-                </div>
+            </div>     
             <div class="field">
-                <label>Vehicle Class</label>
+                <label>Country Code</label>
+                <input placeholder="First Name" ng-model="bookingDetails.countryCode" type="text" value="AU"/>
+            </div>             
+            <div class="field">
+                <label>Vehicle Category</label>
                 <select  ng-model="vehicleClass">
                     <option value="">All</option>
-                    <option ng-repeat="vClass in bookingDetails.vehicleClass" value="<% vClass %>">
-                        <% vClass %>
+                    <option ng-repeat="vCategory in bookingDetails.vehicleCategory" value="<% vCategory %>">
+                        <% vCategory %>
                     </option>
                 </select>
             </div>
+            <div class='field'>
+                <label>Vehicle Class</label>
+                <select  ng-model="vehicleClass">
+                    <option value="">All</option>
+                    <option ng-repeat="vClass in bookingDetails.vehicleClass" value="<% vClass.code %>">
+                        <% vClass.alias %>
+                    </option>
+                </select>
+            </div>            
             <div class='three fields'>
                 <div class="field">
                     <label>Equipment Code</label>
                     <select ng-model="bookingDetails.eqCode">
-                        <option ng-repeat="eCodes in bookingDetails.equipmentsCodes">
-                            <% eCodes %>
+                        <option ng-repeat="eCodes in bookingDetails.equipmentsCodes" value="<% eCodes.alias %>">
+                            <% eCodes.alias %>
                         </option>
                     </select>
                 </div>
@@ -97,7 +100,7 @@
                         </tr>
                     </tbody>
                 </table>
-            </div>            
+            </div>              
             <div class="ui blue button" ng-click="addBooking()">Submit</div>
         {{Form::close()}}
     </div>
@@ -124,8 +127,8 @@
                     'returnDate'         : '12/15/2015',
                     'pickUpTime'         : '10:00',
                     'returnTime'         : '12:00',
-                    'vehicleClass'       : [ 'ECMR', 'ECAR', 'CDAR', 'IDAR', 'FCAR', 'IFAR', 'PVAR', 'IVAR'],
-                    'vehicleCategory'       :  [ 
+                    'vehicleCategory'    : [ 'Car', 'Van', 'SUV', 'Convertible', 'Limousine', 'Station Wagon', 'Pickup', 'Motorhome', 'All-terrain', 'Recreational', 'Sport', 'Special', 'Pickup Extended Cab', 'Regular Cab Pickup', 'Special Offer', 'Coupe', 'Monospace', '2 Wheel Vehicle', 'Roadster', 'Commercial/Van Truck'],
+                    'vehicleClass'       :  [ 
                                             {code : '1', alias : 'Mini' },
                                             {code : '2', alias : 'Subcompact' },
                                             {code : '3', alias : 'Economy' },
@@ -146,8 +149,20 @@
                                             {code : '39', alias : 'Premium Elite' },
                                             {code : '40', alias : 'Luxury Elite'},
                                             {code : '41', alias : 'Oversize'}
-                                            ],                    
-                    'equipmentsCodes'    : [ 'BCAPS' , 'BOOST', 'BSEAT', 'SATNV'],
+                                            ],
+                    'equipmentsCodes'    : [ 
+                                            {code : '4',  alias : 'Ski Rack' },
+                                            {code : '7',  alias : 'Infant Child Seat' },
+                                            {code : '8',  alias : 'Child Toddler Seat' },
+                                            {code : '9',  alias : 'Booster Saet' },
+                                            {code : '11', alias : 'Hand Controls Right' },
+                                            {code : '12', alias : 'Hand Controls Left' },
+                                            {code : '13', alias : 'Neverlost System' },
+                                            {code : '14', alias : 'Snow Tires' },
+                                            {code : '18', alias : 'Spinner Knob' },
+                                            {code : '27', alias : 'Satellite Radio' },
+                                            {code : '29', alias : 'Seatbelt Extender' }
+                                            ],
                     'rateId'             : '12',
                     'countryCode'        : 'AU',
                     'quantityArray'      : new Array(10),
