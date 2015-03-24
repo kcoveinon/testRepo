@@ -45,16 +45,16 @@
             </div>             
             <div class="field">
                 <label>Vehicle Category</label>
-                <select  ng-model="vehicleClass">
+                <select ng-model="vehicleCategory">
                     <option value="">All</option>
-                    <option ng-repeat="vCategory in bookingDetails.vehicleCategory" value="<% vCategory %>">
-                        <% vCategory %>
+                    <option ng-repeat="vCategory in bookingDetails.vehicleCategory" value='<% vCategory.code %>'>
+                        <% vCategory.alias %>
                     </option>
                 </select>
             </div>
             <div class='field'>
                 <label>Vehicle Class</label>
-                <select  ng-model="vehicleClass">
+                <select ng-model="vehicleClass">
                     <option value="">All</option>
                     <option ng-repeat="vClass in bookingDetails.vehicleClass" value="<% vClass.code %>">
                         <% vClass.alias %>
@@ -65,7 +65,7 @@
                 <div class="field">
                     <label>Equipment Code</label>
                     <select ng-model="bookingDetails.eqCode">
-                        <option ng-repeat="eCodes in bookingDetails.equipmentsCodes" value="<% eCodes.alias %>">
+                        <option ng-repeat="eCodes in bookingDetails.equipmentsCodes" value="<% $index %>">
                             <% eCodes.alias %>
                         </option>
                     </select>
@@ -123,12 +123,34 @@
                 $scope.bookingDetails = {
                     'pickUpLocationCode' : 'BNE',
                     'returnLocationCode' : 'ADL',
-                    'pickUpDate'         : '12/12/2015',
-                    'returnDate'         : '12/15/2015',
+                    'pickUpDate'         : '2015-12-12',
+                    'returnDate'         : '2015-12-15',
                     'pickUpTime'         : '10:00',
                     'returnTime'         : '12:00',
-                    'vehicleCategory'    : [ 'Car', 'Van', 'SUV', 'Convertible', 'Limousine', 'Station Wagon', 'Pickup', 'Motorhome', 'All-terrain', 'Recreational', 'Sport', 'Special', 'Pickup Extended Cab', 'Regular Cab Pickup', 'Special Offer', 'Coupe', 'Monospace', '2 Wheel Vehicle', 'Roadster', 'Commercial/Van Truck'],
-                    'vehicleClass'       :  [ 
+                    'vehicleCategory'    : [
+                                            {code : '1' , alias : 'Car'},
+                                            {code : '2' , alias : 'Van'},
+                                            {code : '3' , alias : 'SUV'},
+                                            {code : '4' , alias : 'Convertible'},
+                                            {code : '7' , alias : 'Limousine'},
+                                            {code : '8' , alias : 'Station Wagon'},
+                                            {code : '9' , alias : 'Pickup'},
+                                            {code : '10', alias : 'Motorhome'},
+                                            {code : '11', alias : 'All-terrain'},
+                                            {code : '12' , alias : 'Recreational'},
+                                            {code : '13' , alias : 'Sport'},
+                                            {code : '14' , alias : 'Special'},
+                                            {code : '15' , alias : 'Pickup Extended Cab'},
+                                            {code : '16' , alias : 'Regular Cab Pickup'},
+                                            {code : '17' , alias : 'Special Offer'},
+                                            {code : '18' , alias : 'Coupe'},
+                                            {code : '19' , alias : 'Monospace'},
+                                            {code : '20' , alias : '2 Wheel Vehicle'},
+                                            {code : '21' , alias : 'Roadster'},
+                                            {code : '21' , alias : 'Crossover'},
+                                            {code : '23' , alias : 'Commercial/Van Truck'}
+                                           ],
+                    'vehicleClass'       : [ 
                                             {code : '1', alias : 'Mini' },
                                             {code : '2', alias : 'Subcompact' },
                                             {code : '3', alias : 'Economy' },
@@ -149,8 +171,8 @@
                                             {code : '39', alias : 'Premium Elite' },
                                             {code : '40', alias : 'Luxury Elite'},
                                             {code : '41', alias : 'Oversize'}
-                                            ],
-                    'equipmentsCodes'    : [ 
+                                         ],
+                    'equipmentsCodes'    : [
                                             {code : '4',  alias : 'Ski Rack' },
                                             {code : '7',  alias : 'Infant Child Seat' },
                                             {code : '8',  alias : 'Child Toddler Seat' },
@@ -166,13 +188,17 @@
                     'rateId'             : '12',
                     'countryCode'        : 'AU',
                     'quantityArray'      : new Array(10),
-                    'bookingEquipments' : []
+                    'bookingEquipments'  : []
                 };
 
                 $scope.addEquipments = function() {
                     if(typeof $scope.bookingDetails.eqCode !== "undefined"
                        && typeof $scope.bookingDetails.eqQty !== "undefined") {
-                        $scope.bookingDetails.bookingEquipments.push({name:$scope.bookingDetails.eqCode, qty:$scope.bookingDetails.eqQty, action:'Delete'})
+                        var equipmentIndex = $scope.bookingDetails.eqCode;
+                        $scope.bookingDetails.bookingEquipments.push({name:$scope.bookingDetails.equipmentsCodes[equipmentIndex].alias, 
+                                                                      qty:$scope.bookingDetails.eqQty, 
+                                                                      action:'Delete',
+                                                                      eqOTACode:$scope.bookingDetails.equipmentsCodes[equipmentIndex].code })
                         $scope.bookingDetails.eqCode = "";
                         $scope.bookingDetails.eqQty = "";
                     }
@@ -196,19 +222,17 @@
                                     pickUpTime         : $scope.bookingDetails.pickUpTime,
                                     returnDate         : $scope.bookingDetails.returnDate,
                                     returnTime         : $scope.bookingDetails.returnTime,
-                                    vehicleClass       : $scope.vehicleClass,
                                     rateId             : $scope.bookingDetails.rateId,
                                     countryCode        : $scope.bookingDetails.countryCode,
-                                    vehicleEquipments  : $scope.bookingDetails.bookingEquipments
+                                    vehicleEquipments  : $scope.bookingDetails.bookingEquipments,
+                                    vehicleCategory    : $scope.vehicleCategory,
+                                    vehicleClass       : $scope.vehicleClass
                                 },
                             method : 'POST',
                             type: 'json'
                         })
                         .success(function(data, status, headers, config) {
-                            console.log(data);
-                            console.log(status);
-                            console.log(headers);
-                            console.log(config);
+
                         })
                     };
             }]);

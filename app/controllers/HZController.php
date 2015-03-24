@@ -42,6 +42,24 @@ class HZController extends BaseController
 		return Response::json($result);	
 	}
 
+	public function doBookingWithEquipments()
+	{
+		$result = $this->supplierApi->doBooking(
+						Input::get("pickUpDate"), 
+						Input::get("pickUpTime"), 
+						Input::get("returnDate"), 
+						Input::get("returnTime"), 
+						Input::get("pickUpLocationCode"),
+						Input::get("returnLocationCode"),
+						Input::get("countryCode"), 
+						Input::get("vehicleCategory"), 
+						Input::get("vehicleClass"),
+						Input::get("vehicleEquipments")
+					);
+
+		return Response::json($result);			
+	}
+
 	public function cancelBooking($bookingId)
 	{
 		$result = $this->supplierApi->cancelBooking($bookingId);

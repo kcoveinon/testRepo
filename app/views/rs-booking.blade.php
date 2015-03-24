@@ -52,7 +52,7 @@
             <div class="field">
                 <label>Vehicle Class</label>
                 <select  ng-model="vehicleClass">
-                    <option value="">All</option>
+                    <option value=""></option>
                     <option ng-repeat="vClass in bookingDetails.vehicleClass" value="<% vClass %>">
                         <% vClass %>
                     </option>
@@ -71,7 +71,7 @@
                     <label>Quantity</label>
                     <select ng-model="bookingDetails.eqQty">
                         <option ng-repeat="i in bookingDetails.quantityArray track by $index">
-                            <% $index+1 %>
+                            <% $index + 1 %>
                         </option>
                     </select>
                 </div>
@@ -125,16 +125,16 @@
                     'pickUpTime'         : '10:00',
                     'returnTime'         : '12:00',
                     'vehicleClass'       : [ 'ECMR', 'ECAR', 'CDAR', 'IDAR', 'FCAR', 'IFAR', 'PVAR', 'IVAR'],
-                    'vehicleCategory'       :  [ 
-                                            {code : '1', alias : 'Mini' },
-                                            {code : '2', alias : 'Subcompact' },
-                                            {code : '3', alias : 'Economy' },
-                                            {code : '4', alias : 'Compact' },
-                                            {code : '5', alias : 'MidSize' },
-                                            {code : '6', alias : 'Intermediate' },
-                                            {code : '7', alias : 'Standard' },
-                                            {code : '8', alias : 'Full Size' },
-                                            {code : '9', alias : 'Luxury' },
+                    'vehicleCategory'    : [ 
+                                            {code : '1',  alias : 'Mini' },
+                                            {code : '2',  alias : 'Subcompact' },
+                                            {code : '3',  alias : 'Economy' },
+                                            {code : '4',  alias : 'Compact' },
+                                            {code : '5',  alias : 'MidSize' },
+                                            {code : '6',  alias : 'Intermediate' },
+                                            {code : '7',  alias : 'Standard' },
+                                            {code : '8',  alias : 'Full Size' },
+                                            {code : '9',  alias : 'Luxury' },
                                             {code : '10', alias : 'Premium' },
                                             {code : '23', alias : 'Special' },
                                             {code : '32', alias : 'Mini-Elite' },
@@ -146,17 +146,16 @@
                                             {code : '39', alias : 'Premium Elite' },
                                             {code : '40', alias : 'Luxury Elite'},
                                             {code : '41', alias : 'Oversize'}
-                                            ],                    
-                    'equipmentsCodes'    : [ 'BCAPS' , 'BOOST', 'BSEAT', 'SATNV'],
+                                           ],                    
+                    'equipmentsCodes'    : [ 'BCAPS' , 'BOOST', 'BSEAT', 'SATNV' ],
                     'rateId'             : '12',
                     'countryCode'        : 'AU',
                     'quantityArray'      : new Array(10),
-                    'bookingEquipments' : []
+                    'bookingEquipments'  : []
                 };
 
                 $scope.addEquipments = function() {
-                    if(typeof $scope.bookingDetails.eqCode !== "undefined"
-                       && typeof $scope.bookingDetails.eqQty !== "undefined") {
+                    if( $scope.bookingDetails.eqCode !== "" && $scope.bookingDetails.eqQty !== "") {
                         $scope.bookingDetails.bookingEquipments.push({name:$scope.bookingDetails.eqCode, qty:$scope.bookingDetails.eqQty, action:'Delete'})
                         $scope.bookingDetails.eqCode = "";
                         $scope.bookingDetails.eqQty = "";

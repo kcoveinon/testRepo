@@ -231,6 +231,7 @@ class HZ extends SupplierApi
 	 * @param int $countryCode      
 	 * @param string $vehicleCategory
 	 * @param string $vehicleClass
+	 * @param string $equipments
 	 * 
 	 * @return XML Object
 	 */
@@ -243,7 +244,8 @@ class HZ extends SupplierApi
 		$returnLocationCode,
 		$countryCode, 
 		$vehicleCategory,
-		$vehicleClass
+		$vehicleClass,
+		$equipments
 	) {	
 		if (!$this->validateDate($pickUpDate, $pickUpTime) && !$this->validateDate($returnDate, $returnTime)) {
 			$response = ["result" => "Invalid Parameters"];
@@ -256,7 +258,8 @@ class HZ extends SupplierApi
 							$returnLocationCode,
 							$countryCode,
 							$vehicleCategory,
-							$vehicleClass
+							$vehicleClass,
+							$equipments
 						  );
 
 			$response = $this->executeCurl($xmlRequest->asXML());
@@ -530,6 +533,7 @@ class HZ extends SupplierApi
 	 * @param string $countryCode
 	 * @param int $vehicleCategory      
 	 * @param int $vehicleClass
+	 * @param int $equipments
 	 * 
 	 * @return XML
 	 */
@@ -540,8 +544,10 @@ class HZ extends SupplierApi
 		$returnLocationCode,
 		$countryCode,
 		$vehicleCategory,
-		$vehicleClass
+		$vehicleClass,
+		$equipments
 	) {
+
 		$xmlAction = self::BOOK_VEHICLE_ACTION;
 		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
 
@@ -594,6 +600,15 @@ class HZ extends SupplierApi
 		$vehTypeNode->addAttribute("VehicleCategory", $vehicleCategory);
 		$vehicleClassNode = $vehPrefNode->addChild("vehicleClass");
 		$vehicleClassNode->addAttribute("Size", $vehicleCategory);
+
+		if(count($equipments) > 0) {
+			$specialEquipPrefNode = $vehRsCore->addChild("SpecialEquipPrefs");
+			foreach ($equipments as $equipmentDetails) {
+				$specialEquipPre = $specialEquipPrefNode->addChild("SpecialEquipPref");
+				$specialEquipPre->addAttribute("EquipType", trim($equipmentDetails["eqOTACode"]));
+				$specialEquipPre->addAttribute("Quantity", trim($equipmentDetails["qty"]));
+			}
+		}
 
 		return $xml;
 	}	
@@ -743,8 +758,10 @@ class HZ extends SupplierApi
 
 	/**
 	 * Functions that validates time and date
+	 * 
 	 * @param  date $date
 	 * @param  time $time
+	 * 
 	 * @return bool
 	 */
 	private function validateDate($date, $time)
@@ -754,6 +771,7 @@ class HZ extends SupplierApi
 
 	    return $d && $d->format('Y-m-d H:i:s') == $dateTime;
 	}
+
 }
 
 
