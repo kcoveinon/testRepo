@@ -92,6 +92,7 @@ Route::group(array('prefix' => 'RS/'), function()
 {
     Route::any('showAngular', 'RSController@showAngularTutorial');
     Route::any('showBooking', 'RSController@showBooking');
+    Route::any('getBookingDetails/{bookingId}', 'RSController@getBookingDetails');
     Route::any('doBookingWithEquipments', 'RSController@doBookingWithEquipments');
     Route::any('search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{vehicleClass}/{countryCode}', 'RSController@searchVehicles');
     Route::any('cancel-booking/{bookingId}', 'RSController@cancelBooking');

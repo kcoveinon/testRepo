@@ -36,6 +36,11 @@ class RSController extends BaseController
         return View::make('rs-booking');
     }
 
+    public function getBookingDetails($bookingId)
+    {
+        return Response::json($this->supplierApi->getBookingDetails($bookingId));
+    }
+
     public function searchVehicles(
         $pickUpDate, 
         $pickUpTime, 

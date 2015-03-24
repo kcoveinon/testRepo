@@ -156,6 +156,35 @@ class RS extends SupplierApi
     }
 
     /**
+     * Handles the request for getting bookg details
+     * 
+     * @param  int $bookingId
+     * 
+     * @return XML
+     */
+    public function getBookingDetails($bookingId)
+    {
+        $xmlRequest = $this->getXMLForBookingDetails($bookingId);
+        return $this->executeCurl($xmlRequest->asXML());
+    }
+
+    /**
+     * Retrieve XML for getBookingDetails
+     * 
+     * @param  int $bookingId
+     * 
+     * @return XML
+     */
+    public function getXMLForBookingDetails($bookingId)
+    {
+        $xml = $this->createRootRequestNode();
+        $retrieveReservationRequestNode = $xml->addChild('RetrieveReservationRequest');
+        $retrieveReservationRequestNode->addAttribute("reservationNumber", $bookingId);
+
+        return $xml;
+    }
+
+    /**
      * Strips numbers from a string and get their sum
      * @param  string $stringWithNumber
      * @return int
