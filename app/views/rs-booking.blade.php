@@ -105,7 +105,7 @@
                 <div class="header">
                     Booking Response
                 </div>
-                <div><pre><% response.xml%></pre></div>
+                <div style='font-family:monospace;'><pre><% response.xml | json %></pre></div>
             </div>            
         {{Form::close()}}
     </div>
