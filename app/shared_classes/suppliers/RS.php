@@ -302,12 +302,14 @@ class RS extends SupplierApi
         $flightNode->addAttribute('airlineCode', 'QF');
         $flightNode->addAttribute('flightNumber', '142');
 
-        foreach ($vehicleEquipments as $key => $value) {
-            $optionNode = $newReservationRequestNode->addChild('Option');
-            $optionNode->addChild('Code', trim($value["name"]));
-            $optionNode->addChild('Qty', trim($value["qty"]));
+        if(!empty($vehicleEquipments)) {
+            foreach ($vehicleEquipments as $key => $value) {
+                $optionNode = $newReservationRequestNode->addChild('Option');
+                $optionNode->addChild('Code', trim($value["name"]));
+                $optionNode->addChild('Qty', trim($value["qty"]));
+            }
         }
-        
+
         return $xml;
     }
 

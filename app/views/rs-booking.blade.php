@@ -133,8 +133,11 @@
                 };
 
                 $scope.addEquipments = function() {
-                    if($scope.eqCode !== "" || $scope.eqQty !== "") {
+                    if(typeof $scope.bookingDetails.eqCode !== "undefined"
+                       && typeof $scope.bookingDetails.eqQty !== "undefined") {
                         $scope.bookingDetails.bookingEquipments.push({name:$scope.bookingDetails.eqCode, qty:$scope.bookingDetails.eqQty, action:'Delete'})
+                        $scope.bookingDetails.eqCode = "";
+                        $scope.bookingDetails.eqQty = "";
                     }
                     else {
                         alert("Kindly complete the required fields");
