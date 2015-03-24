@@ -195,7 +195,7 @@ class RS extends SupplierApi
     }
 
     /**
-     * Handles the fetching of options xml
+     * Handles the fetching of locations xml
      * @return XML Object
      */
     public function getLocations()
