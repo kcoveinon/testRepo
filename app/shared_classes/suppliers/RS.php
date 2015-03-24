@@ -297,6 +297,14 @@ class RS extends SupplierApi
         $flightNode->addAttribute('airlineCode', 'QF');
         $flightNode->addAttribute('flightNumber', '142');
 
+        $optionNode = $newReservationRequestNode->addChild('Option');
+        $optionNode->addChild('Code','BPAS');
+        $optionNode->addChild('Qty',' 1');
+
+        $optionNode = $newReservationRequestNode->addChild('Option');
+        $optionNode->addChild('Code','BOOST');
+        $optionNode->addChild('Qty', 2);  
+        
         return $xml;
     }
 

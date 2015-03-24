@@ -17,6 +17,7 @@ class RSController extends BaseController
     }
     public function doBookingWithEquipments()
     {
+        echo '<pre>'; print_r(Input::all()); exit();
         return Response::json($this->supplierApi->doBooking(
                                 Input::get("pickUpDate"),
                                 Input::get("pickUpTime"),
