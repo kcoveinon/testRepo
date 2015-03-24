@@ -8,12 +8,12 @@ $optionsUrl = "https://www.redspot.com.au/options.xml";
 
 return array(
     'api' => array(
-        'url'              => $testUrl,
-        'fleetUrl'         => $fleetUrl,
-        'locationsUrl'         => $locationsUrl,
-        'optionsUrl'         => $optionsUrl,
-        'username'         => 'vroom',
-        'password'         => 'B@R6A!N',
+        'url'          => $testUrl,
+        'fleetUrl'     => $fleetUrl,
+        'locationsUrl' => $locationsUrl,
+        'optionsUrl'   => $optionsUrl,
+        'username'     => 'vroom',
+        'password'     => 'B@R6A!N',
     ),
 );
 
