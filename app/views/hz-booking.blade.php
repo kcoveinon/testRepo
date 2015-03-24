@@ -121,13 +121,13 @@
         (function () {
             var BookingApp = angular.module('BookingApp', ['BookingControllerModule']);
 
-            BookingApp.config(['$interpolateProvider', '$httpProvider', function($interpolateProvider, $httpProvider){
+            BookingApp.config(['$interpolateProvider', '$httpProvider', function ($interpolateProvider, $httpProvider){
                 $interpolateProvider.startSymbol('<%').endSymbol('%>');
                 $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
             }]);
 
             var bookingControllerModule = angular.module('BookingControllerModule', []);
-            bookingControllerModule.controller('BookingController', ['$scope', '$http', function($scope, $http){
+            bookingControllerModule.controller('BookingController', ['$scope', '$http', function ($scope, $http){
                 $scope.bookingDetails = {
                     'pickUpLocationCode' : 'BNE',
                     'returnLocationCode' : 'ADL',
