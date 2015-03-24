@@ -186,6 +186,24 @@ class RS extends SupplierApi
     }
 
     /**
+     * Handles the fetching of options xml
+     * @return XML Object
+     */
+    public function getExtras()
+    {
+        return new SimpleXMLElement(file_get_contents($this->optionsUrl));
+    }
+
+    /**
+     * Handles the fetching of options xml
+     * @return XML Object
+     */
+    public function getLocations()
+    {
+        return new SimpleXMLElement(file_get_contents($this->locationsUrl));
+    }
+
+    /**
      * Handles the cURL request for 
      * @return XML
      */
