@@ -5,10 +5,10 @@ $testUrl =  "https://vv.xqual.hertz.com/DirectLinkWEB/handlers/DirectLinkHandler
 
 return array(
 	'api' => array(
-		'url'              => $testUrl,
-		'validationCode'         => '11V04R77M05',
-		'validationNumber'         => 'T695',
-		'consumerProductCode'         => 'XM03',
+        'url'                 => $testUrl,
+        'validationCode'      => '11V04R77M05',
+        'validationNumber'    => 'T695',
+        'consumerProductCode' => 'XM03',
 	),
 );
 
