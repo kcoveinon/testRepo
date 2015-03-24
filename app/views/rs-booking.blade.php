@@ -101,7 +101,7 @@
             <div class="ui blue button" ng-click="addBooking()">Submit</div>
             <br/><br/>
 
-            <div class="ui positive message" ng-if='response.xml !== ""'>
+            <div class="ui positive message" id="responseDiv" ng-if='response.xml !== ""'>
                 <div class="header">
                     Booking Response
                 </div>
@@ -178,6 +178,7 @@
                 }
 
                 $scope.addBooking = function() {
+                    $('#responseDiv').fadeOut();
                     $http(
                         {
                             url : 'doBookingWithEquipments', 
@@ -197,6 +198,7 @@
                             type: 'json'
                         })
                         .success(function(data, status, headers, config) {
+                            $('#responseDiv').fadeIn();
                             $scope.response = {
                                 xml : data
                             }
