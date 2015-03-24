@@ -208,6 +208,7 @@ class RS extends SupplierApi
      * @param  string $vehicleClass
      * @param  int $rateId
      * @param  string $countryCode
+     * @param  array $vehicleEquipments
      * 
      * @return XML
      */
@@ -220,7 +221,8 @@ class RS extends SupplierApi
         $returnLocationCode,
         $vehicleClass,
         $rateId,
-        $countryCode 
+        $countryCode,
+        $vehicleEquipments
     ) {
         $xmlRequest = $this->getXMLForBooking(
                           $pickUpDate,
@@ -231,7 +233,8 @@ class RS extends SupplierApi
                           $returnLocationCode,
                           $vehicleClass,
                           $rateId,
-                          $countryCode 
+                          $countryCode,
+                          $vehicleEquipments
                        );
 
         return $this->executeCurl($xmlRequest->asXML()); 
@@ -249,6 +252,7 @@ class RS extends SupplierApi
      * @param  string $vehicleClass
      * @param  int $rateId
      * @param  string $countryCode
+     * @param  array $vehicleEquipments
      * 
      * @return XML
      */
@@ -261,7 +265,8 @@ class RS extends SupplierApi
         $returnLocationCode,
         $vehicleClass,
         $rateId,
-        $countryCode        
+        $countryCode,
+        $vehicleEquipments        
     ) {
         $xml = $this->createRootRequestNode();
         $newReservationRequestNode = $xml->addChild('NewReservationRequest');
@@ -297,13 +302,11 @@ class RS extends SupplierApi
         $flightNode->addAttribute('airlineCode', 'QF');
         $flightNode->addAttribute('flightNumber', '142');
 
-        $optionNode = $newReservationRequestNode->addChild('Option');
-        $optionNode->addChild('Code','BPAS');
-        $optionNode->addChild('Qty',' 1');
-
-        $optionNode = $newReservationRequestNode->addChild('Option');
-        $optionNode->addChild('Code','BOOST');
-        $optionNode->addChild('Qty', 2);  
+        foreach ($vehicleEquipments as $key => $value) {
+            $optionNode = $newReservationRequestNode->addChild('Option');
+            $optionNode->addChild('Code', trim($value["name"]));
+            $optionNode->addChild('Qty', trim($value["qty"]));
+        }
         
         return $xml;
     }

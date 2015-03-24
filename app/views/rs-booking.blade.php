@@ -134,7 +134,7 @@
 
                 $scope.addEquipments = function() {
                     if($scope.eqCode !== "" || $scope.eqQty !== "") {
-                        $scope.bookingDetails.bookingEquipments.push({name:$scope.eqCode, qty:$scope.eqQty, action:'Delete'})
+                        $scope.bookingDetails.bookingEquipments.push({name:$scope.bookingDetails.eqCode, qty:$scope.bookingDetails.eqQty, action:'Delete'})
                     }
                     else {
                         alert("Kindly complete the required fields");
