@@ -1,5 +1,5 @@
 <?php
 
 return array(
-	'codes' => array('RS'),
+	'codes' => array('TH'),
 );

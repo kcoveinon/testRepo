@@ -99,6 +99,81 @@ Route::group(array('prefix' => 'RS/'), function()
     Route::any('book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{vehicleClass}/{rateId}/{countryCode}', 'RSController@doBooking');
 });
 
+
+Route::group(array('prefix' => 'AV'), function() {
+    // Get ping response
+    Route::any('/ping', 'AVController@ping');
+
+    // Get all locations
+    Route::any('/locations', 'AVController@getLocations');
+
+    // Get depots per location
+    Route::any('/locationDepots/{locationCode}', 'AVController@getDepotsPerLocation');
+
+    // Get location details
+    Route::any('/locationDetails/{locationCode}', 'AVController@getLocationDetails');
+
+    // Get rates
+    Route::any(
+        'getRates/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocation}/{returnLocation}/{carCategory}',
+        'AVController@getRates'
+    );
+
+    // Search available cars
+    Route::any(
+        'search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{countryCode}/{driverAge}',
+        'AVController@search'
+    );
+
+    // Create booking
+    Route::any(
+        '/createBooking/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{carCategory}',
+        'AVController@createBooking'
+    );
+});
+
+
+
+Route::group(array('prefix' => 'TH'),function(){
+
+   // Get all locations
+   Route::any('/locations','THController@getlocations');
+
+   // Get depots per location
+   Route::any('/locationDepots/{locationCode}','THController@getDepotsPerLocation');
+
+   // Get location details
+   Route::any('/locationDetails/{locationCode}','THController@getLocationDetails');
+
+   // Get rates
+   Route::any(
+       'getRates/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocation}/{returnLocation}/{carCategory}',
+       'THController@getRates'
+   );
+
+   // Search available cars
+   Route::any(
+       'search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{countryCode}/{driverAge}',
+       'THController@search'
+   );
+
+   // Create booking
+   Route::any(
+       '/createBooking/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{carCategory}',
+       'THController@createBooking'
+   );
+   
+   // View booking details
+   Route::any('/bookingDetails/{bookingId}','THController@getBookingDetails');
+   
+   // Cancel booking
+   Route::any('/cancelBooking/{bookingId}','THController@cancelBooking');
+   
+   // Test route
+   Route::get('/testAu','THController@testAu');
+   
+});
+
 Route::controller('booking', 'BookingController');
 Route::controller('vehicle-classification', 'VehicleClassificationController');
 Route::controller('vehicle', 'VehicleController');
