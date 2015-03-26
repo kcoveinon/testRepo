@@ -82,12 +82,8 @@ class AV extends SupplierApi
             CURLOPT_VERBOSE         => false,
             CURLOPT_HTTPHEADER      => $this->headers
         );
-    }
 
-
-    public function getSoapClient()
-    {
-        $client = new SoapClient(
+        $this->soapClient = new SoapClient(
             null,
             array(
                 'location' => $this->apiLocation,
@@ -95,9 +91,7 @@ class AV extends SupplierApi
                 'trace'    => 1,
                 'use'      => SOAP_LITERAL
             )
-        );
-
-        return $client;
+        );        
     }
 
     /**
@@ -150,8 +144,8 @@ class AV extends SupplierApi
                 </SOAP-ENV:Envelope>"; 
 
         $params = new SoapVar(trim($xml), XSD_ANYXML);
-        $client = $this->getSoapClient();
-        return $client->VehAvailRate($params);
+
+        return $this->soapClient->VehAvailRate($params);
     }
 
 
@@ -198,8 +192,8 @@ class AV extends SupplierApi
 
 
         $params = new SoapVar(trim($xml), XSD_ANYXML);
-        $client = $this->getSoapClient();        
-        return $client->VehAvailRate($params);
+
+        return $this->soapClient->VehAvailRate($params);
     }
 
     public function testCurl()

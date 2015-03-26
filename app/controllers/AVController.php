@@ -15,7 +15,7 @@ class AVController extends BaseController
 	{
 		$supplierApi = App::make($this->supplierCode);
 
-		$result = $supplierApi->getVehicleRates();
+		$result = $supplierApi->getLocationSearch();
 		return Response::json($result);
 	}
 
