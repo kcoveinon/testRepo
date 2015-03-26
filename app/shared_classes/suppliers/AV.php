@@ -50,46 +50,14 @@ class AV extends SupplierApi
         $this->primaryLang         = Config::get($this->supplierCode . '.api.primaryLang');
         $this->version             = Config::get($this->supplierCode . '.api.version');
 
-        $this->soapRequest = array(
-                    'xmlns'         => 'http://www.opentravel.org/OTA/2003/05',
-                    'xmlns:xsi'     => 'http://www.w3.org/2008/XMLSchema-instance',
-                    'Target'        => $this->target,
-                    'Version'       => $this->version,
-                    'PrimaryLangID' => $this->primaryLang,
-                    'POS'           => array(
-                        'Source'    => array(
-                            'RequestorID' => array(
-                                'Type' => $this->requestorType,
-                                'ID'   => $this->requestorID)
-                        )
-                    )
-        );
-
-        $this->headers = array(
-            'Content-type: text/xml;charset="utf-8"',
-            'Accept: text/xml',
-            'Cache-Control: no-cache',
-            'Pragma: no-cache'
-        );
-
-        $this->defaultCurlOptions = array(
-            CURLOPT_URL             => $this->apiURL,
-            CURLOPT_POST            => true,
-            CURLOPT_SSL_VERIFYHOST  => false,
-            CURLOPT_SSL_VERIFYPEER  => false,
-            CURLOPT_RETURNTRANSFER  => true,
-            CURLOPT_TIMEOUT         => false,
-            CURLOPT_VERBOSE         => false,
-            CURLOPT_HTTPHEADER      => $this->headers
-        );
-
         $this->soapClient = new SoapClient(
             null,
             array(
-                'location' => $this->apiLocation,
-                'uri'      => $this->apiURI,
-                'trace'    => 1,
-                'use'      => SOAP_LITERAL
+                'location'   => $this->apiLocation,
+                'uri'        => $this->apiURI,
+                'trace'      => 1,
+                'use'        => SOAP_LITERAL,
+                'cache_wsdl' => WSDL_CACHE_NONE
             )
         );        
     }
@@ -99,7 +67,7 @@ class AV extends SupplierApi
      */
     public function getVehicleRates()
     {
-        $xml = "<SOAP-ENV:Envelope xmlns:SOAP-ENV='http://www.w3.org/2001/12/soap-envelope' xmlns:xsi='http://www.w3.org/1999/XMLSchema-instance' xmlns:xsd='http://www.w3.org/1999/XMLSchema'>
+        $xml = "<SOAP-ENV:Envelope xmlns:SOAP-ENV='http://www.w3.org/2001/12/soap-envelope' ReqRespVersion='medium' xmlns:xsi='http://www.w3.org/1999/XMLSchema-instance' xmlns:xsd='http://www.w3.org/1999/XMLSchema'>
                     <SOAP-ENV:Header>
                         <ns:credentials xmlns:ns='http://wsg.avis.com/wsbang/authInAny'>
                             <ns:userID ns:encodingType='xsd:string'>vroom</ns:userID>
@@ -115,10 +83,10 @@ class AV extends SupplierApi
                                       <RequestorID ID='vroom' Type='1'/>
                                     </Source>
                                   </POS>                                  
-                                <VehAvailRQCore Status='Available'>
-                                    <VehRentalCore PickUpDateTime='2015-04-12T09:00:00' ReturnDateTime='2015-04-20T09:00:00'>
-                                        <PickUpLocation LocationCode='ADL'/>
-                                        <ReturnLocation LocationCode='BNE'/>
+                                <VehAvailRQCore Status='All'>
+                                    <VehRentalCore PickUpDateTime='2015-05-14T09:00:00' ReturnDateTime='2015-05-15T09:00:00'>
+                                        <PickUpLocation LocationCode='JFK'/>
+                                        <ReturnLocation LocationCode='JFK'/>
                                     </VehRentalCore>
                                     <VendorPrefs>
                                         <VendorPref CompanyShortName='Avis'/>
@@ -126,10 +94,9 @@ class AV extends SupplierApi
                                 <VehPrefs>
                                     <VehPref ClassPref='Preferred' TransmissionPref='Preferred' TransmissionType='Automatic' TypePref='Preferred'>
                                         <VehType VehicleCategory='1'/>
-                                        <VehClass Size='4'/>
+                                        <VehClass Size='3'/>
                                     </VehPref>
                                 </VehPrefs>
-                                <RateQualifier RateCategory='6'/>
                                 </VehAvailRQCore>
                                 <VehAvailRQInfo>
                                     <Customer>
@@ -143,9 +110,9 @@ class AV extends SupplierApi
                     </SOAP-ENV:Body>
                 </SOAP-ENV:Envelope>"; 
 
-        $params = new SoapVar(trim($xml), XSD_ANYXML);
+        $params = new SoapVar($xml, \XSD_ANYXML);
 
-        return $this->soapClient->VehAvailRate($params);
+        return $this->soapClient->__SoapCall('OTA_VehAvailRateRQ', array($params));
     }
 
 
@@ -196,87 +163,4 @@ class AV extends SupplierApi
         return $this->soapClient->VehAvailRate($params);
     }
 
-    public function testCurl()
-    {
-        try{
-            $curlOptions = $this->defaultCurlOptions;
-
-            $curlOptions[CURLOPT_POSTFIELDS] = $this->testXml();
-            $curlHandler = curl_init();
-            curl_setopt_array($curlHandler, $curlOptions);
-            $response = curl_exec($curlHandler);
-            curl_close($curlHandler);
-            return trim($response);
-        }
-        catch (SoapFault $exc) {
-            echo $exc->getTraceAsString();
-        }        
-    }
-
-    public function testXml()
-    {
-        $xml = "<SOAP-ENV:Envelope xmlns:SOAP-ENV='http://www.w3.org/2001/12/soap-envelope' xmlns:xsi='http://www.w3.org/1999/XMLSchema-instance' xmlns:xsd='http://www.w3.org/1999/XMLSchema'>
-                    <SOAP-ENV:Header>
-                        <ns:credentials xmlns:ns='http://wsg.avis.com/wsbang/authInAny'>
-                            <ns:userID ns:encodingType='xsd:string'>BSPAuto</ns:userID>
-                            <ns:password ns:encodingType='xsd:string'>LQpgW0`2YLS^</ns:password>
-                        </ns:credentials>
-                       <ns:WSBang-Roadmap xmlns:ns='http://wsg.avis.com/wsbang'/>
-                    </SOAP-ENV:Header>
-                  <SOAP-ENV:Body> 
-                    <ns:Request xmlns:ns='http://wsg.avis.com/wsbang'>
-                    <OTA_VehRetResRQ xmlns:xsi='http://www.w3.org/2008/XMLSchema-instance' Version='1.0'>
-                        <POS>
-                              <Source>
-                                <RequestorID Type='5' ID='0195274D'>
-                              </Source>
-                        </POS>
-                        <VehRetResRQCore>
-                            <UniqueID Type='14' ID='0195274D'/>
-                            <PersonName>
-                                <Surname>PREPAID</Surname>
-                            </PersonName>
-                           </VehRetResRQCore>
-                            <VehRetResRQInfo>
-                              <Vendor CompanyShortName='Avis'/>
-                            </VehRetResRQInfo>
-                         </OTA_VehRetResRQ>
-                    </ns:Request>
-                  </SOAP-ENV:Body>
-                </SOAP-ENV:Envelope>
-                ";
-
-        return trim($xml);
-
-    }
-
-    /**
-     *
-     * @return boolean|unknown
-     */
-    public function getLocations ()
-    {
-        $requestCore = array(
-            'Vendor' => array(
-                'Code' => self::VENDOR_CODE
-            )
-        );
-
-        $client = $this->getSoapClient('LocationService.svc?wsdl');
-        if (empty($client)) {
-            return false;
-        }
-        die('aa');
-
-        // Set time limit for this one
-        set_time_limit(self::TIME_LIMIT);
-
-        $data = $client->GetAllLocations(array(
-                'OTA_VehLocSearchRQ' => array_merge($this->soapRequest, $requestCore)
-            ));
-
-        dd($data);
-
-        return $data;
-    }
 }
