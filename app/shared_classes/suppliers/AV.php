@@ -110,9 +110,35 @@ class AV extends SupplierApi
                     </SOAP-ENV:Body>
                 </SOAP-ENV:Envelope>"; 
 
-        $params = new SoapVar($xml, \XSD_ANYXML);
+        $headers = array(
+            "Content-type: text/xml;charset=\"utf-8\"",
+            "Accept: text/xml",
+            "Cache-Control: no-cache",
+            "Pragma: no-cache"
+        );                
 
-        return $this->soapClient->__SoapCall('OTA_VehAvailRateRQ', array($params));
+        $curlOptions = array(
+            CURLOPT_URL             => $this->apiLocation,
+            CURLOPT_POST            => true,
+            CURLOPT_SSL_VERIFYHOST  => false,
+            CURLOPT_SSL_VERIFYPEER  => false,
+            CURLOPT_RETURNTRANSFER  => true,
+            CURLOPT_TIMEOUT         => false,
+            CURLOPT_VERBOSE         => false,
+            CURLOPT_HTTPHEADER      => $headers
+        );
+
+        $curlOptions[CURLOPT_POSTFIELDS] = trim($xml);
+        $curlHandler = curl_init();
+        curl_setopt_array($curlHandler, $curlOptions);
+        $response = curl_exec($curlHandler);
+        curl_close($curlHandler);
+
+        return $response;
+
+        // $params = new SoapVar($xml, \XSD_ANYXML);
+
+        // return $this->soapClient->__SoapCall('OTA_VehAvailRateRQ', array($params));
     }
 
 

@@ -16,7 +16,11 @@ class AVController extends BaseController
 		$supplierApi = App::make($this->supplierCode);
 
 		$result = $supplierApi->getVehicleRates();
-		return Response::json($result);
+		$xml = simplexml_load_string($result);
+		$xml->registerXPathNamespace('SOAP-ENV', 'http://schemas.xmlsoap.org/soap/envelope/');
+		$xml->registerXPathNamespace('auth', 'http://wsg.avis.com/wsbang');
+		$nodes = $xml->xpath('/SOAP-ENV:Envelope/SOAP-ENV:Body/auth:Response');
+		echo '<pre>';print_r($nodes);exit();
 	}
 
 	public function locations()
