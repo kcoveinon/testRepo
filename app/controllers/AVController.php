@@ -20,7 +20,7 @@ class AVController extends BaseController
 		$xml->registerXPathNamespace('SOAP-ENV', 'http://schemas.xmlsoap.org/soap/envelope/');
 		$xml->registerXPathNamespace('auth', 'http://wsg.avis.com/wsbang');
 		$nodes = $xml->xpath('/SOAP-ENV:Envelope/SOAP-ENV:Body/auth:Response');
-		echo '<pre>';print_r($nodes);exit();
+		return Response::json($nodes[0]);
 	}
 
 	public function locations()
