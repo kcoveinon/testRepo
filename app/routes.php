@@ -85,7 +85,8 @@ Route::group(array('prefix' => 'HZ/'), function()
 	Route::any('cancel-booking/{bookingId}', 'HZController@cancelBooking');
 	Route::any('modify-booking/{bookingId}/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{vehicleCategory}/{vehicleClass}', 'HZController@modifyBooking');
 	Route::any('get-depot-details/{locationCode}', 'HZController@getDepotDetails');
-	Route::any('get-location-depots/{locationCode}', 'HZController@getLocationDepots');
+    Route::any('get-location-depots/{locationCode}', 'HZController@getLocationDepots');
+	Route::any('export-depot-location', 'HZController@exportDepotCompilation');
 });
 
 Route::group(array('prefix' => 'RS/'), function()
