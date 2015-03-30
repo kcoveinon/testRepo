@@ -725,21 +725,6 @@ class HZ extends SupplierApi
 	}
 
 	/**
-	 * Returns depots per location IDs
-	 * 
-	 * @param int $pickUpLocationId
-	 * @param int $returnLocationId
-	 * 
-	 * @return DEPOT Object
-	 */
-	public function returnDepotByLocationId($pickUpLocationId, $returnLocationId)
-	{
-		$pickUpObj = Location::find($pickUpLocationId);
-
-		return $pickUpObj ? Depot::getGroupedDepotCode($pickUpObj->getCity())->get() : false;
-	}
-
-	/**
 	 * Returns default datetime format
 	 * 
 	 * @param  date $date
