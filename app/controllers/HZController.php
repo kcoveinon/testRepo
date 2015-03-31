@@ -5,12 +5,12 @@ class HZController extends BaseController
 
 	const DEFAULT_SUPPLIER_CODE = "HZ";
 
-    private $supplierApi;
+	private $supplierApi;
 
 	public function __construct()
 	{
 		parent::__construct();
-        $this->supplierApi = App::make(self::DEFAULT_SUPPLIER_CODE);		
+		$this->supplierApi = App::make(self::DEFAULT_SUPPLIER_CODE);		
 	}
 
 	public function showBooking()
@@ -91,10 +91,7 @@ class HZController extends BaseController
 
 	public function exportDepotCompilation()
 	{
-	    $file_content = file_get_contents(public_path() . "/misc/GDEX1ADC.txt");
-	    $explodedArray = explode("|", $file_content);
-	    $chunkedArray = array_chunk($explodedArray, 110, false);
-	    echo '<pre>'; print_r($chunkedArray); exit();
+		$this->supplierApi->getDepots();
 	}
 }
 

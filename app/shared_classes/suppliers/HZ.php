@@ -756,6 +756,55 @@ class HZ extends SupplierApi
 	    return $d && $d->format('Y-m-d H:i:s') == $dateTime;
 	}
 
+	/**
+	 * Returns the Hertz's depots per location
+	 * 
+	 * @return XML
+	 */
+	public function getDepots()
+	{
+	    $file_content = file_get_contents(public_path() . "/misc/GDEX1ADC.txt");
+	    $explodedArray = explode("|", $file_content);
+	    $chunkedArray = array_chunk($explodedArray, 110, false);
+
+        header ("Content-Type:text/xml");
+        echo '<records>';
+            foreach($chunkedArray as $key => $value) {
+                if(count($value) > 1) {
+					$country   = strlen($value[5])  < 1 ? "N/A" : $value[5];
+					$zipCode   = strlen($value[7])  < 1 ? "N/A" : $value[7];
+					$city      = strlen($value[8])  < 1 ? "N/A" : $value[8];
+					$state     = strlen($value[6])  < 1 ? "N/A" : $value[6];
+					$address1  = strlen($value[9])  < 1 ? "N/A ADD" : $value[9];
+					$address2  = strlen($value[10]) < 1 ? "N/A" : $value[6];
+					$address3  = strlen($value[10]) < 1 ? "N/A" : $value[10];
+					$phone     = strlen($value[12]) < 1 ? "N/A" : $value[12];
+					$fax       = strlen($value[14]) < 1 ? "N/A" : $value[14];
+					$email     = strlen($value[17]) < 1 ? "N/A" : $value[17];
+					$locDesc   = strlen($value[62]) < 1 ? "N/A DESC" :  $value[62];
+					$latitude  = strlen($value[60]) < 1 ? "N/A" : $value[60];
+					$longitude = strlen($value[61]) < 1 ? "N/A" : $value[61];
+
+                    echo '<record>';
+						echo '<key>' . $key. '</key>';
+						echo '<countryCode>' . $country. '</countryCode>';
+						echo '<stateCode>' . $state . '</stateCode>';
+						echo '<zipCode>' . $zipCode . '</zipCode>';
+						echo '<address1>' . htmlentities($address1) . '</address1>';
+						echo '<address2>' . htmlentities($address2) . '</address2>';
+						echo '<address3>' . htmlentities($address3) . '</address3>';
+						echo '<phone>' . $phone . '</phone>';
+						echo '<fax>' . $fax . '</fax>';
+						echo '<email>' . $email . '</email>';
+						echo '<latitude>' . $latitude . '</latitude>';
+						echo '<latitude>' . $longitude . '</latitude>';
+						echo '<locationName>' . htmlentities($locDesc) . '</locationName>';
+                    echo '</record>';
+            	}
+            }
+        echo '</records>';		
+	}
+
 }
 
 
