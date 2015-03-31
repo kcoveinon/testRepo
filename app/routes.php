@@ -91,10 +91,9 @@ Route::group(array('prefix' => 'HZ/'), function()
 
 Route::group(array('prefix' => 'RS/'), function()
 {
-    Route::any('showAngular', 'RSController@showAngularTutorial');
-    Route::any('showBooking', 'RSController@showBooking');
-    Route::any('getBookingDetails/{bookingId}', 'RSController@getBookingDetails');
-    Route::any('doBookingWithEquipments', 'RSController@doBookingWithEquipments');
+    Route::any('show-booking-form', 'RSController@showBooking');
+    Route::any('get-booking-details/{bookingId}', 'RSController@getBookingDetails');
+    Route::any('do-booking-with-equipments', 'RSController@doBookingWithEquipments');
     Route::any('search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{vehicleClass}/{countryCode}', 'RSController@searchVehicles');
     Route::any('cancel-booking/{bookingId}', 'RSController@cancelBooking');
     Route::any('book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{vehicleClass}/{rateId}/{countryCode}', 'RSController@doBooking');
