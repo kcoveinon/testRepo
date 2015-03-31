@@ -58,7 +58,7 @@
                     </div>
                 <div class="field">
                     <label>Vehicle Class</label>
-                    <select ng-model="vehicleClass" name='vehicleClass' class="ui dropdown">
+                    <select ng-model="vehicleClass" name='vehicleClass' class="ui dropdown" required>
                         <option value=""></option>
                         <option ng-repeat="vClass in bookingDetails.vehicleClass" value="<% vClass %>">
                             <% vClass %>
@@ -123,6 +123,9 @@
         {{ HTML::script('js/src/angular-1.2.13.js') }}
         {{ HTML::script('js/src/semantic.min.js') }}
         <script type="text/javascript">
+        $('.ui.dropdown')
+          .dropdown()
+        ;        
             var requiredField = "This field is required";
             $('.ui.form')
               .form({
@@ -306,9 +309,6 @@
                                             xml : data
                                         }
                                     })
-                            }
-                            else {
-                                alert($scope.myForm.$valid);
                             }
                         };
                 }]);
