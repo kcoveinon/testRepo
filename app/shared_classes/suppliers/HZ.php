@@ -783,12 +783,14 @@ class HZ extends SupplierApi
 					$locDesc   = strlen($value[62]) < 1 ? "N/A" : $value[62];
 					$latitude  = strlen($value[60]) < 1 ? "N/A" : $value[60];
 					$longitude = strlen($value[61]) < 1 ? "N/A" : $value[61];
+					$city      = strlen($value[8])  < 1 ? "N/A" : $value[8];
 
                     echo '<record>';
 						echo '<key>' 		  . $key 	  . '</key>';
 						echo '<countryCode>'  . $country  . '</countryCode>';
 						echo '<stateCode>'    . $state    . '</stateCode>';
 						echo '<zipCode>' 	  . $zipCode  . '</zipCode>';
+						echo '<city>' 	  	  . $city     . '</city>';
 						echo '<address1>' 	  . htmlentities($address1)  . '</address1>';
 						echo '<address2>' 	  . htmlentities($address2)  . '</address2>';
 						echo '<address3>' 	  . htmlentities($address3)  . '</address3>';
