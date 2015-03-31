@@ -763,9 +763,9 @@ class HZ extends SupplierApi
 	 */
 	public function getDepots()
 	{
-	    $file_content = file_get_contents(public_path() . "/misc/GDEX1ADC.txt");
-	    $explodedArray = explode("|", $file_content);
-	    $chunkedArray = array_chunk($explodedArray, 110, false);
+		$file_content  = file_get_contents(public_path() . "/misc/GDEX1ADC.txt");
+		$explodedArray = explode("|", $file_content);
+		$chunkedArray  = array_chunk($explodedArray, 110, false);
 
         echo '<records>';
             foreach($chunkedArray as $key => $value) {
