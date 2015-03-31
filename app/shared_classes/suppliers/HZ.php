@@ -780,7 +780,7 @@ class HZ extends SupplierApi
 					$phone     = strlen($value[12]) < 1 ? "N/A" : $value[12];
 					$fax       = strlen($value[14]) < 1 ? "N/A" : $value[14];
 					$email     = strlen($value[17]) < 1 ? "N/A" : $value[17];
-					$locDesc   = strlen($value[62]) < 1 ? "N/A" :  $value[62];
+					$locDesc   = strlen($value[62]) < 1 ? "N/A" : $value[62];
 					$latitude  = strlen($value[60]) < 1 ? "N/A" : $value[60];
 					$longitude = strlen($value[61]) < 1 ? "N/A" : $value[61];
 
