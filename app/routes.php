@@ -91,6 +91,9 @@ Route::group(array('prefix' => 'HZ/'), function()
 
 Route::group(array('prefix' => 'RS/'), function()
 {
+    Route::any('get-fleet', 'RSController@getFleet');
+    Route::any('get-locations', 'RSController@getLocations');
+    Route::any('get-extras', 'RSController@getExtras');
     Route::any('show-booking-form', 'RSController@showBooking');
     Route::any('get-booking-details/{bookingId}', 'RSController@getBookingDetails');
     Route::any('do-booking-with-equipments', 'RSController@doBookingWithEquipments');

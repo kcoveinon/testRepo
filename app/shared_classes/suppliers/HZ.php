@@ -767,7 +767,6 @@ class HZ extends SupplierApi
 	    $explodedArray = explode("|", $file_content);
 	    $chunkedArray = array_chunk($explodedArray, 110, false);
 
-        header ("Content-Type:text/xml");
         echo '<records>';
             foreach($chunkedArray as $key => $value) {
                 if(count($value) > 1) {

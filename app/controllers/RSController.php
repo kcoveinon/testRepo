@@ -92,4 +92,19 @@ class RSController extends BaseController
                             ));
     }
 
+    public function getFleet()
+    {
+        return Response::json($this->supplierApi->getFleet());
+    }
+
+    public function getLocations()
+    {
+        return Response::json($this->supplierApi->getLocations());
+    } 
+
+    public function getExtras()
+    {
+        return Response::json($this->supplierApi->getExtras());
+    }
+
 }
