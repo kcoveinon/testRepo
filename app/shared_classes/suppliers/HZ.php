@@ -785,18 +785,18 @@ class HZ extends SupplierApi
 					$longitude = strlen($value[61]) < 1 ? "N/A" : $value[61];
 
                     echo '<record>';
-						echo '<key>' . $key. '</key>';
-						echo '<countryCode>' . $country. '</countryCode>';
-						echo '<stateCode>' . $state . '</stateCode>';
-						echo '<zipCode>' . $zipCode . '</zipCode>';
-						echo '<address1>' . htmlentities($address1) . '</address1>';
-						echo '<address2>' . htmlentities($address2) . '</address2>';
-						echo '<address3>' . htmlentities($address3) . '</address3>';
-						echo '<phone>' . $phone . '</phone>';
-						echo '<fax>' . $fax . '</fax>';
-						echo '<email>' . $email . '</email>';
-						echo '<latitude>' . $latitude . '</latitude>';
-						echo '<latitude>' . $longitude . '</latitude>';
+						echo '<key>' 		  . $key 	  . '</key>';
+						echo '<countryCode>'  . $country  . '</countryCode>';
+						echo '<stateCode>'    . $state    . '</stateCode>';
+						echo '<zipCode>' 	  . $zipCode  . '</zipCode>';
+						echo '<address1>' 	  . htmlentities($address1)  . '</address1>';
+						echo '<address2>' 	  . htmlentities($address2)  . '</address2>';
+						echo '<address3>' 	  . htmlentities($address3)  . '</address3>';
+						echo '<phone>' 		  . $phone  			   . '</phone>';
+						echo '<fax>' 		  . $fax  				   . '</fax>';
+						echo '<email>' 		  . $email  			   . '</email>';
+						echo '<latitude>' 	  . $latitude  			   . '</latitude>';
+						echo '<latitude>' 	  . $longitude 			   . '</latitude>';
 						echo '<locationName>' . htmlentities($locDesc) . '</locationName>';
                     echo '</record>';
             	}
