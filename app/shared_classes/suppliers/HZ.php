@@ -774,13 +774,13 @@ class HZ extends SupplierApi
 					$zipCode   = strlen($value[7])  < 1 ? "N/A" : $value[7];
 					$city      = strlen($value[8])  < 1 ? "N/A" : $value[8];
 					$state     = strlen($value[6])  < 1 ? "N/A" : $value[6];
-					$address1  = strlen($value[9])  < 1 ? "N/A ADD" : $value[9];
+					$address1  = strlen($value[9])  < 1 ? "N/A" : $value[9];
 					$address2  = strlen($value[10]) < 1 ? "N/A" : $value[6];
 					$address3  = strlen($value[10]) < 1 ? "N/A" : $value[10];
 					$phone     = strlen($value[12]) < 1 ? "N/A" : $value[12];
 					$fax       = strlen($value[14]) < 1 ? "N/A" : $value[14];
 					$email     = strlen($value[17]) < 1 ? "N/A" : $value[17];
-					$locDesc   = strlen($value[62]) < 1 ? "N/A DESC" :  $value[62];
+					$locDesc   = strlen($value[62]) < 1 ? "N/A" :  $value[62];
 					$latitude  = strlen($value[60]) < 1 ? "N/A" : $value[60];
 					$longitude = strlen($value[61]) < 1 ? "N/A" : $value[61];
 
