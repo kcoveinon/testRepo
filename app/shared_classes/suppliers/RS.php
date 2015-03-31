@@ -113,8 +113,9 @@ class RS extends SupplierApi
         $mappedCarDetails = $this->mapVehicleDetails($xmlCurlResponse);
         $result           = array('status' => 'Failed');
 
+
         if ((string) $xmlCurlResponse->ResRates->attributes()->success !== 'true') {
-            $result['data'][] = isset($xmlCurlResponse->CriticalError) ? $xmlCurlResponse->CriticalError : 'Error';
+            $result['data'][] = $xmlCurlResponse;
             return $result;
         }
 
