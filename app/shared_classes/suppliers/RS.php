@@ -96,7 +96,6 @@ class RS extends SupplierApi
         $returnTime,
         $pickUpLocationCode, 
         $returnLocationCode, 
-        $vehicleClass, 
         $countryCode
     ) {
         $xmlRequest  = $this->getSearchVehicleXML(
@@ -106,7 +105,6 @@ class RS extends SupplierApi
                             $returnTime,
                             $pickUpLocationCode, 
                             $returnLocationCode, 
-                            $vehicleClass, 
                             $countryCode 
                        );
         $xmlCurlResponse  = $this->executeCurl($xmlRequest->asXML());
@@ -407,7 +405,6 @@ class RS extends SupplierApi
         $returnTime,
         $pickUpLocationCode, 
         $returnLocationCode,
-        $vehicleClass,
         $countryCode
     ) {
         $xml = $this->createRootRequestNode();
@@ -420,7 +417,6 @@ class RS extends SupplierApi
         $returnLocationNode = $resRatesnode->addChild('Return');
         $returnLocationNode->addAttribute('locationCode', $returnLocationCode);
         $returnLocationNode->addAttribute('dateTime', $this->convertToDateTimeDefaultFormat($returnDate, $returnTime));        
-        // $resRatesnode->addChild('Class', $vehicleClass);
         $sourceNode = $resRatesnode->addChild('Source');
         $sourceNode->addAttribute('countryCode', $countryCode);
 

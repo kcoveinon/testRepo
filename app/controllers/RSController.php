@@ -48,7 +48,6 @@ class RSController extends BaseController
         $returnTime,
         $pickUpLocationCode, 
         $returnLocationCode, 
-        $vehicleClass, 
         $countryCode        
     ) {
         return Response::json($this->supplierApi->search(
@@ -58,7 +57,6 @@ class RSController extends BaseController
                                 $returnTime,
                                 $pickUpLocationCode, 
                                 $returnLocationCode, 
-                                $vehicleClass, 
                                 $countryCode  
                         )); 
     }

@@ -111,7 +111,7 @@
                         </tbody>
                     </table>
                 </div>
-                <input type='submit' class='ui blue button' value='Submit'/>
+                <input type='submit' class='ui blue button' id='submitBtn' value='Submit'/>
                 <br/><br/>
                 <div class="ui positive message" id="responseDiv" ng-if='response.xml !== ""'>
                     <div class="header">
@@ -174,7 +174,6 @@
                     };
                     $scope.response = { xml: '' };
                     $scope.addEquipments = function() {
-                        alert();
                         var eqCode = $scope.bookingDetails.eqCode;
                         var eqQty = $scope.bookingDetails.eqQty;
                         if( (typeof eqCode !== 'undefined' && typeof eqQty !== 'undefined') && (eqCode !== "" && eqQty !== "")) {
@@ -192,6 +191,7 @@
 
                     $scope.addBooking = {
                         submit: function() {
+                            $("#submitBtn").text("Processing");
                             $('#responseDiv').fadeOut();
                             $http(
                                 {
@@ -213,6 +213,7 @@
                                 })
                                 .success(function(data, status, headers, config) {
                                     $('#responseDiv').fadeIn();
+                                    $("#submitBtn").text("Submit");
                                     $scope.response = {
                                         xml : data
                                     }
