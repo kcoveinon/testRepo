@@ -80,7 +80,7 @@ Route::group(array('prefix' => 'HZ/'), function()
     Route::any('show-booking-form', 'HZController@showBooking');
     Route::any('do-booking-with-equipments', 'HZController@doBookingWithEquipments');
 	Route::any('search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{countryCode}/{driverAge}', 'HZController@searchVehicles');
-	Route::any('book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{vehicleCategory}/{vehicleClass}', 'HZController@book');
+	Route::any('book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{vehicleCategory}/{vehicleClass}/{equipemnts}/{age}/{firstName}/{lastName}', 'HZController@book');
 	Route::any('get-booking-details/{bookingId}/{lastName}', 'HZController@getBookingInfo');
 	Route::any('cancel-booking/{bookingId}/{lastName}', 'HZController@cancelBooking');
 	Route::any('modify-booking/{bookingId}/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{vehicleCategory}/{vehicleClass}', 'HZController@modifyBooking');

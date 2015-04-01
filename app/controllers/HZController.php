@@ -75,7 +75,7 @@ class HZController extends BaseController
 		return Response::json($result);	
 	}
 
-	public function book($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $countryCode, $vehicleCategory, $vehicleClass)
+	public function book($pickUpDate, $pickUpTime, $returnDate, $returnTime, $pickUpLocationCode, $returnLocationCode, $countryCode, $vehicleCategory, $vehicleClass, $equipments, $age, $firstName, $lastName)
 	{
 		$result = $this->supplierApi->doBooking(
 						$pickUpDate, 
@@ -86,7 +86,11 @@ class HZController extends BaseController
 						$returnLocationCode,
 						$countryCode, 
 						$vehicleCategory, 
-						$vehicleClass
+						$vehicleClass,
+						[],
+						$age,
+						$firstName,
+						$lastName
 					);
 
 		return Response::json($result);		

@@ -16,8 +16,8 @@ class HZ extends SupplierApi
 	const GET_LOCATION_DEPOTS      = "OTA_VehLocSearchRQ";
 
 	const DEFAULT_XMLNS            = "http://www.opentravel.org/OTA/2003/05";
-	const DEFAULT_XMLNS_XSI        = "http://www.w3.org/2001/XMLSchema-instance";
-	const DEFAULT_VERSION          = "1.008";
+	const DEFAULT_XMLNS_XSI        = "http://www.w3.org/2008/XMLSchema-instance";
+	const DEFAULT_VERSION          = "1.0";
 	const DEFAULT_MAXRESPONSE      = "99";
 	const DEFAULT_PSEUDOCITYCODE   = "LAX";
 	const DEFAULT_REQUEST_TYPE     = "4";
@@ -271,7 +271,6 @@ class HZ extends SupplierApi
 							$firstName,
 							$lastName
 						  );
-
 			$response = $this->executeCurl($xmlRequest->asXML());
 		}
 
@@ -566,10 +565,26 @@ class HZ extends SupplierApi
 	) {
 
 		$xmlAction = self::BOOK_VEHICLE_ACTION;
-		$xml = $this->getXMLCredentialNode($xmlAction, $countryCode);
+
+		$xml = new SimpleXMLElement('<' . $xmlAction . '></' . $xmlAction . '>');
+		$xml->addAttribute("xmlns:xsi", "http://www.w3.org/2008/XMLSchema-instance");
+		$xml->addAttribute("Version", self::DEFAULT_VERSION);
+
+		$posNode = $xml->addChild("POS");
+		$sourceNode = $posNode->addChild("Source");
+		$sourceNode->addAttribute("ISOCountry", "AU");
+		$sourceNode->addAttribute("AgentDutyCode", $this->apiValidationCode);
+
+		$requestNode = $sourceNode->addChild("RequestorID");
+		$requestNode->addAttribute("Type", self::DEFAULT_REQUEST_TYPE);
+		$requestNode->addAttribute("ID", $this->apiValidationNumber);
+
+		$companyNameNode = $requestNode->addChild("CompanyName");
+		$companyNameNode->addAttribute("Code", self::DEFAULT_CONSUMER_PRODUCT);
+		$companyNameNode->addAttribute("CodeContext", $this->apiConsumerProductCode);
 
 		$vehRsCore = $xml->addChild("VehResRQCore");
-		$vehRsCore->addAttribute("Status",self::DEFAULT_REQUEST_STATUS);
+		$vehRsCore->addAttribute("Status","Available");
 
 		$vehRentalCoreNode = $vehRsCore->addChild("VehRentalCore");
 		$vehRentalCoreNode->addAttribute("PickUpDateTime", $pickUpDateTime);
@@ -589,25 +604,13 @@ class HZ extends SupplierApi
 		if($age > 0 || $age !== "") {
 			$date =  new DateTime(date("Y") - ((int) str_replace("+", "", $age)) . "-" . date("m-d"));
 			$result = $date->format("Y-m-d");
-			$primaryNode->addAttribute("BirthDate", $result);
+			// $primaryNode->addAttribute("BirthDate", $result);
 		}
 		$personNameNode = $primaryNode->addChild("PersonName");
 		$personNameNode->addChild("GivenName", $firstName);
 		$personNameNode->addChild("Surname", $lastName);
-		$telephoneNode = $primaryNode->addChild("Telephone");
-		$telephoneNode->addAttribute("PhoneTechType", "1");
-		$telephoneNode->addAttribute("AreaCityCode", "9999");
-		$telephoneNode->addAttribute("PhoneNumber", "9999999");
-		$primaryNode->addChild("Email", "saford@hertz.com");		
-
-		$addressNode = $primaryNode->addChild("Address");
-		$addressNode->addChild("AddressLine", "5601 NW Exp");
-		$addressNode->addChild("AddressLine", "Bldg 2");
-		$addressNode->addChild("CityName", "Oklahoma City");
-		$addressNode->addChild("PostalCode", "73112");
-		$stateProveNode = $addressNode->addChild("StateProv");
-		$stateProveNode->addAttribute("StateCode", "OK");
-		$addressNode->addChild("CountryName")->addAttribute("Code", $countryCode);
+		$citizenCountryNameNode = $primaryNode->addChild("CitizenCountryName");
+		$citizenCountryNameNode->addAttribute("Code", $countryCode)	;
 
 		$vehPrefNode = $vehRsCore->addChild("VehPref");
 		$vehPrefNode->addAttribute("AirConditionInd", "true");
@@ -621,8 +624,11 @@ class HZ extends SupplierApi
 
 		$vehTypeNode = $vehPrefNode->addChild("VehType");
 		$vehTypeNode->addAttribute("VehicleCategory", $vehicleCategory);
-		$vehicleClassNode = $vehPrefNode->addChild("vehicleClass");
-		$vehicleClassNode->addAttribute("Size", $vehicleCategory);
+		$vehicleClassNode = $vehPrefNode->addChild("VehClass");
+		$vehicleClassNode->addAttribute("Size", $vehicleClass);
+
+		$rateQualifierNode = $vehRsCore->addChild("RateQualifier");
+		$rateQualifierNode->addAttribute("RateQualifier", "BEST");
 
 		if(count($equipments) > 0) {
 			$specialEquipPrefNode = $vehRsCore->addChild("SpecialEquipPrefs");
@@ -632,7 +638,8 @@ class HZ extends SupplierApi
 				$specialEquipPre->addAttribute("Quantity", trim($equipmentDetails["qty"]));
 			}
 		}
-
+		// header("Content-type: text/xml");
+		// print_r($xml->asXML()); exit();
 		return $xml;
 	}	
 
