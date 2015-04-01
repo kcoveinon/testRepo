@@ -112,7 +112,7 @@
                     </tbody>
                 </table>
             </div>              
-            <input type='submit' class='ui blue button' value='Submit'/>
+                <input type='submit' class='ui blue button' value='Submit'/>
             <br/><br/>
 
             <div class="ui positive message" id="responseDiv" ng-if='response.xml !== ""'>
@@ -210,15 +210,17 @@
                 };
                 $scope.response = { xml: '' };
                 $scope.addEquipments = function() {
-                    if(typeof $scope.bookingDetails.eqCode !== "undefined"
-                       && typeof $scope.bookingDetails.eqQty !== "undefined") {
+                    if((typeof $scope.bookingDetails.eqCode !== "undefined"
+                       && typeof $scope.bookingDetails.eqQty !== "undefined")
+                       && ($scope.bookingDetails.eqCode !== "" && $scope.bookingDetails.eqQty !== "")
+                       ){
                         var equipmentIndex = $scope.bookingDetails.eqCode;
-                        $scope.bookingDetails.bookingEquipments.push({name:$scope.bookingDetails.equipmentsCodes[equipmentIndex].alias, 
-                                                                      qty:$scope.bookingDetails.eqQty, 
-                                                                      action:'Delete',
-                                                                      eqOTACode:$scope.bookingDetails.equipmentsCodes[equipmentIndex].code })
+                        $scope.bookingDetails.bookingEquipments.push({name      : $scope.bookingDetails.equipmentsCodes[equipmentIndex].alias, 
+                                                                      qty       : $scope.bookingDetails.eqQty, 
+                                                                      action    :'Delete',
+                                                                      eqOTACode : $scope.bookingDetails.equipmentsCodes[equipmentIndex].code })
                         $scope.bookingDetails.eqCode = "";
-                        $scope.bookingDetails.eqQty = "";
+                        $scope.bookingDetails.eqQty  = "";
                     }
                     else {
                         alert("Kindly complete the required fields");
@@ -259,130 +261,9 @@
                             }) 
                         }
                 }
-                // $scope.addBooking = function() {
-                //     $('#responseDiv').fadeOut();                    
-                //     $http(
-                //         {
-                //             url : 'doBookingWithEquipments', 
-                //             data: {
-                //                     pickUpLocationCode : $scope.bookingDetails.pickUpLocationCode,
-                //                     returnLocationCode : $scope.bookingDetails.returnLocationCode,
-                //                     pickUpDate         : $scope.bookingDetails.pickUpDate,
-                //                     pickUpTime         : $scope.bookingDetails.pickUpTime,
-                //                     returnDate         : $scope.bookingDetails.returnDate,
-                //                     returnTime         : $scope.bookingDetails.returnTime,
-                //                     rateId             : $scope.bookingDetails.rateId,
-                //                     countryCode        : $scope.bookingDetails.countryCode,
-                //                     vehicleEquipments  : $scope.bookingDetails.bookingEquipments,
-                //                     vehicleCategory    : $scope.vehicleCategory,
-                //                     vehicleClass       : $scope.vehicleClass
-                //                 },
-                //             method : 'POST',
-                //             type: 'json'
-                //         })
-                //         .success(function(data, status, headers, config) {
-                //             $('#responseDiv').fadeIn();                            
-                //             $scope.response = {
-                //                 xml : data
-                //             }
-                //         })
-                //     };
+
             }]);
         })();
-
-        // var requiredField = "This field is required";
-        // $('.ui.form')
-        //   .form({
-        //     pickUpLocationCode: {
-        //       identifier  : 'pickUpLocationCode',
-        //       rules: [
-        //         {
-        //           type   : 'empty',
-        //           prompt : requiredField
-        //         }
-        //       ]
-        //     },
-        //     returnLocationCode: {
-        //       identifier  : 'returnLocationCode',
-        //       rules: [
-        //         {
-        //           type   : 'empty',
-        //           prompt : requiredField
-        //         }
-        //       ]
-        //     },
-        //     pickUpDate: {
-        //       identifier : 'pickUpDate',
-        //       rules: [
-        //         {
-        //           type   : 'empty',
-        //           prompt : requiredField
-        //         }
-        //       ]
-        //     },
-        //     returnDate: {
-        //       identifier : 'returnDate',
-        //       rules: [
-        //         {
-        //           type   : 'empty',
-        //           prompt : requiredField
-        //         }
-        //       ]
-        //     },
-        //     pickUpTime: {
-        //       identifier : 'pickUpTime',
-        //       rules: [
-        //         {
-        //           type   : 'empty',
-        //           prompt : requiredField
-        //         }
-        //       ]
-        //     },     
-        //     returnTime: {
-        //       identifier : 'returnTime',
-        //       rules: [
-        //         {
-        //           type   : 'empty',
-        //           prompt : requiredField
-        //         }
-        //       ]
-        //     },
-        //     vehicleClass: {
-        //       identifier : 'vehicleClass',
-        //       rules: [
-        //         {
-        //           type   : 'empty',
-        //           prompt : requiredField
-        //         }
-        //       ]
-        //     },    
-        //     rateId: {
-        //       identifier : 'rateId',
-        //       rules: [
-        //         {
-        //           type   : 'empty',
-        //           prompt : requiredField
-        //         }
-        //       ]
-        //     },
-        //     countryCode: {
-        //       identifier : 'countryCode',
-        //       rules: [
-        //         {
-        //           type   : 'empty',
-        //           prompt : requiredField
-        //         }
-        //       ]
-        //     },                                   
-        //   },
-        //     {
-        //         inline: true,
-        //         on: 'blur',
-        //         transition: 'fade down',               
-        //     }          
-        //   )
-        // ;
-
     </script>
         </div>
     </body>
