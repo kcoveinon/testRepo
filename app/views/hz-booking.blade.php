@@ -4,7 +4,7 @@
         <meta charset="utf-8" />
         <link type="text/css" href="{{{ asset('css/src/semantic.min.css')  }}}" rel="stylesheet"  media="screen"/>
         <meta name="_token" content="{{ csrf_token() }}" />
-        <title> RedSpot Booking Form</title>
+        <title>Hertz Booking Form</title>
     </head>
     <style type="text/css">
         button[ng-click]{

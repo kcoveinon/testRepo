@@ -785,9 +785,11 @@ class HZ extends SupplierApi
 					$latitude  = strlen($value[60]) < 1 ? "N/A" : $value[60];
 					$longitude = strlen($value[61]) < 1 ? "N/A" : $value[61];
 					$city      = strlen($value[8])  < 1 ? "N/A" : $value[8];
+					$oagCode   = strlen($value[4])  < 1 ? "N/A" : $value[4];
 
                     echo '<record>';
 						echo '<key>' 		  . $key 	  . '</key>';
+						echo '<locationCode>' . $oagCode  . '</locationCode>';
 						echo '<countryCode>'  . $country  . '</countryCode>';
 						echo '<stateCode>'    . $state    . '</stateCode>';
 						echo '<zipCode>' 	  . $zipCode  . '</zipCode>';
