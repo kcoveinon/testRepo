@@ -114,12 +114,13 @@ class HZ extends SupplierApi
 	 * Handles the cancel booking action
 	 * 
 	 * @param  int/array $bookingId
+	 * @param  string $lastName
 	 * 
 	 * @return XML Object
 	 */
-	public function cancelBooking($bookingId)
+	public function cancelBooking($bookingId, $lastName)
 	{
-		$xmlRequest = $this->getCancelBookingXml($bookingId);
+		$xmlRequest = $this->getCancelBookingXml($bookingId, $lastName);
 
 		return $this->executeCurl($xmlRequest->asXML());	
 	}
@@ -485,10 +486,11 @@ class HZ extends SupplierApi
 	 * Returns the needed XML request for modify booking action
 	 * 
 	 * @param  int $bookingId
+	 * @param  string $lastName
 	 * 
 	 * @return XML
 	 */
-	public function getCancelBookingXml($bookingId)
+	public function getCancelBookingXml($bookingId, $lastName)
 	{
 		$xmlAction = self::CANCEL_BOOKING_ACTION;
 
@@ -502,7 +504,7 @@ class HZ extends SupplierApi
 		$uniqueIDNode->addAttribute("ID", (string) $bookingId);
 		
 		$personNameNode  = $vehCancelRQCore->addChild("PersonName");
-		$personNameNode->addChild("Surname", "Testing");	
+		$personNameNode->addChild("Surname", $lastName);	
 		
 		return $xml;
 	}	

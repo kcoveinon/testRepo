@@ -63,9 +63,9 @@ class HZController extends BaseController
 		return Response::json($result);			
 	}
 
-	public function cancelBooking($bookingId)
+	public function cancelBooking($bookingId, $lastName)
 	{
-		$result = $this->supplierApi->cancelBooking($bookingId);
+		$result = $this->supplierApi->cancelBooking($bookingId, $lastName);
 		return Response::json($result);	
 	}
 
