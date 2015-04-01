@@ -103,10 +103,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat = "equips in bookingDetails.bookingEquipments">
+                            <tr ng-repeat = "equips in bookingDetails.bookingEquipments track by $index">
                                 <td><% equips.name %></td>
                                 <td><% equips.qty %></td>
-                                <td ng-click="removeEquipment(index)" style='cursor:pointer;font-weight:bold;'><% equips.action %></td>
+                                <td ng-click="removeEquipment($index)" style='cursor:pointer;font-weight:bold;'><% equips.action %></td>
                             </tr>
                         </tbody>
                     </table>
