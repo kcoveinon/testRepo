@@ -21,19 +21,19 @@
 
         <div ng-controller='BookingController'>
             <form name="myForm" class='ui form segment' ng-submit="myForm.$valid && addBooking.submit()">
-            <div class='two fields'>
-                <div class="field">
-                    <label>Customer First Name</label>
-                    <input placeholder="First Name" ng-model="bookingDetails.firstName" required type="text"/>
-                </div>
-                <div class="field">
-                    <label>Customer Last Name</label>
-                    <input placeholder="Pick Up Date" required ng-model="bookingDetails.lastName" type="text"/>
-                </div>
-            </div>
                 <div class='two fields'>
                     <div class="field">
-                        <label>PickUpLocationCode</label>
+                        <label>Customer First Name</label>
+                        <input placeholder="First Name" ng-model="bookingDetails.firstName" required type="text"/>
+                    </div>
+                    <div class="field">
+                        <label>Customer Last Name</label>
+                        <input placeholder="Pick Up Date" required ng-model="bookingDetails.lastName" type="text"/>
+                    </div>
+                </div>
+                <div class='two fields'>
+                    <div class="field">
+                        <label>Pick Up Location Code</label>
                         <input placeholder="First Name" required  name='pickUpLocationCode' ng-model="bookingDetails.pickUpLocationCode" type="text"/>
                     </div>
                     <div class="field">
@@ -148,8 +148,8 @@
                 bookingControllerModule.controller('BookingController', ['$scope', '$http', function ($scope, $http){
 
                     $scope.bookingDetails = {
-                        'firstName' : 'Inon',
-                        'lastName' : 'Baguio',
+                        'firstName'          : 'Inon',
+                        'lastName'           : 'Baguio',
                         'pickUpLocationCode' : 'BNE',
                         'returnLocationCode' : 'ADL',
                         'pickUpTime'         : '10:00',
@@ -178,7 +178,7 @@
                                                 {code : '41', alias : 'Oversize'}
                                                ],                    
                         'equipmentsCodes'    : [ 'BCAPS' , 'BOOST', 'BSEAT', 'SATNV' ],
-                        'rateId'             : '12',
+                        'rateId'             : '11030115055333ECAR',
                         'countryCode'        : 'AU',
                         'quantityArray'      : new Array(10),
                         'bookingEquipments'  : []
