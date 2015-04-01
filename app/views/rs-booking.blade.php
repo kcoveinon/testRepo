@@ -21,7 +21,16 @@
 
         <div ng-controller='BookingController'>
             <form name="myForm" class='ui form segment' ng-submit="myForm.$valid && addBooking.submit()">
-
+            <div class='two fields'>
+                <div class="field">
+                    <label>Customer First Name</label>
+                    <input placeholder="First Name" ng-model="bookingDetails.firstName" required type="text"/>
+                </div>
+                <div class="field">
+                    <label>Customer Last Name</label>
+                    <input placeholder="Pick Up Date" required ng-model="bookingDetails.lastName" type="text"/>
+                </div>
+            </div>
                 <div class='two fields'>
                     <div class="field">
                         <label>PickUpLocationCode</label>
@@ -139,6 +148,8 @@
                 bookingControllerModule.controller('BookingController', ['$scope', '$http', function ($scope, $http){
 
                     $scope.bookingDetails = {
+                        'firstName' : 'Inon',
+                        'lastName' : 'Baguio',
                         'pickUpLocationCode' : 'BNE',
                         'returnLocationCode' : 'ADL',
                         'pickUpTime'         : '10:00',
@@ -206,7 +217,9 @@
                                             vehicleClass       : $scope.vehicleClass,
                                             rateId             : $scope.bookingDetails.rateId,
                                             countryCode        : $scope.bookingDetails.countryCode,
-                                            vehicleEquipments  : $scope.bookingDetails.bookingEquipments
+                                            vehicleEquipments  : $scope.bookingDetails.bookingEquipments,
+                                            firstName          : $scope.bookingDetails.firstName,
+                                            lastName           : $scope.bookingDetails.lastName
                                         },
                                     method : 'POST',
                                     type: 'json'

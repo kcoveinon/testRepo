@@ -27,7 +27,9 @@ class RSController extends BaseController
                                 Input::get("vehicleClass"),
                                 Input::get("rateId"),
                                 Input::get("countryCode"),
-                                Input::get("vehicleEquipments")
+                                Input::get("vehicleEquipments"),
+                                Input::get("firstName"),
+                                Input::get("lastName")
                             ));
     }
 

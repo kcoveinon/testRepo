@@ -277,7 +277,9 @@ class RS extends SupplierApi
         $vehicleClass,
         $rateId,
         $countryCode,
-        $vehicleEquipments
+        $vehicleEquipments,
+        $firstName,
+        $lastName
     ) {
         $xmlRequest = $this->getXMLForBooking(
                           $pickUpDate,
@@ -289,7 +291,9 @@ class RS extends SupplierApi
                           $vehicleClass,
                           $rateId,
                           $countryCode,
-                          $vehicleEquipments
+                          $vehicleEquipments,
+                          $firstName,
+                          $lastName
                        );
 
         return $this->executeCurl($xmlRequest->asXML()); 
@@ -308,6 +312,8 @@ class RS extends SupplierApi
      * @param  int $rateId
      * @param  string $countryCode
      * @param  array $vehicleEquipments
+     * @param  string $firstName     
+     * @param  string $lastName     
      * 
      * @return XML
      */
@@ -321,7 +327,9 @@ class RS extends SupplierApi
         $vehicleClass,
         $rateId,
         $countryCode,
-        $vehicleEquipments        
+        $vehicleEquipments,
+        $firstName,
+        $lastName       
     ) {
         $xml = $this->createRootRequestNode();
         $newReservationRequestNode = $xml->addChild('NewReservationRequest');
@@ -342,8 +350,8 @@ class RS extends SupplierApi
 
         $renterNode = $newReservationRequestNode->addChild('Renter');
         $renterNameNode = $renterNode->addChild('RenterName');
-        $renterNameNode->addAttribute('firstName', 'test');
-        $renterNameNode->addAttribute('lastName', 'test');
+        $renterNameNode->addAttribute('firstName', $firstName);
+        $renterNameNode->addAttribute('lastName', $lastName);
 
         $addressNode = $renterNode->addChild('Address');
         $addressNode->addChild('Email', 'info@redspotcars.com.au');
