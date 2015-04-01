@@ -77,8 +77,8 @@ Route::group(array('prefix' => 'api/{supplierCode}'), function () {
 
 Route::group(array('prefix' => 'HZ/'), function()
 {
-    Route::any('showBooking', 'HZController@showBooking');
-    Route::any('doBookingWithEquipments', 'HZController@doBookingWithEquipments');
+    Route::any('show-booking-form', 'HZController@showBooking');
+    Route::any('do-booking-with-equipments', 'HZController@doBookingWithEquipments');
 	Route::any('search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{countryCode}/{driverAge}', 'HZController@searchVehicles');
 	Route::any('book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{vehicleCategory}/{vehicleClass}', 'HZController@book');
 	Route::any('get-booking-details/{bookingId}', 'HZController@getBookingInfo');

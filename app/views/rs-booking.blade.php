@@ -6,16 +6,22 @@
         <meta name="_token" content="{{ csrf_token() }}" />
         <title> RedSpot Booking Form</title>
     </head>
-
+    <style type="text/css">
+        button[ng-click]{
+            cursor: pointer;
+        }
+    </style>
     <body>
-    <div class='container'>
+    <div class='container' ng-app="BookingApp">
         <div class="ui fixed inverted main menu">
             <a class="launch item">
               <h1>RedSpot Booking Form</h1>
             </a>
         </div><br/><br/><br/>
-        <div ng-app="BookingApp">
-            {{ Form::open(array('url' => 'RS/do-booking-with-equipments','class'=>'ui form segment','id'=>'registration_form', 'files'=>'true','ng-controller'=>'BookingController', 'name' => 'myForm')) }}
+
+        <div ng-controller='BookingController'>
+            <form name="myForm" class='ui form segment' ng-submit="myForm.$valid && addBooking.submit()">
+
                 <div class='two fields'>
                     <div class="field">
                         <label>PickUpLocationCode</label>
@@ -23,7 +29,7 @@
                     </div>
                     <div class="field">
                         <label>Pick Up Date</label>
-                        <input placeholder="Pick Up Date" required  name='pickUpDate' ng-model="bookingDetails.pickUpDate" type="text"/>
+                        <input type="date" placeholder="Pick Up Date" required  name='pickUpDate' ng-model="bookingDetails.pickUpDate" type="text"/>
                     </div>
                 </div>
                 <div class='two fields'>
@@ -39,7 +45,7 @@
                 <div class='two fields'>
                     <div class="field">
                         <label>Return Date</label>
-                        <input placeholder="Return Date" required  name='returnDate' ng-model="bookingDetails.returnDate" type="text"/>
+                        <input type="date" placeholder="Return Date" required  name='returnDate' ng-model="bookingDetails.returnDate" type="text"/>
                     </div>
                     <div class="field">
                         <label>Return Time</label>
@@ -104,12 +110,9 @@
                             </tr>
                         </tbody>
                     </table>
-                </div>            
-                <div class="ui blue button" ng-click="addBooking()"
-                ng-disabled="myForm.pickUpLocationCode.$dirty && myForm.pickUpLocationCode.$invalid ||
-                              myForm.returnLocationCode.$dirty && myForm.returnLocationCode.$invalid">Submit</div>
+                </div>
+                <input type='submit' class='ui blue button' value='Submit'/>
                 <br/><br/>
-
                 <div class="ui positive message" id="responseDiv" ng-if='response.xml !== ""'>
                     <div class="header">
                         Booking Response
@@ -123,101 +126,6 @@
         {{ HTML::script('js/src/angular-1.2.13.js') }}
         {{ HTML::script('js/src/semantic.min.js') }}
         <script type="text/javascript">
-        $('.ui.dropdown')
-          .dropdown()
-        ;        
-            var requiredField = "This field is required";
-            $('.ui.form')
-              .form({
-                pickUpLocationCode: {
-                  identifier  : 'pickUpLocationCode',
-                  rules: [
-                    {
-                      type   : 'empty',
-                      prompt : requiredField
-                    }
-                  ]
-                },
-                returnLocationCode: {
-                  identifier  : 'returnLocationCode',
-                  rules: [
-                    {
-                      type   : 'empty',
-                      prompt : requiredField
-                    }
-                  ]
-                },
-                pickUpDate: {
-                  identifier : 'pickUpDate',
-                  rules: [
-                    {
-                      type   : 'empty',
-                      prompt : requiredField
-                    }
-                  ]
-                },
-                returnDate: {
-                  identifier : 'returnDate',
-                  rules: [
-                    {
-                      type   : 'empty',
-                      prompt : requiredField
-                    }
-                  ]
-                },
-                pickUpTime: {
-                  identifier : 'pickUpTime',
-                  rules: [
-                    {
-                      type   : 'empty',
-                      prompt : requiredField
-                    }
-                  ]
-                },     
-                returnTime: {
-                  identifier : 'returnTime',
-                  rules: [
-                    {
-                      type   : 'empty',
-                      prompt : requiredField
-                    }
-                  ]
-                },
-                vehicleClass: {
-                  identifier : 'vehicleClass',
-                  rules: [
-                    {
-                      type   : 'empty',
-                      prompt : requiredField
-                    }
-                  ]
-                },    
-                rateId: {
-                  identifier : 'rateId',
-                  rules: [
-                    {
-                      type   : 'empty',
-                      prompt : requiredField
-                    }
-                  ]
-                },
-                countryCode: {
-                  identifier : 'countryCode',
-                  rules: [
-                    {
-                      type   : 'empty',
-                      prompt : requiredField
-                    }
-                  ]
-                },                                   
-              },
-                {
-                    inline: true,
-                    on: 'blur',
-                    transition: 'fade down',               
-                }          
-              )
-            ;
 
             (function () {
                 var BookingApp = angular.module('BookingApp', ['BookingControllerModule']);
@@ -229,11 +137,10 @@
 
                 var bookingControllerModule = angular.module('BookingControllerModule', []);
                 bookingControllerModule.controller('BookingController', ['$scope', '$http', function ($scope, $http){
+
                     $scope.bookingDetails = {
                         'pickUpLocationCode' : 'BNE',
                         'returnLocationCode' : 'ADL',
-                        'pickUpDate'         : '12/12/2015',
-                        'returnDate'         : '12/15/2015',
                         'pickUpTime'         : '10:00',
                         'returnTime'         : '12:00',
                         'vehicleClass'       : [ 'ECMR', 'ECAR', 'CDAR', 'IDAR', 'FCAR', 'IFAR', 'PVAR', 'IVAR'],
@@ -266,7 +173,8 @@
                         'bookingEquipments'  : []
                     };
                     $scope.response = { xml: '' };
-                    $scope.addEquipments = function(event) {
+                    $scope.addEquipments = function() {
+                        alert();
                         var eqCode = $scope.bookingDetails.eqCode;
                         var eqQty = $scope.bookingDetails.eqQty;
                         if( (typeof eqCode !== 'undefined' && typeof eqQty !== 'undefined') && (eqCode !== "" && eqQty !== "")) {
@@ -282,35 +190,35 @@
                         $scope.bookingDetails.bookingEquipments.splice(index, 1);
                     }
 
-                    $scope.addBooking = function() {
-                            if($scope.myForm.$valid === true) {
-                                $('#responseDiv').fadeOut();
-                                $http(
-                                    {
-                                        url : 'do-booking-with-equipments', 
-                                        data: {
-                                                pickUpLocationCode : $scope.bookingDetails.pickUpLocationCode,
-                                                returnLocationCode : $scope.bookingDetails.returnLocationCode,
-                                                pickUpDate         : $scope.bookingDetails.pickUpDate,
-                                                pickUpTime         : $scope.bookingDetails.pickUpTime,
-                                                returnDate         : $scope.bookingDetails.returnDate,
-                                                returnTime         : $scope.bookingDetails.returnTime,
-                                                vehicleClass       : $scope.vehicleClass,
-                                                rateId             : $scope.bookingDetails.rateId,
-                                                countryCode        : $scope.bookingDetails.countryCode,
-                                                vehicleEquipments  : $scope.bookingDetails.bookingEquipments
-                                            },
-                                        method : 'POST',
-                                        type: 'json'
-                                    })
-                                    .success(function(data, status, headers, config) {
-                                        $('#responseDiv').fadeIn();
-                                        $scope.response = {
-                                            xml : data
-                                        }
-                                    })
-                            }
-                        };
+                    $scope.addBooking = {
+                        submit: function() {
+                            $('#responseDiv').fadeOut();
+                            $http(
+                                {
+                                    url : 'do-booking-with-equipments', 
+                                    data: {
+                                            pickUpLocationCode : $scope.bookingDetails.pickUpLocationCode,
+                                            returnLocationCode : $scope.bookingDetails.returnLocationCode,
+                                            pickUpDate         : $scope.bookingDetails.pickUpDate,
+                                            pickUpTime         : $scope.bookingDetails.pickUpTime,
+                                            returnDate         : $scope.bookingDetails.returnDate,
+                                            returnTime         : $scope.bookingDetails.returnTime,
+                                            vehicleClass       : $scope.vehicleClass,
+                                            rateId             : $scope.bookingDetails.rateId,
+                                            countryCode        : $scope.bookingDetails.countryCode,
+                                            vehicleEquipments  : $scope.bookingDetails.bookingEquipments
+                                        },
+                                    method : 'POST',
+                                    type: 'json'
+                                })
+                                .success(function(data, status, headers, config) {
+                                    $('#responseDiv').fadeIn();
+                                    $scope.response = {
+                                        xml : data
+                                    }
+                                })
+                        }
+                    }
                 }]);
             })();
 

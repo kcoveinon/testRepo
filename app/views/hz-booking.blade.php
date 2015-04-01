@@ -1,51 +1,62 @@
-@extends('default.default')
-
-
-@section('content')
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <link type="text/css" href="{{{ asset('css/src/semantic.min.css')  }}}" rel="stylesheet"  media="screen"/>
+        <meta name="_token" content="{{ csrf_token() }}" />
+        <title> RedSpot Booking Form</title>
+    </head>
+    <style type="text/css">
+        button[ng-click]{
+            cursor: pointer;
+        }
+    </style>
+    <body>
     <div class="ui fixed inverted main menu">
         <a class="launch item">
           <h1>Hertz Booking Form</h1>
         </a>
     </div><br/><br/><br/>
     <div ng-app="BookingApp">
-        {{ Form::open(array('url' => 'RS/doBookingWithEquipments','class'=>'ui form segment','id'=>'registration_form', 'files'=>'true','ng-controller'=>'BookingController')) }}
+        <div ng-controller='BookingController'>
+        <form name="myForm" class='ui form segment' ng-submit="myForm.$valid && addBooking.submit()">        
             <div class='two fields'>
                 <div class="field">
                     <label>PickUpLocationCode</label>
-                    <input placeholder="First Name" ng-model="bookingDetails.pickUpLocationCode" type="text"/>
+                    <input placeholder="First Name" ng-model="bookingDetails.pickUpLocationCode" required type="text"/>
                 </div>
                 <div class="field">
                     <label>Pick Up Date</label>
-                    <input placeholder="First Name" ng-model="bookingDetails.pickUpDate" type="text"/>
+                    <input placeholder="First Name" required ng-model="bookingDetails.pickUpDate" type="date"/>
                 </div>
             </div>
             <div class='two fields'>
                 <div class="field">
                     <label>Pick Up Time</label>
-                    <input placeholder="First Name" ng-model="bookingDetails.pickUpTime" type="text"/>
+                    <input placeholder="First Name" required ng-model="bookingDetails.pickUpTime" type="text"/>
                 </div>
                 <div class="field">
                     <label>Return Location Code</label>
-                    <input placeholder="First Name" ng-model="bookingDetails.returnLocationCode" type="text"/>
+                    <input placeholder="First Name" required ng-model="bookingDetails.returnLocationCode" type="text"/>
                 </div>
             </div>
             <div class='two fields'>
                 <div class="field">
                     <label>Return Date</label>
-                    <input placeholder="First Name" ng-model="bookingDetails.returnDate" type="text"/>
+                    <input placeholder="First Name" required ng-model="bookingDetails.returnDate" type="date"/>
                 </div>
                 <div class="field">
                     <label>Return Time</label>
-                    <input placeholder="First Name" ng-model="bookingDetails.returnTime" type="text"/>
+                    <input placeholder="First Name" required ng-model="bookingDetails.returnTime" type="text"/>
                 </div>                                   
             </div>     
             <div class="field">
                 <label>Country Code</label>
-                <input placeholder="First Name" ng-model="bookingDetails.countryCode" type="text" value="AU"/>
+                <input placeholder="First Name" required ng-model="bookingDetails.countryCode" type="text" value="AU"/>
             </div>             
             <div class="field">
                 <label>Vehicle Category</label>
-                <select ng-model="vehicleCategory">
+                <select ng-model="vehicleCategory" required>
                     <option value="">All</option>
                     <option ng-repeat="vCategory in bookingDetails.vehicleCategory" value='<% vCategory.code %>'>
                         <% vCategory.alias %>
@@ -54,7 +65,7 @@
             </div>
             <div class='field'>
                 <label>Vehicle Class</label>
-                <select ng-model="vehicleClass">
+                <select ng-model="vehicleClass" required>
                     <option value="">All</option>
                     <option ng-repeat="vClass in bookingDetails.vehicleClass" value="<% vClass.code %>">
                         <% vClass.alias %>
@@ -101,7 +112,7 @@
                     </tbody>
                 </table>
             </div>              
-            <div class="ui blue button" ng-click="addBooking()">Submit</div>
+            <input type='submit' class='ui blue button' value='Submit'/>
             <br/><br/>
 
             <div class="ui positive message" id="responseDiv" ng-if='response.xml !== ""'>
@@ -110,11 +121,10 @@
                 </div>
                 <div style='font-family:monospace;'><pre><% response.xml | json %></pre></div>
             </div>            
-        {{Form::close()}}
+        </form>
+        </div>
     </div>
-@stop
 
-@section('page_js')
 
     {{ HTML::script('js/src/angular-1.2.13.js') }}
     <script type="text/javascript">
@@ -219,34 +229,64 @@
                     $scope.bookingDetails.bookingEquipments.splice(index, 1);
                 }
 
-                $scope.addBooking = function() {
-                    $('#responseDiv').fadeOut();                    
-                    $http(
-                        {
-                            url : 'doBookingWithEquipments', 
-                            data: {
-                                    pickUpLocationCode : $scope.bookingDetails.pickUpLocationCode,
-                                    returnLocationCode : $scope.bookingDetails.returnLocationCode,
-                                    pickUpDate         : $scope.bookingDetails.pickUpDate,
-                                    pickUpTime         : $scope.bookingDetails.pickUpTime,
-                                    returnDate         : $scope.bookingDetails.returnDate,
-                                    returnTime         : $scope.bookingDetails.returnTime,
-                                    rateId             : $scope.bookingDetails.rateId,
-                                    countryCode        : $scope.bookingDetails.countryCode,
-                                    vehicleEquipments  : $scope.bookingDetails.bookingEquipments,
-                                    vehicleCategory    : $scope.vehicleCategory,
-                                    vehicleClass       : $scope.vehicleClass
-                                },
-                            method : 'POST',
-                            type: 'json'
-                        })
-                        .success(function(data, status, headers, config) {
-                            $('#responseDiv').fadeIn();                            
-                            $scope.response = {
-                                xml : data
-                            }
-                        })
-                    };
+                $scope.addBooking = {
+                    submit: function() {
+                        $('#responseDiv').fadeOut();                    
+                        $http(
+                            {
+                                url : 'do-booking-with-equipments', 
+                                data: {
+                                        pickUpLocationCode : $scope.bookingDetails.pickUpLocationCode,
+                                        returnLocationCode : $scope.bookingDetails.returnLocationCode,
+                                        pickUpDate         : $scope.bookingDetails.pickUpDate,
+                                        pickUpTime         : $scope.bookingDetails.pickUpTime,
+                                        returnDate         : $scope.bookingDetails.returnDate,
+                                        returnTime         : $scope.bookingDetails.returnTime,
+                                        rateId             : $scope.bookingDetails.rateId,
+                                        countryCode        : $scope.bookingDetails.countryCode,
+                                        vehicleEquipments  : $scope.bookingDetails.bookingEquipments,
+                                        vehicleCategory    : $scope.vehicleCategory,
+                                        vehicleClass       : $scope.vehicleClass
+                                    },
+                                method : 'post',
+                                type: 'json'
+                            })
+                            .success(function(data, status, headers, config) {
+                                $('#responseDiv').fadeIn();                            
+                                $scope.response = {
+                                    xml : data
+                                }
+                            }) 
+                        }
+                }
+                // $scope.addBooking = function() {
+                //     $('#responseDiv').fadeOut();                    
+                //     $http(
+                //         {
+                //             url : 'doBookingWithEquipments', 
+                //             data: {
+                //                     pickUpLocationCode : $scope.bookingDetails.pickUpLocationCode,
+                //                     returnLocationCode : $scope.bookingDetails.returnLocationCode,
+                //                     pickUpDate         : $scope.bookingDetails.pickUpDate,
+                //                     pickUpTime         : $scope.bookingDetails.pickUpTime,
+                //                     returnDate         : $scope.bookingDetails.returnDate,
+                //                     returnTime         : $scope.bookingDetails.returnTime,
+                //                     rateId             : $scope.bookingDetails.rateId,
+                //                     countryCode        : $scope.bookingDetails.countryCode,
+                //                     vehicleEquipments  : $scope.bookingDetails.bookingEquipments,
+                //                     vehicleCategory    : $scope.vehicleCategory,
+                //                     vehicleClass       : $scope.vehicleClass
+                //                 },
+                //             method : 'POST',
+                //             type: 'json'
+                //         })
+                //         .success(function(data, status, headers, config) {
+                //             $('#responseDiv').fadeIn();                            
+                //             $scope.response = {
+                //                 xml : data
+                //             }
+                //         })
+                //     };
             }]);
         })();
 
@@ -344,4 +384,12 @@
         // ;
 
     </script>
-@stop
+        </div>
+    </body>
+
+
+    {{ HTML::script('js/src/jquery-2.0.0.min.js') }}
+    {{ HTML::script('js/src/semantic.min.js') }}
+     @yield('page_js')
+
+</html>
