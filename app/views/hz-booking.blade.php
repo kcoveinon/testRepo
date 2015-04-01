@@ -60,31 +60,35 @@
                     <input placeholder="Return Time" required ng-model="bookingDetails.returnTime" type="text"/>
                 </div>                                   
             </div>
-            <div class="field">
-                <label>Driver Age</label>
-                <input placeholder="Driver Age" required ng-model="bookingDetails.driverAge" type="number"/>
-            </div>     
-            <div class="field">
-                <label>Country Code</label>
-                <input placeholder="Country Code" required ng-model="bookingDetails.countryCode" type="text" value="AU"/>
-            </div>             
-            <div class="field">
-                <label>Vehicle Category</label>
-                <select ng-model="vehicleCategory" required>
-                    <option value="">All</option>
-                    <option ng-repeat="vCategory in bookingDetails.vehicleCategory" value='<% vCategory.code %>'>
-                        <% vCategory.alias %>
-                    </option>
-                </select>
-            </div>
-            <div class='field'>
-                <label>Vehicle Class</label>
-                <select ng-model="vehicleClass" required>
-                    <option value="">All</option>
-                    <option ng-repeat="vClass in bookingDetails.vehicleClass" value="<% vClass.code %>">
-                        <% vClass.alias %>
-                    </option>
-                </select>
+            <div class='two fields'>
+                <div class="field">
+                    <label>Driver Age</label>
+                    <input placeholder="Driver Age" required ng-model="bookingDetails.driverAge" type="number"/>
+                </div>     
+                <div class="field">
+                    <label>Country Code</label>
+                    <input placeholder="Country Code" required ng-model="bookingDetails.countryCode" type="text" value="AU"/>
+                </div> 
+            </div>            
+            <div class='two fields'>
+                <div class="field">
+                    <label>Vehicle Category</label>
+                    <select ng-model="vehicleCategory" required>
+                        <option value="">All</option>
+                        <option ng-repeat="vCategory in bookingDetails.vehicleCategory" value='<% vCategory.code %>'>
+                            <% vCategory.alias %>
+                        </option>
+                    </select>
+                </div>
+                <div class='field'>
+                    <label>Vehicle Class</label>
+                    <select ng-model="vehicleClass" required>
+                        <option value="">All</option>
+                        <option ng-repeat="vClass in bookingDetails.vehicleClass" value="<% vClass.code %>">
+                            <% vClass.alias %>
+                        </option>
+                    </select>
+                </div>
             </div>            
             <div class='three fields'>
                 <div class="field">
