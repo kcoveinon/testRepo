@@ -167,12 +167,13 @@ class HZ extends SupplierApi
 	 * Retrieves booking details of a particular booking Id or an array of booking IDs
 	 * 
 	 * @param  int/array $bookingId
+	 * @param  string $lastName
 	 * 
 	 * @return XML Object
 	 */
-	public function getBookingDetails($bookingId)
+	public function getBookingDetails($bookingId, $lastName)
 	{
-		$xmlRequest = $this->getBookingDetailsXML($bookingId);
+		$xmlRequest = $this->getBookingDetailsXML($bookingId, $lastName);
 		return $this->executeCurl($xmlRequest->asXML());	
 	}
 
@@ -231,6 +232,9 @@ class HZ extends SupplierApi
 	 * @param string $vehicleCategory
 	 * @param string $vehicleClass
 	 * @param string $equipments
+	 * @param string $equipments
+	 * @param string $firstName
+	 * @param string $lastName
 	 * 
 	 * @return XML Object
 	 */
@@ -244,7 +248,10 @@ class HZ extends SupplierApi
 		$countryCode, 
 		$vehicleCategory,
 		$vehicleClass,
-		$equipments
+		$equipments,
+		$age,
+		$firstName,
+		$lastName
 	) {	
 		if (!$this->validateDate($pickUpDate, $pickUpTime) && !$this->validateDate($returnDate, $returnTime)) {
 			$response = ["result" => "Invalid Parameters"];
@@ -258,7 +265,10 @@ class HZ extends SupplierApi
 							$countryCode,
 							$vehicleCategory,
 							$vehicleClass,
-							$equipments
+							$equipments,
+							$age,
+							$firstName,
+							$lastName
 						  );
 
 			$response = $this->executeCurl($xmlRequest->asXML());
@@ -501,10 +511,11 @@ class HZ extends SupplierApi
 	 * Returns the needed XML request for booking details
 	 * 
 	 * @param  int $bookingId
+	 * @param  string $lastName
 	 * 
 	 * @return XML
 	 */
-	public function getBookingDetailsXML($bookingId)
+	public function getBookingDetailsXML($bookingId, $lastName)
 	{
 		$xmlAction = self::GET_BOOKING_INFO_ACTION;
 
@@ -516,7 +527,7 @@ class HZ extends SupplierApi
 		$uniqueIDNode->addAttribute("ID", (string) $bookingId);
 
 		$personNameNode = $vehRetResRQCoreNode->addChild("PersonName");
-		$personNameNode->addChild("Surname", "Testing");	
+		$personNameNode->addChild("Surname", trim($lastName));	
 		
 		return $xml;
 	}
@@ -532,6 +543,9 @@ class HZ extends SupplierApi
 	 * @param int $vehicleCategory      
 	 * @param int $vehicleClass
 	 * @param int $equipments
+	 * @param int $age
+	 * @param int $firstName
+	 * @param int $lastName
 	 * 
 	 * @return XML
 	 */
@@ -543,7 +557,10 @@ class HZ extends SupplierApi
 		$countryCode,
 		$vehicleCategory,
 		$vehicleClass,
-		$equipments
+		$equipments,
+		$age,
+		$firstName,
+		$lastName
 	) {
 
 		$xmlAction = self::BOOK_VEHICLE_ACTION;
@@ -566,9 +583,15 @@ class HZ extends SupplierApi
 
 		$customerNode = $vehRsCore->addChild("Customer");
 		$primaryNode = $customerNode->addChild("Primary");
+
+		if($age > 0 || $age !== "") {
+			$date =  new DateTime(date("Y") - ((int) str_replace("+", "", $age)) . "-" . date("m-d"));
+			$result = $date->format("Y-m-d");
+			$primaryNode->addAttribute("BirthDate", $result);
+		}
 		$personNameNode = $primaryNode->addChild("PersonName");
-		$personNameNode->addChild("GivenName", "PrePaidThree");
-		$personNameNode->addChild("Surname", "Testing");
+		$personNameNode->addChild("GivenName", $firstName);
+		$personNameNode->addChild("Surname", $lastName);
 		$telephoneNode = $primaryNode->addChild("Telephone");
 		$telephoneNode->addAttribute("PhoneTechType", "1");
 		$telephoneNode->addAttribute("AreaCityCode", "9999");

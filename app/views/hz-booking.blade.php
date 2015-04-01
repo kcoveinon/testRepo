@@ -19,40 +19,54 @@
     </div><br/><br/><br/>
     <div ng-app="BookingApp">
         <div ng-controller='BookingController'>
-        <form name="myForm" class='ui form segment' ng-submit="myForm.$valid && addBooking.submit()">        
+        <form name="myForm" class='ui form segment' ng-submit="myForm.$valid && addBooking.submit()">
             <div class='two fields'>
                 <div class="field">
-                    <label>PickUpLocationCode</label>
+                    <label>Customer First Name</label>
+                    <input placeholder="First Name" ng-model="bookingDetails.firstName" required type="text"/>
+                </div>
+                <div class="field">
+                    <label>Customer Last Name</label>
+                    <input placeholder="Pick Up Date" required ng-model="bookingDetails.lastName" type="text"/>
+                </div>
+            </div>
+            <div class='two fields'>
+                <div class="field">
+                    <label>Pick Up Location Code</label>
                     <input placeholder="First Name" ng-model="bookingDetails.pickUpLocationCode" required type="text"/>
                 </div>
                 <div class="field">
                     <label>Pick Up Date</label>
-                    <input placeholder="First Name" required ng-model="bookingDetails.pickUpDate" type="date"/>
+                    <input placeholder="Pick Up Date" required ng-model="bookingDetails.pickUpDate" type="date"/>
                 </div>
             </div>
             <div class='two fields'>
                 <div class="field">
                     <label>Pick Up Time</label>
-                    <input placeholder="First Name" required ng-model="bookingDetails.pickUpTime" type="text"/>
+                    <input placeholder="Pick Up Time" required ng-model="bookingDetails.pickUpTime" type="text"/>
                 </div>
                 <div class="field">
                     <label>Return Location Code</label>
-                    <input placeholder="First Name" required ng-model="bookingDetails.returnLocationCode" type="text"/>
+                    <input placeholder="Return Location Code" required ng-model="bookingDetails.returnLocationCode" type="text"/>
                 </div>
             </div>
             <div class='two fields'>
                 <div class="field">
                     <label>Return Date</label>
-                    <input placeholder="First Name" required ng-model="bookingDetails.returnDate" type="date"/>
+                    <input placeholder="Return Date" required ng-model="bookingDetails.returnDate" type="date"/>
                 </div>
                 <div class="field">
                     <label>Return Time</label>
-                    <input placeholder="First Name" required ng-model="bookingDetails.returnTime" type="text"/>
+                    <input placeholder="Return Time" required ng-model="bookingDetails.returnTime" type="text"/>
                 </div>                                   
+            </div>
+            <div class="field">
+                <label>Driver Age</label>
+                <input placeholder="Driver Age" required ng-model="bookingDetails.driverAge" type="number"/>
             </div>     
             <div class="field">
                 <label>Country Code</label>
-                <input placeholder="First Name" required ng-model="bookingDetails.countryCode" type="text" value="AU"/>
+                <input placeholder="Country Code" required ng-model="bookingDetails.countryCode" type="text" value="AU"/>
             </div>             
             <div class="field">
                 <label>Vehicle Category</label>
@@ -112,7 +126,7 @@
                     </tbody>
                 </table>
             </div>              
-                <input type='submit' class='ui blue button' value='Submit'/>
+                <input type='submit' class='ui blue button' id="submitBtn" value='Submit'/>
             <br/><br/>
 
             <div class="ui positive message" id="responseDiv" ng-if='response.xml !== ""'>
@@ -139,12 +153,15 @@
             var bookingControllerModule = angular.module('BookingControllerModule', []);
             bookingControllerModule.controller('BookingController', ['$scope', '$http', function ($scope, $http){
                 $scope.bookingDetails = {
+                    'firstName' : 'Inon',
+                    'lastName' : 'Baguio',
                     'pickUpLocationCode' : 'BNE',
                     'returnLocationCode' : 'ADL',
                     'pickUpDate'         : '2015-12-12',
                     'returnDate'         : '2015-12-15',
                     'pickUpTime'         : '10:00',
                     'returnTime'         : '12:00',
+                    'driverAge'          : 25,
                     'vehicleCategory'    : [
                                             {code : '1' , alias : 'Car'},
                                             {code : '2' , alias : 'Van'},
@@ -194,7 +211,7 @@
                                             {code : '4',  alias : 'Ski Rack' },
                                             {code : '7',  alias : 'Infant Child Seat' },
                                             {code : '8',  alias : 'Child Toddler Seat' },
-                                            {code : '9',  alias : 'Booster Saet' },
+                                            {code : '9',  alias : 'Booster Seat' },
                                             {code : '11', alias : 'Hand Controls Right' },
                                             {code : '12', alias : 'Hand Controls Left' },
                                             {code : '13', alias : 'Neverlost System' },
@@ -233,7 +250,8 @@
 
                 $scope.addBooking = {
                     submit: function() {
-                        $('#responseDiv').fadeOut();                    
+                        $('#responseDiv').fadeOut();
+                        $('#submitBtn').html("Processing");
                         $http(
                             {
                                 url : 'do-booking-with-equipments', 
@@ -248,13 +266,17 @@
                                         countryCode        : $scope.bookingDetails.countryCode,
                                         vehicleEquipments  : $scope.bookingDetails.bookingEquipments,
                                         vehicleCategory    : $scope.vehicleCategory,
-                                        vehicleClass       : $scope.vehicleClass
+                                        vehicleClass       : $scope.vehicleClass,
+                                        age                : $scope.bookingDetails.driverAge,
+                                        firstName          : $scope.bookingDetails.firstName,
+                                        lastName           : $scope.bookingDetails.lastName
                                     },
                                 method : 'post',
                                 type: 'json'
                             })
                             .success(function(data, status, headers, config) {
-                                $('#responseDiv').fadeIn();                            
+                                $('#responseDiv').fadeIn();
+                                $('#submitBtn').html("Submit");    
                                 $scope.response = {
                                     xml : data
                                 }

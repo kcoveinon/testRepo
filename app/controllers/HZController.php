@@ -54,7 +54,10 @@ class HZController extends BaseController
 						Input::get("countryCode"), 
 						Input::get("vehicleCategory"), 
 						Input::get("vehicleClass"),
-						Input::get("vehicleEquipments")
+						Input::get("vehicleEquipments"),
+						Input::get("age"),
+						Input::get("firstName"),
+						Input::get("lastName")
 					);
 
 		return Response::json($result);			
@@ -66,9 +69,9 @@ class HZController extends BaseController
 		return Response::json($result);	
 	}
 
-	public function getBookingInfo($bookingId)
+	public function getBookingInfo($bookingId, $firstName)
 	{
-		$result = $this->supplierApi->getBookingDetails($bookingId);
+		$result = $this->supplierApi->getBookingDetails($bookingId, $firstName);
 		return Response::json($result);	
 	}
 
