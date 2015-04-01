@@ -147,6 +147,9 @@ class AV extends SupplierApi
      */
     public function getLocationSearch()
     {
+
+
+
         $xml = "<SOAP-ENV:Envelope xmlns:SOAP-ENV='http://www.w3.org/2001/12/soap-envelope' xmlns:xsi='http://www.w3.org/1999/XMLSchema-instance' xmlns:xsd='http://www.w3.org/1999/XMLSchema'>
                     <SOAP-ENV:Header>
                         <ns:credentials xmlns:ns='http://wsg.avis.com/wsbang/authInAny'>
