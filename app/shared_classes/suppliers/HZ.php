@@ -301,7 +301,6 @@ class HZ extends SupplierApi
 							$driverAge
 					   );
 		$xmlObject = $this->executeCurl($xmlRequest->asXML());
-		return $xmlObject;
 		$result = [];
 
 		if (isset($xmlObject->Errors)) {
@@ -653,8 +652,10 @@ class HZ extends SupplierApi
         $customerNode       = $vehAvailRQInfoNode->addChild("Customer");
         $primaryNode        = $customerNode->addChild("Primary");
 
-        $newDriverAge = date("Y") - ((int) str_replace("+", "", $driverAge));
-        $primaryNode->addAttribute("BirthDate", $newDriverAge."-06-13");
+		$date =  new DateTime(date("Y") - ((int) str_replace("+", "", $driverAge)) . "-" . date("m-d"));
+		$result = $date->format("Y-m-d");
+
+        $primaryNode->addAttribute("BirthDate", $result);
         $primaryNode->addChild("Email", "saford@hertz");
 
         $addressNode = $primaryNode->addChild("Address");
