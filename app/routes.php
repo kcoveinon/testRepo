@@ -63,9 +63,6 @@ Route::group(array('prefix' => 'api/{supplierCode}'), function () {
                 $supplierReturnDepotCode = $returnDepot[0]->depotCode;
             }
 
-            // echo '<pre>' . print_r($supplierPickUpDepotCode, true) . '</pre>';
-            // echo '<pre>' . print_r($supplierReturnDepotCode, true) . '</pre>'; die();
-
             $supplierApi = App::make($supplierCode);
 
             $result = $supplierApi->searchVehicles($pickUpDate, $pickUpTime, $returnDate, $returnTime, $supplierPickUpDepotCode, $supplierReturnDepotCode, $countryCode, $driverAge);
