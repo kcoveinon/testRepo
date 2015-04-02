@@ -601,7 +601,7 @@ class HZ extends SupplierApi
 		$customerNode = $vehRsCore->addChild("Customer");
 		$primaryNode = $customerNode->addChild("Primary");
 
-		if($age > 0 || $age !== "") {
+		if((int) $age > 0 || $age !== "") {
 			$date =  new DateTime(date("Y") - ((int) str_replace("+", "", $age)) . "-" . date("m-d"));
 			$result = $date->format("Y-m-d");
 			$primaryNode->addAttribute("BirthDate", $result);
