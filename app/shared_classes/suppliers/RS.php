@@ -109,7 +109,7 @@ class RS extends SupplierApi
                             $pickUpLocationCode, 
                             $returnLocationCode, 
                             $countryCode 
-                       );
+                         );
         $searchResult['executionTime'] = time() - $timeStart;
         $searchResult['supplierCode']  = $this->supplierCode;
 
