@@ -802,14 +802,15 @@ class HZ extends SupplierApi
 			ini_set("max_execution_time", 0);
 			ini_set("memory_limit", "10000M");
         	header ("Content-Type:text/xml");
+
 			$file_content  = file_get_contents(public_path() . "/misc/GDEX1ADC.txt");
 			$explodedArray = explode("|", $file_content);
 			$chunkedArray  = array_chunk($explodedArray, 110, false);
-			$counter = 0;
 	        echo '<records>';
-	            foreach($chunkedArray as $key => $value) {
-	            	$counter++;
-	                if(count($value) > 1 && $counter < 20) {
+
+	            foreach ($chunkedArray as $key => $value) {
+
+	                if (count($value) > 1 && $counter < 20) {
 						$country   = strlen($value[5])  < 1 ? "N/A" : $value[5];
 						$zipCode   = strlen($value[7])  < 1 ? "N/A" : $value[7];
 						$city      = strlen($value[8])  < 1 ? "N/A" : $value[8];
@@ -840,17 +841,15 @@ class HZ extends SupplierApi
 							echo '<fax>' 		  . $fax  				   . '</fax>';
 							echo '<email>' 		  . $email  			   . '</email>';
 							echo '<latitude>' 	  . $latitude  			   . '</latitude>';
-							echo '<latitude>' 	  . $longitude 			   . '</latitude>';
+							echo '<longitude>' 	  . $longitude 			   . '</longitude>';
 							echo '<locationName>' . htmlentities($locDesc) . '</locationName>';
 	                    echo '</record>';
-	            	}
-	            	else {
+	            	} else {
 	            		break;
 	            	}
 	            }
 	        echo '</records>';
-        }
-        else {
+        } else {
         	 echo "File does not exist";
         }
 	}
