@@ -50,7 +50,8 @@ class RSController extends BaseController
         $returnTime,
         $pickUpLocationCode, 
         $returnLocationCode, 
-        $countryCode        
+        $countryCode,
+        $driverAge      
     ) {
         return Response::json($this->supplierApi->search(
                                 $pickUpDate, 
@@ -59,7 +60,8 @@ class RSController extends BaseController
                                 $returnTime,
                                 $pickUpLocationCode, 
                                 $returnLocationCode, 
-                                $countryCode  
+                                $countryCode,
+                                $driverAge 
                         )); 
     }
 

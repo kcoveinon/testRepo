@@ -78,14 +78,15 @@ class RS extends SupplierApi
     /**
      * Handles the cURL request for the get vehicle rates
      * 
-     * @param  date $pickUpDate
-     * @param  time $pickUpTime
-     * @param  date $returnDate
-     * @param  time $returnTime
-     * @param  string $pickUpLocationCode
-     * @param  string $returnLocationCode
-     * @param  string $vehicleClass
-     * @param  string $countryCode
+     * @param date $pickUpDate
+     * @param time $pickUpTime
+     * @param date $returnDate
+     * @param time $returnTime
+     * @param string $pickUpLocationCode
+     * @param string $returnLocationCode
+     * @param string $vehicleClass
+     * @param string $countryCode
+     * @param string $countryCode
      * 
      * @return XML
      */
@@ -96,7 +97,8 @@ class RS extends SupplierApi
         $returnTime,
         $pickUpLocationCode, 
         $returnLocationCode, 
-        $countryCode
+        $countryCode,
+        $driverAge
     ) {
         $xmlRequest  = $this->getSearchVehicleXML(
                             $pickUpDate, 

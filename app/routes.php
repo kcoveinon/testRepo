@@ -97,7 +97,7 @@ Route::group(array('prefix' => 'RS/'), function()
     Route::any('show-booking-form', 'RSController@showBooking');
     Route::any('get-booking-details/{bookingId}', 'RSController@getBookingDetails');
     Route::any('do-booking-with-equipments', 'RSController@doBookingWithEquipments');
-    Route::any('search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{countryCode}', 'RSController@searchVehicles');
+    Route::any('search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{countryCode}/{age}', 'RSController@searchVehicles');
     Route::any('cancel-booking/{bookingId}', 'RSController@cancelBooking');
     Route::any('book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{vehicleClass}/{rateId}/{countryCode}', 'RSController@doBooking');
 });
