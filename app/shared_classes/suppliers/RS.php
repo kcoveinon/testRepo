@@ -76,7 +76,7 @@ class RS extends SupplierApi
     }
 
     /**
-     * Handles the cURL request for the get vehicle rates
+     * Generic function for get vehicle rates
      * 
      * @param date $pickUpDate
      * @param time $pickUpTime
@@ -100,7 +100,42 @@ class RS extends SupplierApi
         $countryCode,
         $driverAge
     ) {
-        $timeStart = time();
+        $timeStart     = time();
+        $searchResult  = $this->resRates(
+                            $pickUpDate, 
+                            $pickUpTime, 
+                            $returnDate, 
+                            $returnTime,
+                            $pickUpLocationCode, 
+                            $returnLocationCode, 
+                            $countryCode 
+                       );
+        $searchResult['executionTime'] = time() - $timeStart;
+        $searchResult['supplierCode']  = $this->supplierCode;
+
+        return $searchResult;
+    }
+
+    /**
+     * Dedicated function for search()
+     * @param  date $pickUpDate        
+     * @param  date $pickUpTime        
+     * @param  date $returnDate        
+     * @param  time $returnTime     
+     * @param  string $pickUpLocationCode
+     * @param  string $returnLocationCode
+     * @param  string $countryCode
+     * @return Array
+     */
+    public function resRates(
+        $pickUpDate, 
+        $pickUpTime, 
+        $returnDate, 
+        $returnTime,
+        $pickUpLocationCode, 
+        $returnLocationCode, 
+        $countryCode         
+    ) {
         $xmlRequest  = $this->getSearchVehicleXML(
                             $pickUpDate, 
                             $pickUpTime, 
@@ -125,8 +160,9 @@ class RS extends SupplierApi
         $counter          = 0;
 
         foreach ($xmlCurlResponse->ResRates->Rate as $value) {
-            if (!empty($mappedCarDetails[$counter])) {
+            if (!empty($mappedCarDetails[$counter]) && (string) trim($value->Availability) === "Available") {
                 $result['data'][] = array(
+                    'supplierCode'    => (string) $this->supplierCode,
                     'hasAirCondition' => (string) 'N/A',
                     'transmission'    => (string) $mappedCarDetails[$counter]->gearbox,
                     'baggageQty'      => $this->getSumOfNumbersFromString($mappedCarDetails[$counter]->storage),
@@ -152,9 +188,7 @@ class RS extends SupplierApi
             }
 
             $counter++;
-        }
-        $result['executionTime'] = time() - $timeStart;
-        $result['supplierCode']  = $this->supplierCode;
+        } 
 
         return $result;
     }
