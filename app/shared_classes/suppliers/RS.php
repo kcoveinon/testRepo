@@ -118,6 +118,7 @@ class RS extends SupplierApi
 
     /**
      * Dedicated function for search()
+     * 
      * @param  date $pickUpDate        
      * @param  date $pickUpTime        
      * @param  date $returnDate        
@@ -125,6 +126,7 @@ class RS extends SupplierApi
      * @param  string $pickUpLocationCode
      * @param  string $returnLocationCode
      * @param  string $countryCode
+     * 
      * @return Array
      */
     public function resRates(
@@ -157,7 +159,6 @@ class RS extends SupplierApi
         $acrissHelper     = new AcrissHelper();
         $result['status'] = 'OK';
         $counter          = 0;
-
         foreach ($xmlCurlResponse->ResRates->Rate as $value) {
             if (!empty($mappedCarDetails[$counter]) && (string) trim($value->Availability) === "Available") {
                 $result['data'][] = array(
