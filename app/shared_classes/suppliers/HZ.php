@@ -604,7 +604,7 @@ class HZ extends SupplierApi
 		if($age > 0 || $age !== "") {
 			$date =  new DateTime(date("Y") - ((int) str_replace("+", "", $age)) . "-" . date("m-d"));
 			$result = $date->format("Y-m-d");
-			// $primaryNode->addAttribute("BirthDate", $result);
+			$primaryNode->addAttribute("BirthDate", $result);
 		}
 		$personNameNode = $primaryNode->addChild("PersonName");
 		$personNameNode->addChild("GivenName", $firstName);
@@ -638,8 +638,7 @@ class HZ extends SupplierApi
 				$specialEquipPre->addAttribute("Quantity", trim($equipmentDetails["qty"]));
 			}
 		}
-		// header("Content-type: text/xml");
-		// print_r($xml->asXML()); exit();
+
 		return $xml;
 	}	
 
@@ -806,11 +805,12 @@ class HZ extends SupplierApi
 			$file_content  = file_get_contents(public_path() . "/misc/GDEX1ADC.txt");
 			$explodedArray = explode("|", $file_content);
 			$chunkedArray  = array_chunk($explodedArray, 110, false);
+
 	        echo '<records>';
 
 	            foreach ($chunkedArray as $key => $value) {
 
-	                if (count($value) > 1 && $counter < 20) {
+	                if (count($value) > 1) {
 						$country   = strlen($value[5])  < 1 ? "N/A" : $value[5];
 						$zipCode   = strlen($value[7])  < 1 ? "N/A" : $value[7];
 						$city      = strlen($value[8])  < 1 ? "N/A" : $value[8];

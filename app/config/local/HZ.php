@@ -5,7 +5,7 @@ $prodUrl = "https://vv.xnet.hertz.com/DirectLinkWEB/handlers/DirectLinkHandler?i
 
 return array(
 	'api' => array(
-        'url'                 => $testUrl,
+        'url'                 => $prodUrl,
         'validationCode'      => '11V04R77M05',
         'validationNumber'    => 'T695',
         'consumerProductCode' => 'XM03',
