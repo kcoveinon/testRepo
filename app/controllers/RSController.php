@@ -15,6 +15,8 @@ class RSController extends BaseController
     {
         return View::make("angular");
     }
+
+
     public function doBookingWithEquipments()
     {
         return Response::json($this->supplierApi->doBooking(
