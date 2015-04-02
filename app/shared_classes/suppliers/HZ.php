@@ -601,7 +601,7 @@ class HZ extends SupplierApi
 		$customerNode = $vehRsCore->addChild("Customer");
 		$primaryNode = $customerNode->addChild("Primary");
 
-		if((int) $age > 0) {
+		if ((int) $age > 0) {
 			$date =  new DateTime(date("Y") - ((int) str_replace("+", "", $age)) . "-" . date("m-d"));
 			$result = $date->format("Y-m-d");
 			$primaryNode->addAttribute("BirthDate", $result);
@@ -630,7 +630,7 @@ class HZ extends SupplierApi
 		$rateQualifierNode = $vehRsCore->addChild("RateQualifier");
 		$rateQualifierNode->addAttribute("RateQualifier", "BEST");
 
-		if(count($equipments) > 0) {
+		if (count($equipments) > 0) {
 			$specialEquipPrefNode = $vehRsCore->addChild("SpecialEquipPrefs");
 			foreach ($equipments as $equipmentDetails) {
 				$specialEquipPre = $specialEquipPrefNode->addChild("SpecialEquipPref");
@@ -797,7 +797,7 @@ class HZ extends SupplierApi
 	{
 		$file = public_path() . "/misc/GDEX1ADC.txt";
 
-		if(file_exists($file)) {
+		if (file_exists($file)) {
 			ini_set("max_execution_time", 0);
 			ini_set("memory_limit", "10000M");
         	header ("Content-Type:text/xml");
