@@ -1,6 +1,6 @@
 <?php
 
-$testUrl      =  "https://www.thermeon.com.au/webXG/redspot-test/xml/webxml/";
+$testUrl      = "https://www.thermeon.com.au/webXG/redspot-test/xml/webxml/";
 $fleetUrl     = "https://www.redspot.com.au/fleet.xml";
 $locationsUrl = "https://www.redspot.com.au/locations.xml";
 $optionsUrl   = "https://www.redspot.com.au/options.xml";
