@@ -159,6 +159,7 @@ class RS extends SupplierApi
         $acrissHelper     = new AcrissHelper();
         $result['status'] = 'OK';
         $counter          = 0;
+
         foreach ($xmlCurlResponse->ResRates->Rate as $value) {
             if (!empty($mappedCarDetails[$counter]) && (string) trim($value->Availability) === "Available") {
                 $result['data'][] = array(
