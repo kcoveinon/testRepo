@@ -11,12 +11,6 @@ class RSController extends BaseController
         $this->supplierApi = App::make(self::DEFAULT_SUPPLIER_CODE);
     }
 
-    public function showAngularTutorial()
-    {
-        return View::make("angular");
-    }
-
-
     public function doBookingWithEquipments()
     {
         return Response::json($this->supplierApi->doBooking(
