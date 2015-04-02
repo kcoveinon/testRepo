@@ -79,14 +79,14 @@ Route::group(array('prefix' => 'HZ/'), function()
 {
     Route::any('show-booking-form', 'HZController@showBooking');
     Route::any('do-booking-with-equipments', 'HZController@doBookingWithEquipments');
-	Route::any('search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{countryCode}/{driverAge}', 'HZController@searchVehicles');
-	Route::any('book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{vehicleCategory}/{vehicleClass}/{equipemnts}/{age}/{firstName}/{lastName}', 'HZController@book');
-	Route::any('get-booking-details/{bookingId}/{lastName}', 'HZController@getBookingInfo');
-	Route::any('cancel-booking/{bookingId}/{lastName}', 'HZController@cancelBooking');
-	Route::any('modify-booking/{bookingId}/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{vehicleCategory}/{vehicleClass}', 'HZController@modifyBooking');
-	Route::any('get-depot-details/{locationCode}', 'HZController@getDepotDetails');
+	  Route::any('search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{countryCode}/{driverAge}', 'HZController@searchVehicles');
+	  Route::any('book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{vehicleCategory}/{vehicleClass}/{equipemnts}/{age}/{firstName}/{lastName}', 'HZController@book');
+	  Route::any('get-booking-details/{bookingId}/{lastName}', 'HZController@getBookingInfo');
+	  Route::any('cancel-booking/{bookingId}/{lastName}', 'HZController@cancelBooking');
+	  Route::any('modify-booking/{bookingId}/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{vehicleCategory}/{vehicleClass}', 'HZController@modifyBooking');
+	  Route::any('get-depot-details/{locationCode}', 'HZController@getDepotDetails');
     Route::any('get-location-depots/{locationCode}', 'HZController@getLocationDepots');
-	Route::any('export-depot-location', 'HZController@exportDepotCompilation');
+	  Route::any('export-depot-location', 'HZController@exportDepotCompilation');
 });
 
 Route::group(array('prefix' => 'RS/'), function()
