@@ -100,6 +100,7 @@ class RS extends SupplierApi
         $countryCode,
         $driverAge
     ) {
+        $timeStart = time();
         $xmlRequest  = $this->getSearchVehicleXML(
                             $pickUpDate, 
                             $pickUpTime, 
@@ -152,6 +153,8 @@ class RS extends SupplierApi
 
             $counter++;
         }
+        $result['executionTime'] = time() - $timeStart;
+        $result['supplierCode']  = $this->supplierCode;
 
         return $result;
     }
