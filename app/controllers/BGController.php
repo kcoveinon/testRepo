@@ -1,8 +1,8 @@
 <?php
 
-class AVController extends BaseController
+class BGController extends BaseController
 {
-	const DEFAULT_SUPPLIER_CODE = "AV";
+	const DEFAULT_SUPPLIER_CODE = "BG";
 
 	public function __construct()
 	{

@@ -2,300 +2,598 @@
 
 class AV extends SupplierApi
 {
-    /**
-     * @var array
-     */
-    private $soapRequest;
-    private $requestorType;
+    private $userID;
     private $requestorID;
-    private $supplierCode;
-    private $supplierName;
-    private $apiURL;
+    private $password;
     private $target;
     private $primaryLang;
     private $version;
+    private $authUrl;
 
-    /**
-     *
-     */
-    const TIME_LIMIT  = 150;
-    const VENDOR_CODE = 'AV';
-    const VENDOR_NAME = 'Avis';
-    const VENDOR_CLASS_CODE = 'AV';
+    const TIME_LIMIT                 = 150;
+    const VENDOR_CODE                = 'AV';
+    const VENDOR_NAME                = 'Avis';
+    const VENDOR_CLASS_CODE          = 'AV';
 
-    /**
-     * @var array
-     */
-    private $transmissionType = array(
-        'Automatic' => 'AT',
-        'Manual'    => 'MT'
-    );
+    const SEARCH_VEHICLE_ACTION      = 'OTA_VehAvailRateRQ';
+    const BOOK_VEHICLE_ACTION        = 'OTA_VehResRQ';
+    const GET_BOOKING_INFO_ACTION    = 'OTA_VehRetResRQ';
+    const CANCEL_BOOKING_ACTION      = 'OTA_VehCancelRQ';
+    const MODIFY_BOOKING_ACTION      = 'OTA_VehModifyRQ';
+    const GET_LOCATION_SEARCH_ACTION = 'OTA_VehLocSearchRQ';
+    const GET_RATE_RULE_ACTION       = 'OTA_VehRateRuleRQ';
+
+    const DEFAULT_XMLNS              = 'http://www.opentravel.org/OTA/2003/05';
+    const DEFAULT_XMLNS_XSI          = 'http://www.w3.org/2008/XMLSchema-instance';
+    const DEFAULT_SEQUENCE_NUMBER    = '1';
+    const DEFAULT_REQUEST_TYPE       = '1';
+    const DEFAULT_CODE_CONTEXT       = 'IATA';
+    const DEFAULT_REQUEST_STATUS     = 'Available';
+    const DEFAULT_MAX_RESPONSE       = '10';
 
     /**
      *
      */
     public function __construct ()
     {
-        $this->supplierCode        = get_class();
-        $this->supplierName        = Config::get($this->supplierCode . '.api.supplierName');
-        $this->target              = Config::get($this->supplierCode . '.api.target');
-        $this->apiURI              = Config::get($this->supplierCode . '.api.uri');
-        $this->apiLocation         = Config::get($this->supplierCode . '.api.location');
-        $this->apiUsernameVariable = Config::get($this->supplierCode . '.api.usernameVariable');
-        $this->apiPasswordVariable = Config::get($this->supplierCode . '.api.passwordVariable');
-        $this->apiUsername         = Config::get($this->supplierCode . '.api.username');
-        $this->apiPassword         = Config::get($this->supplierCode . '.api.password');
-        $this->requestorType       = Config::get($this->supplierCode . '.api.requestorType');
-        $this->requestorID         = Config::get($this->supplierCode . '.api.requestorID');
-        $this->primaryLang         = Config::get($this->supplierCode . '.api.primaryLang');
-        $this->version             = Config::get($this->supplierCode . '.api.version');
+        $this->target          = Config::get(self::VENDOR_CODE . '.api.target');
+        $this->apiUri          = Config::get(self::VENDOR_CODE . '.api.uri');
+        $this->apiLocation     = Config::get(self::VENDOR_CODE . '.api.location');
+        $this->requestorID     = Config::get(self::VENDOR_CODE . '.api.requestorID');
+        $this->userID          = Config::get(self::VENDOR_CODE . '.api.userID');
+        $this->password        = Config::get(self::VENDOR_CODE . '.api.password');
+        $this->primaryLang     = Config::get(self::VENDOR_CODE . '.api.primaryLang');
+        $this->version         = Config::get(self::VENDOR_CODE . '.api.version');
+        $this->authUrl         = Config::get(self::VENDOR_CODE . '.api.authUrl');
 
-        $this->soapRequest = array(
-            //'OTA_VehLocSearchRQ' => array(
-                'xmlns'         => 'http://www.opentravel.org/OTA/2003/05',
-                'xmlns:xsi'     => "http://www.w3.org/2001/XMLSchema-instance",
-                //'Target'        => Config::get('AV.api.target'),
-                'Version'       => "1.0",
-                'MaxResponses'  => '99',
-                //'PrimaryLangID' => Config::get('AV.api.primaryLangID'),
-                'POS'           => array(
-                    'Source' => array(
-                        'ISOCountry' => 'AU',
-                        'RequestorID' => array(
-                            'Type' => '1',
-                            'ID'   => 'vroom',
-                            /*'CompanyName' => array(
-                                'CompanyName' => 'Avis'
-                            )*/
-                        )
-                    )
-                )
-            //)
-        );
-
-        //var_dump($this->soapRequest);die;
-
-        $this->soapClient = new SoapClient(
-            null,
-            array(
-                'location'   => $this->apiLocation,
-                'uri'        => $this->apiURI,
-                'trace'      => 1,
-                'use'        => SOAP_LITERAL,
-                'cache_wsdl' => WSDL_CACHE_NONE
-            )
-        );
-    }
-
-    private function getSoapClient ()
-    {
-        try {
-
-            $opts = array(
-                'http' => array(
-                    'user_agent' => 'PHPSoapClient'
-                ),
-                'ssl'  => array(
-                    'ciphers'          => 'RC4-SHA',
-                    'verify_peer'      => false,
-                    'verify_peer_name' => false
-                )
-            );
-
-            // SOAP 1.2 client
-            $context = stream_context_create($opts);
-            return new SoapClient(
-                null,
-                array(
-                    //'location'   => $this->apiLocation,
-                    'uri'        => $this->apiURI,
-                    'stream_context' => $context,
-                    'trace'      => 1,
-                    'use'        => SOAP_LITERAL,
-                    'cache_wsdl' => WSDL_CACHE_NONE
-                )
-            );
-        } catch (Exception $e) {
-            // Do nothing
-            echo $e->getMessage();
-        }
-    }
-
-
-    public function ping1()
-    {
-        $auth           = new stdClass();
-        $auth->userID   = 'vroom';
-        $auth->password = new stdClass();
-        $auth->password = '09vroom15';
-
-        $header = new SoapHeader('http://wsg.avis.com/wsbang/authInAny', 'credentials', $auth, false);
-        $this->soapClient->__setSoapHeaders($header);
-
-        $test = new stdClass();
-        $test->EchoData = 'Test';
-
-        $this->soapClient->Request(new SoapParam(new SoapVar($test, SOAP_ENC_OBJECT, "string", "http://wsg.avis.com/wsbang"), 'OTA_PingRQ'));
-        header ("Content-Type:text/xml");
-        print_r($this->soapClient->__getLastRequest());
-        // print_r($this->soapClient->__getLastResponse());
-        exit();
-    }
-
-
-    public function ping2()
-    {
-        $auth           = new AvisAuth('vroom', '09vroom15');
-        $header = new SoapHeader('http://wsg.avis.com/wsbang/authInAny', 'credentials', $auth, false);
-        $this->soapClient->__setSoapHeaders($header);
-
-        $data =  array('EchoData' => 'EchoData');
-
-        header ("Content-Type:text/xml");
-        $this->soapClient->__soapCall('OTA_PingRQ',  array($data));
-        print_r($this->soapClient->__getLastRequest());
-        exit();
-    }
-
-    public function ping3()
-    {
-        $xml = '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
-xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance"
-xmlns:xsd="http://www.w3.org/1999/XMLSchema">
-<SOAP-ENV:Header>
-<ns:credentials xmlns:ns="http://wsg.avis.com/wsbang/authInAny">
-<ns:userID ns:encodingType="xsd:string">vroom</ns:userID>
-<ns:password ns:encodingType="xsd:string">09vroom15</ns:password>
-</ns:credentials>
-<ns:WSBang-Roadmap xmlns:ns="http://wsg.avis.com/wsbang"/>
-</SOAP-ENV:Header>
-<SOAP-ENV:Body>
-<ns:Request xmlns:ns="http://wsg.avis.com/wsbang">
-<OTA_PingRQ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-Version="1.0">
-<EchoData>Hello World</EchoData>
-</OTA_PingRQ></ns:Request>
-</SOAP-ENV:Body>
-</SOAP-ENV:Envelope>';
-
-        $params = new SoapVar(trim($xml), XSD_ANYXML);
-
-        return $this->soapClient->__soapCall('OTA_PingRQ', array($params));
-    }
-
-    public function array_to_objecttree($array) {
-
-        if (is_numeric(key($array))) { // Because Filters->Filter should be an array
-            foreach ($array as $key => $value) {
-                $array[$key] = $this->array_to_objecttree($value);
-            }
-            return $array;
-        }
-        $Object = new stdClass;
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $Object->$key = $this->array_to_objecttree($value);
-            }  else {
-                $Object->$key = $value;
-            }
-        }
-        return $Object;
-    }
-
-    function fff()
-    {
-        $array = array(
-            'SOAP-ENV:Envelope' =>
-                array(
-                    'xmlns:SOAP-ENV' => 'http://www.w3.org/2001/12/soap-envelope',
-                    'xmlns:xsi'      => 'http://www.w3.org/1999/XMLSchema-instance',
-                    'xmlns:xsd'      => 'http://www.w3.org/1999/XMLSchema',
-                    'SOAP-ENV:Header' => array(
-                        'ns:credentials' => array(
-                            'xmlns:ns' => 'http://wsg.avis.com/wsbang/authInAny',
-                            'ns:userID' => 'BSPAuto',
-                            'ns:password' => 'LQpgW0`2YLS^'
-                        ),
-                        'ns:WSBang-Roadmap' => array(
-                            'xmlns:ns' => 'http://wsg.avis.com/wsbang'
-                        )
-                    ),
-                    'SOAP-ENV:Body' => array(
-                        'ns:Request' => array(
-                            'xmlns:ns' => 'http://wsg.avis.com/wsbang',
-                            'OTA_VehLocSearchRQ' => array(
-                                'xmlns'         => 'http://www.opentravel.org/OTA/2003/05',
-                                'xmlns:xsi'     => "http://www.w3.org/2001/XMLSchema-instance",
-                                //'Target'        => Config::get('AV.api.target'),
-                                //'Version'       => "1.0",
-                                'MaxResponses'  => '99',
-                                //'PrimaryLangID' => Config::get('AV.api.primaryLangID'),
-                                'POS'           => array(
-                                    'Source' => array(
-                                        'ISOCountry' => 'US',
-                                        'RequestorID' => array(
-                                            'Type' => '1',
-                                            'ID'   => 'vroom',
-                                            /*'CompanyName' => array(
-                                        'CompanyName' => 'Avis'
-                                    )*/
-                                        )
-                                    )
-                                ),
-                                'VehLocSearchCriterion' => array(
-                                    'Address' => array(
-                                        'AddressLine' => '52 Narra Drive',
-                                        'CityName'    => 'Antiplo City',
-                                        'PostalCode'  => '1870',
-                                        'County'      => 'Philippines',
-                                        'CountryName' => array('Code' => 'PH')
-                                    ),
-                                    'Radius' => array('DistanceMax' => '40', 'DistanceMeasure' => 'Miles')
-                                ),
-                                'Vendor' => array('Code' => 'Avis')
-                            )
-                        )
-                    )
-                )
-        );
+        $this->soapClient = new SoapClient( null, array(
+            'location' => $this->apiLocation,
+            'uri'      => $this->apiUri,
+            'trace'    => 1,
+            'features' => SOAP_LITERAL
+        ) );
     }
 
     /**
-     * @return bool
+     * @param        $locationCode
+     * @param string $countryCode
+     *
+     * @return array
      */
-    public function getLocationSearch2()
+    public function getLocations($locationCode, $countryCode = 'AU')
     {
-        //$xml = '<OTA_VehLocSearchRQ xmlns="http://www.opentravel.org/OTA/2003/05" xsi="http://www.w3.org/2001/XMLSchema-instance" Version="1.0" SequenceNmbr="123456789" MaxResponses="99"><POS><Source ISOCountry="AU"><RequestorID Type="1" ID="vroom"/></Source></POS><VehLocSearchCriterion><Address><AddressLine>Near Chinatown/Central Sta)</AddressLine><CityName>SYDNEY</CityName><PostalCode>2000</PostalCode><StateProv>SYD</StateProv><CountryName Code="AU"/></Address></VehLocSearchCriterion><Vendor Code="Avis"/></OTA_VehLocSearchRQ>';
+        $timeStart = time();
+        $soapVar = $this->otaRQNode(self::GET_LOCATION_SEARCH_ACTION, true).
+                       "<VehLocSearchCriterion>
+                            <Address>
+                                <CityName>{$locationCode}</CityName>
+                                <CountryName Code='{$countryCode}'/>
+                            </Address>
+                            <Radius DistanceMax='40' DistanceMeasure='Miles'/>
+                        </VehLocSearchCriterion>
+                        <Vendor Code='".self::VENDOR_NAME."'/>
+                        <TPA_Extensions>
+                            <SortOrderType>DESCENDING</SortOrderType>
+                            <TestLocationType>NO</TestLocationType>
+                            <LocationStatusType>OPEN</LocationStatusType>
+                            <LocationType>RENTAL</LocationType>
+                        </TPA_Extensions>".
+                   $this->otaRQNode(self::GET_LOCATION_SEARCH_ACTION, false);
 
-        //$xml = '<ns1:OTA_VehLocSearchRQ><param0><item><key>xmlns</key><value>http://www.opentravel.org/OTA/2003/05</value></item><item><key>xmlns:xsi</key><value>http://www.w3.org/2001/XMLSchema-instance</value></item><item><key>Target</key><value>Test</value></item><item><key>Version</key><value>1.0</value></item><item><key>MaxResponses</key><value>99</value></item><item><key>PrimaryLangID</key><value>EN</value></item><item><key>POS</key><value><item><key>Source</key><value><item><key>ISOCountry</key><value>US</value></item><item><key>RequestorID</key><value><item><key>Type</key><value>1</value></item><item><key>ID</key><value>vroom</value></item><item><key>CompanyName</key><value><item><key>CompanyName</key><value>Avis</value></item></value></item></value></item></value></item></value></item><item><key>VehLocSearchCriterion</key><value><item><key>Address</key><value><item><key>AddressLine</key><value>52 Narra Drive</value></item><item><key>CityName</key><value>Antiplo City</value></item><item><key>PostalCode</key><value>1870</value></item><item><key>County</key><value>Philippines</value></item><item><key>CountryName</key><value><item><key>Code</key><value>PH</value></item></value></item></value></item><item><key>Radius</key><value><item><key>DistanceMax</key><value>40</value></item><item><key>DistanceMeasure</key><value>Miles</value></item></value></item></value></item><item><key>Vendor</key><value><item><key>Code</key><value>Avis</value></item></value></item></param0></ns1:OTA_VehLocSearchRQ>';
+        if (!empty($locationCode)) {
+            $params = new SoapVar($soapVar, XSD_ANYXML);
+            $this->setSoapHeader();
+            $this->soapClient->Request($params);
+            $parseResponse = $this->parseResponse($this->soapClient->__getLastResponse());
 
-        $xml = '
-<ns2:credentials>
-<userID>vroom</userID>
-<password>09vroom15</password>
-</ns2:credentials>
+            $response = [];
+            if (isset($parseResponse->OTA_VehLocSearchRS->Errors)) {
+                $response['status'] =  "Failed";
+                $response['data']   = (string) $parseResponse->OTA_VehLocSearchRS->Errors->Error;
+            } else {
+                $response = $parseResponse->OTA_VehLocSearchRS; // TODO need to send only required information
+            }
+        } else {
+            $response =  ["result" => "Invalid Parameters"];
+        }
 
-<ns1:OTA_PingRQ>
-<EchoData xsi:type="xsd:string">ECHO DATA</EchoData>
-</ns1:OTA_PingRQ>
-';
+        $response['executionTime'] = time() - $timeStart;
+        $response['supplierCode']  = self::VENDOR_CODE;
 
-        $params = new SoapVar(trim($xml), XSD_ANYXML);
-
-        return $this->soapClient->VehAvailRate($params);
+        return $response;
     }
 
-}
-
-
-class AvisAuth
-{
-    public $userID;
-    public $password;
-
-    public function __construct($userID, $password)
+    /**
+     * @param        $pickUpDate
+     * @param        $pickUpTime
+     * @param        $returnDate
+     * @param        $returnTime
+     * @param        $pickUpLocationCode
+     * @param        $returnLocationCode
+     * @param string $countryCode
+     * @param int    $vehicleCategory
+     * @param int    $vehicleClass
+     *
+     * @return response
+     */
+    public function searchVehicles(
+        $pickUpDate,
+        $pickUpTime,
+        $returnDate,
+        $returnTime,
+        $pickUpLocationCode,
+        $returnLocationCode,
+        $countryCode = 'AU',
+        $vehicleCategory = 1,
+        $vehicleClass = 3
+    )
     {
-        $this->userID = $userID;
-        $this->password = $password;
+        $timeStart = time();
+
+        $pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
+        $returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
+
+        $soapVar = $this->otaRQNode(self::SEARCH_VEHICLE_ACTION, true).
+                        "<VehAvailRQCore Status='".self::DEFAULT_REQUEST_STATUS."'>
+                            <VehRentalCore PickUpDateTime='{$pickUpDateTime}' ReturnDateTime='{$returnDateTime}'>
+                                <PickUpLocation LocationCode='{$pickUpLocationCode}'/>
+                                <ReturnLocation LocationCode='{$returnLocationCode}'/>
+                            </VehRentalCore>
+                            <VendorPrefs>
+                                <VendorPref CompanyShortName='".self::VENDOR_NAME."'/>
+                            </VendorPrefs>
+                            <VehPrefs>
+                                <VehPref ClassPref='Preferred' TransmissionPref='Preferred' TransmissionType='Automatic' TypePref='Preferred'>
+                                    <VehType VehicleCategory='{$vehicleCategory}'/>
+                                    <VehClass Size='{$vehicleClass}'/>
+                                </VehPref>
+                            </VehPrefs>
+                        </VehAvailRQCore>
+                        <VehAvailRQInfo>
+                            <Customer>
+                                <Primary>
+                                    <CitizenCountryName Code='{$countryCode}'/>
+                                </Primary>
+                            </Customer>
+                        </VehAvailRQInfo>".
+                    $this->otaRQNode(self::SEARCH_VEHICLE_ACTION, false);
+
+        if ($this->validateDate($pickUpDate, $pickUpTime)
+            && $this->validateDate($returnDate, $returnTime)
+        ) {
+            $params = new SoapVar($soapVar, XSD_ANYXML);
+            $this->setSoapHeader();
+            $this->soapClient->Request($params);
+            $parseResponse = $this->parseResponse($this->soapClient->__getLastResponse());
+
+            $response = [];
+            if (isset($parseResponse->OTA_VehAvailRateRS->Errors)) {
+                $response['status'] =  "Failed";
+                $response['data']   = (string) $parseResponse->OTA_VehAvailRateRS->Errors->Error;
+            } else {
+                $response = $parseResponse->OTA_VehAvailRateRS; // TODO need to send only required information
+            }
+        } else {
+            $response =  ["result" => "Invalid Parameters"];
+        }
+
+        $response['executionTime'] = time() - $timeStart;
+        $response['supplierCode']  = self::VENDOR_CODE;
+
+        return $response;
+    }
+
+    /**
+     * @param        $pickUpDate
+     * @param        $pickUpTime
+     * @param        $returnDate
+     * @param        $returnTime
+     * @param        $pickUpLocationCode
+     * @param        $returnLocationCode
+     * @param        $firstName
+     * @param        $lastName
+     * @param string $countryCode
+     * @param int    $vehicleCategory
+     * @param int    $vehicleClass
+     *
+     * @return array
+     */
+    public function doBooking(
+        $pickUpDate,
+        $pickUpTime,
+        $returnDate,
+        $returnTime,
+        $pickUpLocationCode,
+        $returnLocationCode,
+        $firstName,
+        $lastName,
+        $countryCode = 'AU',
+        $vehicleCategory = 1,
+        $vehicleClass = 4
+    ) {
+        $timeStart = time();
+
+        $pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
+        $returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
+
+        $soapVar = $this->otaRQNode(self::BOOK_VEHICLE_ACTION, true).
+                       "<VehResRQCore Status='".self::DEFAULT_REQUEST_STATUS."'>
+                            <VehRentalCore PickUpDateTime='{$pickUpDateTime}' ReturnDateTime='{$returnDateTime}'>
+                                <PickUpLocation LocationCode='{$pickUpLocationCode}'/>
+                                <ReturnLocation LocationCode='{$returnLocationCode}'/>
+                            </VehRentalCore>
+                            <Customer>
+                                <Primary>
+                                    <PersonName>
+                                        <GivenName>{$firstName}</GivenName>
+                                        <Surname>{$lastName}</Surname>
+                                    </PersonName>
+                                    <CitizenCountryName Code='{$countryCode}'/>
+                                </Primary>
+                            </Customer>
+                            <VendorPref CompanyShortName='".self::VENDOR_NAME."'/>
+                            <VehPref TypePref='Only' ClassPref='Only' TransmissionType='Automatic' TransmissionPref='Only' AirConditionPref='Only'>
+                                <VehType VehicleCategory='{$vehicleCategory}'/>
+                                <VehClass Size='{$vehicleClass}'/>
+                            </VehPref>
+                            <RateQualifier RateQualifier='2A'/>
+                        </VehResRQCore>".
+                   $this->otaRQNode(self::BOOK_VEHICLE_ACTION, false);
+
+        if ($this->validateDate($pickUpDate, $pickUpTime)
+            && $this->validateDate($returnDate, $returnTime)
+        ) {
+            $params = new SoapVar($soapVar, XSD_ANYXML);
+            $this->setSoapHeader();
+            $this->soapClient->Request($params);
+            $parseResponse = $this->parseResponse($this->soapClient->__getLastResponse());
+
+            $response = [];
+            if (isset($parseResponse->OTA_VehResRS->Errors)) {
+                $response['status'] =  "Failed";
+                $response['data']   = (string) $parseResponse->OTA_VehResRS->Errors->Error;
+            } else {
+                $response = $parseResponse->OTA_VehResRS; // TODO need to send only required information
+            }
+        } else {
+            $response =  ["result" => "Invalid Parameters"];
+        }
+
+        $response['executionTime'] = time() - $timeStart;
+        $response['supplierCode']  = self::VENDOR_CODE;
+
+        return $response;
+    }
+
+    /**
+     * @param $bookingId
+     * @param $surname
+     *
+     * @return array
+     */
+    public function getBookingDetails($bookingId, $surname)
+    {
+        $timeStart = time();
+
+        $soapVar = $this->otaRQNode(self::GET_BOOKING_INFO_ACTION, true).
+                   "<VehRetResRQCore>
+                        <UniqueID Type='14' ID='{$bookingId}'/>
+                        <PersonName>
+                            <Surname>{$surname}</Surname>
+                        </PersonName>
+                    </VehRetResRQCore>
+                    <VehRetResRQInfo>
+                        <Vendor CompanyShortName='".self::VENDOR_NAME."'/>
+                    </VehRetResRQInfo>".
+                   $this->otaRQNode(self::GET_BOOKING_INFO_ACTION, false);
+
+        if (!empty($bookingId)) {
+            $params = new SoapVar($soapVar, XSD_ANYXML);
+            $this->setSoapHeader();
+            $this->soapClient->Request($params);
+            $parseResponse = $this->parseResponse($this->soapClient->__getLastResponse());
+
+            $response = [];
+            if (isset($parseResponse->OTA_VehRetResRS->Errors)) {
+                $response['status'] =  "Failed";
+                $response['data']   = (string) $parseResponse->OTA_VehRetResRS->Errors->Error;
+            } else {
+                $response = $parseResponse->OTA_VehRetResRS; // TODO need to send only required information
+            }
+        } else {
+            $response =  ["result" => "Invalid Parameters"];
+        }
+
+        $response['executionTime'] = time() - $timeStart;
+        $response['supplierCode']  = self::VENDOR_CODE;
+
+        return $response;
+    }
+
+    /**
+     * @param        $bookingId
+     * @param        $pickUpDate
+     * @param        $pickUpTime
+     * @param        $returnDate
+     * @param        $returnTime
+     * @param        $pickUpLocationCode
+     * @param        $returnLocationCode
+     * @param        $firstName
+     * @param        $lastName
+     * @param string $countryCode
+     * @param int    $vehicleCategory
+     * @param int    $vehicleClass
+     *
+     * @return array
+     */
+    public function modifyBooking(
+        $bookingId,
+        $pickUpDate,
+        $pickUpTime,
+        $returnDate,
+        $returnTime,
+        $pickUpLocationCode,
+        $returnLocationCode,
+        $firstName,
+        $lastName,
+        $countryCode = 'AU',
+        $vehicleCategory = 1,
+        $vehicleClass = 4
+    ) {
+        $timeStart = time();
+
+        $pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
+        $returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
+
+        $soapVar = $this->otaRQNode(self::MODIFY_BOOKING_ACTION, true).
+                   "<VehModifyRQCore ModifyType='Modify'>
+                        <UniqueID Type='14' ID='{$bookingId}'/>
+                        <VehRentalCore PickUpDateTime='{$pickUpDateTime}' ReturnDateTime='{$returnDateTime}'>
+                            <PickUpLocation LocationCode='{$pickUpLocationCode}'/>
+                            <ReturnLocation LocationCode='{$returnLocationCode}'/>
+                        </VehRentalCore>
+                        <Customer>
+                            <Primary>
+                                <PersonName>
+                                    <GivenName>{$firstName}</GivenName>
+                                    <Surname>{$lastName}</Surname>
+                                </PersonName>
+                                <CitizenCountryName Code='{$countryCode}'/>
+                            </Primary>
+                        </Customer>
+                        <VendorPref CompanyShortName='".self::VENDOR_NAME."'/>
+                        <VehPref TypePref='Only' ClassPref='Only' TransmissionType='Automatic' TransmissionPref='Only' AirConditionPref='Only'>
+                            <VehType VehicleCategory='{$vehicleCategory}'/>
+                            <VehClass Size='{$vehicleClass}'/>
+                        </VehPref>
+                        <RateQualifier RateCategory='3' RateQualifier='2A'/>
+                    </VehModifyRQCore>".
+                   $this->otaRQNode(self::MODIFY_BOOKING_ACTION, false);
+
+        if (!empty($bookingId)) {
+            $params = new SoapVar($soapVar, XSD_ANYXML);
+            $this->setSoapHeader();
+            $this->soapClient->Request($params);
+            $parseResponse = $this->parseResponse($this->soapClient->__getLastResponse());
+
+            $response = [];
+            if (isset($parseResponse->OTA_VehModifyRS->Errors)) {
+                $response['status'] =  "Failed";
+                $response['data']   = (string) $parseResponse->OTA_VehModifyRS->Errors->Error;
+            } else {
+                $response = $parseResponse->OTA_VehModifyRS; // TODO need to send only required information
+            }
+        } else {
+            $response =  ["result" => "Invalid Parameters"];
+        }
+
+        $response['executionTime'] = time() - $timeStart;
+        $response['supplierCode']  = self::VENDOR_CODE;
+
+        return $response;
+    }
+
+    /**
+     * @param $bookingId
+     * @param $surname
+     *
+     * @return array
+     */
+    public function cancelBooking($bookingId, $surname)
+    {
+        $timeStart = time();
+
+        $soapVar = $this->otaRQNode(self::CANCEL_BOOKING_ACTION, true).
+                   "<VehCancelRQCore CancelType='Commit'>
+                        <UniqueID Type='15' ID='{$bookingId}'/>
+                        <PersonName>
+                            <Surname>{$surname}</Surname>
+                        </PersonName>
+                    </VehCancelRQCore>
+                    <VehCancelRQInfo>
+                        <Vendor CompanyShortName='".self::VENDOR_NAME."'/>
+                    </VehCancelRQInfo>".
+                   $this->otaRQNode(self::CANCEL_BOOKING_ACTION, false);
+
+        if (!empty($bookingId)) {
+            $params = new SoapVar($soapVar, XSD_ANYXML);
+            $this->setSoapHeader();
+            $this->soapClient->Request($params);
+            $parseResponse = $this->parseResponse($this->soapClient->__getLastResponse());
+
+            $response = [];
+            if (isset($parseResponse->OTA_VehCancelRS->Errors)) {
+                $response['status'] =  "Failed";
+                $response['data']   = (string) $parseResponse->OTA_VehCancelRS->Errors->Error;
+            } else {
+                $response = $parseResponse->OTA_VehCancelRS; // TODO need to send only required information
+            }
+        } else {
+            $response =  ["result" => "Invalid Parameters"];
+        }
+
+        $response['executionTime'] = time() - $timeStart;
+        $response['supplierCode']  = self::VENDOR_CODE;
+
+        return $response;
+    }
+
+    /**
+     * @param        $pickUpDate
+     * @param        $pickUpTime
+     * @param        $returnDate
+     * @param        $returnTime
+     * @param        $pickUpLocationCode
+     * @param        $returnLocationCode
+     * @param string $countryCode
+     * @param int    $vehicleCategory
+     * @param int    $vehicleClass
+     *
+     * @return array
+     */
+    public function getRates(
+        $pickUpDate,
+        $pickUpTime,
+        $returnDate,
+        $returnTime,
+        $pickUpLocationCode,
+        $returnLocationCode,
+        $countryCode = 'AU',
+        $vehicleCategory = 1,
+        $vehicleClass = 4
+    ) {
+        $timeStart = time();
+
+        $pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
+        $returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
+
+        $soapVar = $this->otaRQNode(self::GET_RATE_RULE_ACTION, true).
+                   "<RentalInfo>
+                        <VehRentalCore PickUpDateTime='{$pickUpDateTime}' ReturnDateTime='{$returnDateTime}'>
+                            <PickUpLocation LocationCode='{$pickUpLocationCode}' />
+                            <ReturnLocation LocationCode='{$returnLocationCode}' />
+                        </VehRentalCore>
+                        <VehicleInfo TypePref='Only' TransmissionPref='Only' TransmissionType='Automatic' AirConditionPref='Only' ClassPref='Only'>
+                            <VehType VehicleCategory='{$vehicleCategory}'/>
+                            <VehClass Size='{$vehicleClass}'/>
+                        </VehicleInfo>
+                        <RateQualifier RateQualifier='2A'/>
+                        <CustomerID Type='1' ID='{$countryCode}'/>
+                    </RentalInfo>".
+                   $this->otaRQNode(self::GET_RATE_RULE_ACTION, false);
+
+        if ($this->validateDate($pickUpDate, $pickUpTime)
+            && $this->validateDate($returnDate, $returnTime)
+        ) {
+            $params = new SoapVar($soapVar, XSD_ANYXML);
+            $this->setSoapHeader();
+            $this->soapClient->Request($params);
+
+            $parseResponse = $this->parseResponse($this->soapClient->__getLastResponse());
+
+            $response = [];
+            if (isset($parseResponse->OTA_VehRateRuleRS->Errors)) {
+                $response['status'] =  "Failed";
+                $response['data']   = (string) $parseResponse->OTA_VehRateRuleRS->Errors->Error;
+            } else {
+                $response = $parseResponse->OTA_VehRateRuleRS; // TODO need to send only required information
+            }
+        } else {
+            $response =  ["result" => "Invalid Parameters"];
+        }
+
+        $response['executionTime'] = time() - $timeStart;
+        $response['supplierCode']  = self::VENDOR_CODE;
+
+        return $response;
+    }
+
+    /**
+     * @param      $action
+     * @param bool $openNode
+     *
+     * @return string
+     */
+    private function otaRQNode($action, $openNode = true)
+    {
+        if($openNode) {
+            return "<{$action} Version='{$this->version}'
+                    SequenceNmbr='".self::DEFAULT_SEQUENCE_NUMBER."'
+                    MaxResponses='".self::DEFAULT_MAX_RESPONSE."'
+                    xmlns:xsi='".self::DEFAULT_XMLNS_XSI."'>
+                    <POS>
+                        <Source>
+                            <RequestorID Type='".self::DEFAULT_REQUEST_TYPE."' ID='{$this->requestorID}' />
+                        </Source>
+                    </POS>";
+        } else {
+            return "</{$action}>";
+        }
+    }
+
+    /**
+     * Set Soap Header
+     */
+    private function setSoapHeader()
+    {
+        $auth           = new stdClass();
+        $auth->userID   = $this->userID;
+        $auth->password = new stdClass();
+        $auth->password = $this->password;
+
+        $header = new SoapHeader( $this->authUrl, 'credentials', $auth, false );
+        $this->soapClient->__setSoapHeaders( $header );
+    }
+
+    /**
+     * @param $response
+     *
+     * @return parsedResponse
+     */
+    private function parseResponse($response)
+    {
+        $response = preg_replace("/<\\/?SOAP-ENV:Envelope(\\s+.*?>|>)/", "", $response);
+        $response = preg_replace("/<\\/?SOAP-ENV:Body(\\s+.*?>|>)/", "", $response);
+
+        $response = preg_replace("/<\\/?env:Fault(\\s+.*?>|>)/", "", $response);
+        $response = preg_replace("/<\\/?env:Server(\\s+.*?>|>)/", "", $response);
+
+        $response = preg_replace("/<\\/?env:Envelope(\\s+.*?>|>)/", "", $response);
+        $response = preg_replace("/<\\/?env:Body(\\s+.*?>|>)/", "", $response);
+
+        $response = str_replace(array("\n", "\r", "\t"), '', $response);
+
+        $parsedResponse = simplexml_load_string($response);
+
+        return $parsedResponse;
+    }
+
+    /**
+     * Returns default datetime format
+     *
+     * @param  date $date
+     * @param  time $time
+     *
+     * @return DATE object
+     */
+    private function convertToDateTimeDefaultFormat($date, $time)
+    {
+        $date =  new \DateTime($date." ".$time);
+        $result = $date->format('Y-m-d H:i:s');
+
+        return str_replace(" ", "T", $result);
+    }
+
+    /**
+     * Functions that validates time and date
+     * @param  date $date
+     * @param  time $time
+     * @return bool
+     */
+    private function validateDate($date, $time)
+    {
+        $dateTime = $date. " " . $time . ":00";
+        $d = DateTime::createFromFormat('Y-m-d H:i:s', $dateTime);
+        return $d && $d->format('Y-m-d H:i:s') == $dateTime;
     }
 }

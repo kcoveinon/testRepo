@@ -99,37 +99,91 @@ Route::group(array('prefix' => 'RS/'), function()
     Route::any('book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{vehicleClass}/{rateId}/{countryCode}', 'RSController@doBooking');
 });
 
-
 Route::group(array('prefix' => 'AV'), function() {
-    // Get ping response
-    Route::any('/ping', 'AVController@ping');
+  // Get ping response
+  Route::any('/ping', 'AVController@ping');
 
-    // Get all locations
-    Route::any('/locations', 'AVController@getLocations');
+  // Search locations
+  Route::any('/locations/{locationCode}/{countryCode}', 'AVController@getVehicleLocations');
 
-    // Get depots per location
-    Route::any('/locationDepots/{locationCode}', 'AVController@getDepotsPerLocation');
+  // Search available vehicles
+  Route::any(
+    'search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{countryCode}/{vehicleCategory}/{vehicleClass}',
+    'AVController@searchVehicles'
+  );
 
-    // Get location details
-    Route::any('/locationDetails/{locationCode}', 'AVController@getLocationDetails');
+  // Booking for a vehicle
+  Route::any(
+    'book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{firstName}/{lastName}/{countryCode}/{vehicleCategory}/{vehicleClass}',
+    'AVController@book'
+  );
 
-    // Get rates
-    Route::any(
-        'getRates/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocation}/{returnLocation}/{carCategory}',
-        'AVController@getRates'
-    );
+  // Booking details
+  Route::any(
+    'get-booking-details/{bookingId}/{surname}',
+    'AVController@getBookingInfo'
+  );
 
-    // Search available cars
-    Route::any(
-        'search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{countryCode}/{driverAge}',
-        'AVController@search'
-    );
+  // Cancel a booking
+  Route::any('cancel-booking/{bookingId}/{surname}',
+    'AVController@cancelBooking'
+  );
 
-    // Create booking
-    Route::any(
-        '/createBooking/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{carCategory}',
-        'AVController@createBooking'
-    );
+  // Update a booking
+  Route::any(
+    'modify-booking/{bookingId}/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{firstName}/{lastName}/{countryCode}/{vehicleCategory}/{vehicleClass}',
+    'AVController@modifyBooking'
+  );
+
+  // Get rates
+  Route::any(
+    'get-rates/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{countryCode}/{carCategory}/{vehicleClass}',
+    'AVController@getRates'
+  );
+});
+
+
+Route::group(array('prefix' => 'BG'), function() {
+  // Get ping response
+  Route::any('/ping', 'AVController@ping');
+
+  // Search locations
+  Route::any('/locations/{locationCode}/{countryCode}', 'BGController@getVehicleLocations');
+
+  // Search available vehicles
+  Route::any(
+    'search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{countryCode}/{vehicleCategory}/{vehicleClass}',
+    'BGController@searchVehicles'
+  );
+
+  // Booking for a vehicle
+  Route::any(
+    'book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{firstName}/{lastName}/{countryCode}/{vehicleCategory}/{vehicleClass}',
+    'BGController@book'
+  );
+
+  // Booking details
+  Route::any(
+    'get-booking-details/{bookingId}/{surname}',
+    'BGController@getBookingInfo'
+  );
+
+  // Cancel a booking
+  Route::any('cancel-booking/{bookingId}/{surname}',
+    'BGController@cancelBooking'
+  );
+
+  // Update a booking
+  Route::any(
+    'modify-booking/{bookingId}/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{firstName}/{lastName}/{countryCode}/{vehicleCategory}/{vehicleClass}',
+    'BGController@modifyBooking'
+  );
+
+  // Get rates
+  Route::any(
+    'get-rates/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{countryCode}/{carCategory}/{vehicleClass}',
+    'BGController@getRates'
+  );
 });
 
 
