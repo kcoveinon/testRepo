@@ -29,7 +29,7 @@ class AV extends SupplierApi
     const DEFAULT_REQUEST_TYPE       = '1';
     const DEFAULT_CODE_CONTEXT       = 'IATA';
     const DEFAULT_REQUEST_STATUS     = 'Available';
-    const DEFAULT_MAX_RESPONSE       = '10';
+    const DEFAULT_MAX_RESPONSE       = '1000';
 
     /**
      *
