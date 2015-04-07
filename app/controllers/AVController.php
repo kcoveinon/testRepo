@@ -35,6 +35,7 @@ class AVController extends BaseController
 		$vehicleCategory,
 		$vehicleClass
 	) {
+
 		$result = $this->supplierApi->searchVehicles(
 			$pickUpDate,
 			$pickUpTime,

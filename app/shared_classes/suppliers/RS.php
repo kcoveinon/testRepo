@@ -150,7 +150,7 @@ class RS extends SupplierApi
         $xmlCurlResponse  = $this->executeCurl($xmlRequest->asXML());
         $mappedCarDetails = $this->mapVehicleDetails($xmlCurlResponse);
         $result           = array('status' => 'Failed');
-
+        return $xmlCurlResponse;
         if ((string) $xmlCurlResponse->ResRates->attributes()->success !== 'true') {
             $result['data'][] = $xmlCurlResponse;
             return $result;

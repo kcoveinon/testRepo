@@ -2,8 +2,7 @@
 
 return array(
 	'api' => array(
-		// 'target'		   => 'Test',
-		'target'           => 'Production',
+		'target'		   => 'Test',
 		'version'		   => '2007',
 		'primaryLangID'    => 'EN',
 		'requestorIdType'  => '4',

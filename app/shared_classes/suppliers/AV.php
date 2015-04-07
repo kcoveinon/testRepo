@@ -9,6 +9,7 @@ class AV extends SupplierApi
 	private $primaryLang;
 	private $version;
 	private $authUrl;
+	private $apiUri;
 
 	const TIME_LIMIT                 = 150;
 	const VENDOR_CODE                = 'AV';
