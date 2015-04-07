@@ -601,11 +601,12 @@ class HZ extends SupplierApi
 		$customerNode = $vehRsCore->addChild("Customer");
 		$primaryNode = $customerNode->addChild("Primary");
 
-		if ((int) $age > 0) {
+		if ($age > 0 || $age !== "") {
 			$date =  new DateTime(date("Y") - ((int) str_replace("+", "", $age)) . "-" . date("m-d"));
 			$result = $date->format("Y-m-d");
 			$primaryNode->addAttribute("BirthDate", $result);
 		}
+
 		$personNameNode = $primaryNode->addChild("PersonName");
 		$personNameNode->addChild("GivenName", $firstName);
 		$personNameNode->addChild("Surname", $lastName);
@@ -630,8 +631,9 @@ class HZ extends SupplierApi
 		$rateQualifierNode = $vehRsCore->addChild("RateQualifier");
 		$rateQualifierNode->addAttribute("RateQualifier", "BEST");
 
-		if (count($equipments) > 0) {
+		if(count($equipments) > 0) {
 			$specialEquipPrefNode = $vehRsCore->addChild("SpecialEquipPrefs");
+
 			foreach ($equipments as $equipmentDetails) {
 				$specialEquipPre = $specialEquipPrefNode->addChild("SpecialEquipPref");
 				$specialEquipPre->addAttribute("EquipType", trim($equipmentDetails["eqOTACode"]));
@@ -808,46 +810,46 @@ class HZ extends SupplierApi
 
 	        echo '<records>';
 
-	            foreach ($chunkedArray as $key => $value) {
+            foreach ($chunkedArray as $key => $value) {
+                if (count($value) > 1) {
+					$country   = strlen($value[5])  < 1 ? "N/A" : $value[5];
+					$zipCode   = strlen($value[7])  < 1 ? "N/A" : $value[7];
+					$city      = strlen($value[8])  < 1 ? "N/A" : $value[8];
+					$state     = strlen($value[6])  < 1 ? "N/A" : $value[6];
+					$address1  = strlen($value[9])  < 1 ? "N/A" : $value[9];
+					$address2  = strlen($value[10]) < 1 ? "N/A" : $value[6];
+					$address3  = strlen($value[10]) < 1 ? "N/A" : $value[10];
+					$phone     = strlen($value[12]) < 1 ? "N/A" : $value[12];
+					$fax       = strlen($value[14]) < 1 ? "N/A" : $value[14];
+					$email     = strlen($value[17]) < 1 ? "N/A" : $value[17];
+					$locDesc   = strlen($value[62]) < 1 ? "N/A" : $value[62];
+					$latitude  = strlen($value[60]) < 1 ? "N/A" : $value[60];
+					$longitude = strlen($value[61]) < 1 ? "N/A" : $value[61];
+					$city      = strlen($value[8])  < 1 ? "N/A" : $value[8];
+					$oagCode   = strlen($value[4])  < 1 ? "N/A" : $value[4];
 
-	                if (count($value) > 1) {
-						$country   = strlen($value[5])  < 1 ? "N/A" : $value[5];
-						$zipCode   = strlen($value[7])  < 1 ? "N/A" : $value[7];
-						$city      = strlen($value[8])  < 1 ? "N/A" : $value[8];
-						$state     = strlen($value[6])  < 1 ? "N/A" : $value[6];
-						$address1  = strlen($value[9])  < 1 ? "N/A" : $value[9];
-						$address2  = strlen($value[10]) < 1 ? "N/A" : $value[6];
-						$address3  = strlen($value[10]) < 1 ? "N/A" : $value[10];
-						$phone     = strlen($value[12]) < 1 ? "N/A" : $value[12];
-						$fax       = strlen($value[14]) < 1 ? "N/A" : $value[14];
-						$email     = strlen($value[17]) < 1 ? "N/A" : $value[17];
-						$locDesc   = strlen($value[62]) < 1 ? "N/A" : $value[62];
-						$latitude  = strlen($value[60]) < 1 ? "N/A" : $value[60];
-						$longitude = strlen($value[61]) < 1 ? "N/A" : $value[61];
-						$city      = strlen($value[8])  < 1 ? "N/A" : $value[8];
-						$oagCode   = strlen($value[4])  < 1 ? "N/A" : $value[4];
+                    echo '<record>';
+						echo '<key>' 		  . $key 	  . '</key>';
+						echo '<locationCode>' . $oagCode  . '</locationCode>';
+						echo '<countryCode>'  . $country  . '</countryCode>';
+						echo '<stateCode>'    . $state    . '</stateCode>';
+						echo '<zipCode>' 	  . $zipCode  . '</zipCode>';
+						echo '<city>' 	  	  . $city     . '</city>';
+						echo '<address1>' 	  . htmlentities($address1)  . '</address1>';
+						echo '<address2>' 	  . htmlentities($address2)  . '</address2>';
+						echo '<address3>' 	  . htmlentities($address3)  . '</address3>';
+						echo '<phone>' 		  . $phone  			   . '</phone>';
+						echo '<fax>' 		  . $fax  				   . '</fax>';
+						echo '<email>' 		  . $email  			   . '</email>';
+						echo '<latitude>' 	  . $latitude  			   . '</latitude>';
+						echo '<longitude>' 	  . $longitude 			   . '</longitude>';
+						echo '<locationName>' . htmlentities($locDesc) . '</locationName>';
+                    echo '</record>';
+            	} else {
+            		break;
+            	}
+            }
 
-	                    echo '<record>';
-							echo '<key>' 		  . $key 	  . '</key>';
-							echo '<locationCode>' . $oagCode  . '</locationCode>';
-							echo '<countryCode>'  . $country  . '</countryCode>';
-							echo '<stateCode>'    . $state    . '</stateCode>';
-							echo '<zipCode>' 	  . $zipCode  . '</zipCode>';
-							echo '<city>' 	  	  . $city     . '</city>';
-							echo '<address1>' 	  . htmlentities($address1)  . '</address1>';
-							echo '<address2>' 	  . htmlentities($address2)  . '</address2>';
-							echo '<address3>' 	  . htmlentities($address3)  . '</address3>';
-							echo '<phone>' 		  . $phone  			   . '</phone>';
-							echo '<fax>' 		  . $fax  				   . '</fax>';
-							echo '<email>' 		  . $email  			   . '</email>';
-							echo '<latitude>' 	  . $latitude  			   . '</latitude>';
-							echo '<longitude>' 	  . $longitude 			   . '</longitude>';
-							echo '<locationName>' . htmlentities($locDesc) . '</locationName>';
-	                    echo '</record>';
-	            	} else {
-	            		break;
-	            	}
-	            }
 	        echo '</records>';
         } else {
         	 echo "File does not exist";

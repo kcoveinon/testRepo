@@ -11,6 +11,10 @@ class RSController extends BaseController
         $this->supplierApi = App::make(self::DEFAULT_SUPPLIER_CODE);
     }
 
+    public function showAngularTutorial()
+    {
+        return View::make("angular");
+    }
     public function doBookingWithEquipments()
     {
         return Response::json($this->supplierApi->doBooking(
@@ -31,7 +35,7 @@ class RSController extends BaseController
 
     public function showBooking()
     {
-        return View::make('rs-booking');
+        return View::make('prototype.rs-booking');
     }
 
     public function getBookingDetails($bookingId)
@@ -47,7 +51,7 @@ class RSController extends BaseController
         $pickUpLocationCode, 
         $returnLocationCode, 
         $countryCode,
-        $driverAge      
+        $driverAge        
     ) {
         return Response::json($this->supplierApi->search(
                                 $pickUpDate, 
@@ -57,7 +61,7 @@ class RSController extends BaseController
                                 $pickUpLocationCode, 
                                 $returnLocationCode, 
                                 $countryCode,
-                                $driverAge 
+                                $driverAge  
                         )); 
     }
 

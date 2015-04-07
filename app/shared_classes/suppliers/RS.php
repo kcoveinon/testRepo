@@ -109,7 +109,7 @@ class RS extends SupplierApi
                             $pickUpLocationCode, 
                             $returnLocationCode, 
                             $countryCode 
-                         );
+                       );
         $searchResult['executionTime'] = time() - $timeStart;
         $searchResult['supplierCode']  = $this->supplierCode;
 
@@ -150,6 +150,7 @@ class RS extends SupplierApi
         $xmlCurlResponse  = $this->executeCurl($xmlRequest->asXML());
         $mappedCarDetails = $this->mapVehicleDetails($xmlCurlResponse);
         $result           = array('status' => 'Failed');
+
         if ((string) $xmlCurlResponse->ResRates->attributes()->success !== 'true') {
             $result['data'][] = $xmlCurlResponse;
             return $result;
@@ -189,6 +190,7 @@ class RS extends SupplierApi
 
             $counter++;
         } 
+
         return $result;
     }
 
@@ -384,7 +386,6 @@ class RS extends SupplierApi
         $sourceNode->addAttribute('confirmationNumber', self::DEFAULT_CONFIRMATION_NUMBER);
         $sourceNode->addAttribute('countryCode', $countryCode);
         $sourceNode->addAttribute('corporateRateID', self::DEFAULT_CORPORATE_ID);
-
         $newReservationRequestNode->addChild('Vehicle')->addAttribute('classCode', $vehicleClass);
 
         $renterNode = $newReservationRequestNode->addChild('Renter');
@@ -466,6 +467,7 @@ class RS extends SupplierApi
         $returnLocationNode->addAttribute('dateTime', $this->convertToDateTimeDefaultFormat($returnDate, $returnTime));        
         $sourceNode = $resRatesnode->addChild('Source');
         $sourceNode->addAttribute('countryCode', $countryCode);
+
         $resRatesnode->addChild('CorpRateID', self::DEFAULT_CORPORATE_ID);
 
         return $xml;

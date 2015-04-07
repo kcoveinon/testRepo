@@ -15,7 +15,7 @@ class HZController extends BaseController
 
 	public function showBooking()
 	{
-		return View::make("hz-booking");
+		return View::make("prototype.hz-booking");
 	}
 
 	public function getLocationDepots($locationCode)
@@ -98,6 +98,7 @@ class HZController extends BaseController
 
 	public function exportDepotCompilation()
 	{	
+        header ("Content-Type:text/xml");
 		$this->supplierApi->getDepots();
 	}
 }

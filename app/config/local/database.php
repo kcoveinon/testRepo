@@ -29,7 +29,7 @@ return array(
 		'mysql' => array(
 			'driver'    => 'mysql',
 			'host'      => 'localhost',
-			'database'  => 'phpvroom',
+			'database'  => 'PHPVroom',
 			'username'  => 'root',
 			'password'  => '',
 			'charset'   => 'utf8',
