@@ -802,13 +802,10 @@ class HZ extends SupplierApi
 		if (file_exists($file)) {
 			ini_set("max_execution_time", 0);
 			ini_set("memory_limit", "10000M");
-        	header ("Content-Type:text/xml");
 
-			$file_content  = file_get_contents(public_path() . "/misc/GDEX1ADC.txt");
+			$file_content  = file_get_contents($file);
 			$explodedArray = explode("|", $file_content);
 			$chunkedArray  = array_chunk($explodedArray, 110, false);
-
-	        echo '<records>';
 
             foreach ($chunkedArray as $key => $value) {
                 if (count($value) > 1) {
@@ -828,29 +825,40 @@ class HZ extends SupplierApi
 					$city      = strlen($value[8])  < 1 ? "N/A" : $value[8];
 					$oagCode   = strlen($value[4])  < 1 ? "N/A" : $value[4];
 
-                    echo '<record>';
-						echo '<key>' 		  . $key 	  . '</key>';
-						echo '<locationCode>' . $oagCode  . '</locationCode>';
-						echo '<countryCode>'  . $country  . '</countryCode>';
-						echo '<stateCode>'    . $state    . '</stateCode>';
-						echo '<zipCode>' 	  . $zipCode  . '</zipCode>';
-						echo '<city>' 	  	  . $city     . '</city>';
-						echo '<address1>' 	  . htmlentities($address1)  . '</address1>';
-						echo '<address2>' 	  . htmlentities($address2)  . '</address2>';
-						echo '<address3>' 	  . htmlentities($address3)  . '</address3>';
-						echo '<phone>' 		  . $phone  			   . '</phone>';
-						echo '<fax>' 		  . $fax  				   . '</fax>';
-						echo '<email>' 		  . $email  			   . '</email>';
-						echo '<latitude>' 	  . $latitude  			   . '</latitude>';
-						echo '<longitude>' 	  . $longitude 			   . '</longitude>';
-						echo '<locationName>' . htmlentities($locDesc) . '</locationName>';
-                    echo '</record>';
+					$data['result'][] = [
+						"key" => $key,
+						"locationCode" => $oagCode,
+						"countryCode" => $country,
+						"stateCode" => $state,
+						"zipCode" => $zipCode,
+						"city" => $city,
+						"address1" => $address1,
+						"address2" => $address2,
+						"address3" => $address3,
+						"operationSchedule" => [
+							'monday'    => htmlentities($value[18]) .'-' . htmlentities($value[19]),
+							'tuesday'   => htmlentities($value[24]) .'-' . htmlentities($value[25]),
+							'wednesday' => htmlentities($value[30]) .'-' . htmlentities($value[31]),
+							'thursday'  => htmlentities($value[36]) .'-' . htmlentities($value[37]),
+							'friday'    => htmlentities($value[42]) .'-' . htmlentities($value[43]),
+							'saturday'  => htmlentities($value[48]) .'-' . htmlentities($value[49]),
+							'sunday'    => htmlentities($value[54]) .'-' . htmlentities($value[55])
+						],
+						"fax" => $fax,
+						"phone" => $phone,
+						"email" => $email,
+						"latitude" => $longitude,
+						"longitude" => $longitude,
+						"locationName" => htmlentities($locDesc)
+					];
+
             	} else {
             		break;
             	}
             }
 
-	        echo '</records>';
+            return $data;
+
         } else {
         	 echo "File does not exist";
         }

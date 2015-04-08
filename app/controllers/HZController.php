@@ -98,8 +98,7 @@ class HZController extends BaseController
 
 	public function exportDepotCompilation()
 	{	
-        header ("Content-Type:text/xml");
-		$this->supplierApi->getDepots();
+		return Response::json($this->supplierApi->getDepots());
 	}
 }
 
