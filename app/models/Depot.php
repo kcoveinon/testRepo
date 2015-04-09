@@ -2,8 +2,9 @@
 
 class Depot extends BaseModel
 {
-    protected $table      = "depot";
-    protected $primaryKey = "depotId";
+    protected $table      = "depottest_20150409";
+    protected $primaryKey = "depotID";
+    protected $fillable = array("*");
 
     public function getId()
     {
@@ -233,6 +234,55 @@ class Depot extends BaseModel
     public function setDeletedBy($value)
     {
         $this->attributes['deletedBy'] = $value;
+    }
+
+    public function scopeWhereCode($query, $code) 
+    {
+        return $query->where($this->table . '.depotCode', '=', $code);
+    }
+
+    public function scopeWhereSupplierId($query, $supplierId) 
+    {
+        return $query->where($this->table . '.supplierID', '=', $supplierId);
+    }
+
+    public static function updateDepotRecord($data)
+    {
+        try{
+            $resultMessage = '';
+            $depoObject = Depot::whereCode($data["locationCode"])
+                                ->whereSupplierId($data["supplierID"])
+                                ->first();
+
+            if(empty($depoObject)) {
+                $depoObject = new Depot();
+            } 
+
+            $depoObject->setSupplierId($data["supplierID"]);
+            $depoObject->setCountryId($data["countryCode"]);
+            $depoObject->setCode($data["locationCode"]);
+            $depoObject->setName($data["locationName"]);
+            $depoObject->setaddress($data["address"]);
+            $depoObject->setcity($data["city"]);
+            $depoObject->setpostCode($data["postCode"]);
+            $depoObject->setphoneNumber($data["phoneNumber"]);
+            $depoObject->setLatitude($data["latitude"]);
+            $depoObject->setLongitude($data["latitude"]);
+
+            $result =  $depoObject->save();
+
+
+        } catch(Exception $e) {
+            $result        =  false;
+            $resultMessage = $e->getMessage();
+        }
+
+        $response =  array(
+            'result'  => $result,
+            'message' => $resultMessage
+        );
+
+        return $response;
     }
 }
 

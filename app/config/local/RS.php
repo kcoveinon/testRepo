@@ -8,7 +8,7 @@ $prodUrl      = "https://www.thermeon.com.au/webXG/redspot/xml/webxml/";
 
 return array(
     'api' => array(
-        'url'          => $prodUrl,
+        'url'          => $testUrl,
         'fleetUrl'     => $fleetUrl,
         'locationsUrl' => $locationsUrl,
         'optionsUrl'   => $optionsUrl,
