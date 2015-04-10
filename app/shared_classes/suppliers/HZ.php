@@ -848,6 +848,7 @@ class HZ extends SupplierApi
 							'phoneNumber'  => $phone,
 							'latitude'     => $longitude,
 							'longitude'    => $longitude,
+                    		'isAirport'    => strpos(strtolower($locDesc), 'airport') !== false ? 1 : 0,
 							'locationName' => htmlentities($locDesc)
 						);
 						$response = Depot::updateDepotRecord($data);

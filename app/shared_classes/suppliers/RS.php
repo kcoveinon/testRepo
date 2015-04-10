@@ -283,6 +283,7 @@ class RS extends SupplierApi
                     'phoneNumber'  => $value->phone,
                     'latitude'     => $value->longitude,
                     'longitude'    => $value->longitude,
+                    'isAirport'    => strpos(strtolower($value->name), 'airport') !== false ? 1 : 0,
                     'locationName' => $value->name
                 );
                 $response = Depot::updateDepotRecord($data);

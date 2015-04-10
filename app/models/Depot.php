@@ -263,6 +263,7 @@ class Depot extends BaseModel
             $depoObject->setName($data["locationName"]);
             $depoObject->setaddress($data["address"]);
             $depoObject->setcity($data["city"]);
+            $depoObject->setIsAirport($data["isAirport"]);
             $depoObject->setpostCode($data["postCode"]);
             $depoObject->setphoneNumber($data["phoneNumber"]);
             $depoObject->setLatitude($data["latitude"]);
