@@ -22,4 +22,10 @@ class CronController extends BaseController
 			});
 		}
 	}
+
+	public function updateDepotTable()
+	{
+		return View::make('prototype.async_update_depots');
+	}
+
 }

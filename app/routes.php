@@ -129,6 +129,8 @@ Route::group(array('prefix' => 'RS/'), function()
     Route::any('book/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationCode}/{returnLocationCode}/{vehicleClass}/{rateId}/{countryCode}', 'RSController@doBooking');
 });
 
+Route::any('update-supplier-depots', 'CronController@updateDepotTable');
+
 Route::group(array('prefix' => 'TH'),function(){
 
    // Get all locations
