@@ -100,7 +100,12 @@ class HZController extends BaseController
 	{	
 		$result = array("success" => $this->supplierApi->updateDepots());
 		return Response::json($result);
+	}
 
+	public function viewDepots()
+	{	
+		$result = array("success" => $this->supplierApi->getDepots());
+		return Response::json($result);
 	}
 }
 

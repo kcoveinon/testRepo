@@ -111,12 +111,14 @@ Route::group(array('prefix' => 'HZ/'), function()
     Route::any('modify-booking/{bookingId}/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{vehicleCategory}/{vehicleClass}', 'HZController@modifyBooking');
     Route::any('get-depot-details/{locationCode}', 'HZController@getDepotDetails');
     Route::any('get-location-depots/{locationCode}', 'HZController@getLocationDepots');
+    Route::any('view-depots', 'HZController@viewDepots');
     Route::any('export-depot-location', 'HZController@exportDepotCompilation');
 });
 
 Route::group(array('prefix' => 'RS/'), function()
 {
     Route::any('get-fleet', 'RSController@getFleet');
+    Route::any('export-depot-location', 'RSController@exportLocations');
     Route::any('get-locations', 'RSController@getLocations');
     Route::any('get-extras', 'RSController@getExtras');
     Route::any('show-booking-form', 'RSController@showBooking');

@@ -811,49 +811,51 @@ class HZ extends SupplierApi
 			$chunkedArray  = array_chunk($explodedArray, 110, false);
 			$supplierObject = Supplier::getSupplierIDByCode($this->supplierCode);
 			$countryArray = [];
-            foreach ($chunkedArray as $key => $value) {
-                if (count($value) > 1) {
-					$country   = strlen($value[5])  < 1 ? '' : trim($value[5]);
-					$zipCode   = strlen($value[7])  < 1 ? '' : trim($value[7]);
-					$city      = strlen($value[8])  < 1 ? '' : trim($value[8]);
-					$state     = strlen($value[6])  < 1 ? '' : trim($value[6]);
-					$address1  = strlen($value[9])  < 1 ? '' : trim($value[9]);
-					$address2  = strlen($value[10]) < 1 ? '' : trim($value[6]);
-					$address3  = strlen($value[10]) < 1 ? '' : trim($value[10]);
-					$phone     = strlen($value[12]) < 1 ? '' : trim($value[12]);
-					$locDesc   = strlen($value[62]) < 1 ? '' : trim($value[62]);
-					$latitude  = strlen($value[60]) < 1 ? '' : trim($value[60]);
-					$longitude = strlen($value[61]) < 1 ? '' : trim($value[61]);
-					$oagCode   = strlen($value[4])  < 1 ? '' : trim($value[4]);
+			if(!is_null($supplierObject)) {
+	            foreach ($chunkedArray as $key => $value) {
+	                if (count($value) > 1) {
+						$country   = strlen($value[5])  < 1 ? '' : trim($value[5]);
+						$zipCode   = strlen($value[7])  < 1 ? '' : trim($value[7]);
+						$city      = strlen($value[8])  < 1 ? '' : trim($value[8]);
+						$state     = strlen($value[6])  < 1 ? '' : trim($value[6]);
+						$address1  = strlen($value[9])  < 1 ? '' : trim($value[9]);
+						$address2  = strlen($value[10]) < 1 ? '' : trim($value[6]);
+						$address3  = strlen($value[10]) < 1 ? '' : trim($value[10]);
+						$phone     = strlen($value[12]) < 1 ? '' : trim($value[12]);
+						$locDesc   = strlen($value[62]) < 1 ? '' : trim($value[62]);
+						$latitude  = strlen($value[60]) < 1 ? '' : trim($value[60]);
+						$longitude = strlen($value[61]) < 1 ? '' : trim($value[61]);
+						$oagCode   = strlen($value[4])  < 1 ? '' : trim($value[4]);
 
-					$countryObj = Country::where('countryCode', $country)->first();
+						$countryObj = Country::where('countryCode', $country)->first();
 
-					$data = array(
-						'supplierID'   => is_null($supplierObject) ? '0' : $supplierObject->getSupplierID(),
-						'locationCode' => $oagCode,
-						'countryCode'  => is_null($countryObj) ? '0' : $countryObj->getId(),
-						'postCode'     => $zipCode,
-						'city'         => $city,
-						'address'      => trim($address1 . ' ' . $address2 . ' '. $address3),
-						'operationSchedule' => array(
-							'monday'    => htmlentities($value[18]) . '-' . htmlentities($value[19]),
-							'tuesday'   => htmlentities($value[24]) . '-' . htmlentities($value[25]),
-							'wednesday' => htmlentities($value[30]) . '-' . htmlentities($value[31]),
-							'thursday'  => htmlentities($value[36]) . '-' . htmlentities($value[37]),
-							'friday'    => htmlentities($value[42]) . '-' . htmlentities($value[43]),
-							'saturday'  => htmlentities($value[48]) . '-' . htmlentities($value[49]),
-							'sunday'    => htmlentities($value[54]) . '-' . htmlentities($value[55])
-						),
-						'phoneNumber'  => $phone,
-						'latitude'     => $longitude,
-						'longitude'    => $longitude,
-						'locationName' => htmlentities($locDesc)
-					);
-					$response = Depot::updateDepotRecord($data);
-            	} else {
-            		break;
-            	}
-            }
+						$data = array(
+							'supplierID'   => $supplierObject->getSupplierID(),
+							'locationCode' => $oagCode,
+							'countryCode'  => is_null($countryObj) ? '0' : $countryObj->getId(),
+							'postCode'     => $zipCode,
+							'city'         => $city,
+							'address'      => trim($address1 . ' ' . $address2 . ' '. $address3),
+							'operationSchedule' => array(
+								'monday'    => htmlentities($value[18]) . '-' . htmlentities($value[19]),
+								'tuesday'   => htmlentities($value[24]) . '-' . htmlentities($value[25]),
+								'wednesday' => htmlentities($value[30]) . '-' . htmlentities($value[31]),
+								'thursday'  => htmlentities($value[36]) . '-' . htmlentities($value[37]),
+								'friday'    => htmlentities($value[42]) . '-' . htmlentities($value[43]),
+								'saturday'  => htmlentities($value[48]) . '-' . htmlentities($value[49]),
+								'sunday'    => htmlentities($value[54]) . '-' . htmlentities($value[55])
+							),
+							'phoneNumber'  => $phone,
+							'latitude'     => $longitude,
+							'longitude'    => $longitude,
+							'locationName' => htmlentities($locDesc)
+						);
+						$response = Depot::updateDepotRecord($data);
+	            	} else {
+	            		break;
+	            	}
+	            }
+        	}
         } else {
         	 echo 'File does not exist';
         }	

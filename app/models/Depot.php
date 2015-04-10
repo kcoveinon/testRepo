@@ -4,7 +4,6 @@ class Depot extends BaseModel
 {
     protected $table      = "depottest_20150409";
     protected $primaryKey = "depotID";
-    protected $fillable = array("*");
 
     public function getId()
     {

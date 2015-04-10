@@ -263,6 +263,35 @@ class RS extends SupplierApi
     }
 
     /**
+     * Updates Depot table for RedSpot
+     * @return XML Object
+     */
+    public function updateDepots()
+    {
+        $response = new SimpleXMLElement(file_get_contents($this->locationsUrl));
+        $supplierObject = Supplier::getSupplierIDByCode($this->supplierCode);
+        if(!is_null($supplierObject)) {
+            foreach ($response as $key => $value) {
+                $stateObject = State::whereCode($value->statecode)->first();
+                $data = array(
+                    'supplierID'   => $supplierObject->getSupplierID(),
+                    'locationCode' => $key,
+                    'countryCode'  => is_null($stateObject) ? '0' : $stateObject->getCountryId(),
+                    'postCode'     => $value->postcode,
+                    'city'         => $value->suburb,
+                    'address'      => trim($value->address1 . ' ' . $value->address2),
+                    'phoneNumber'  => $value->phone,
+                    'latitude'     => $value->longitude,
+                    'longitude'    => $value->longitude,
+                    'locationName' => $value->name
+                );
+                $response = Depot::updateDepotRecord($data);
+            }
+        }
+    }
+
+
+    /**
      * Handles the fetching of locations xml
      * @return XML Object
      */

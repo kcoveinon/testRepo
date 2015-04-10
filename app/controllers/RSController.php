@@ -99,6 +99,11 @@ class RSController extends BaseController
         return Response::json($this->supplierApi->getFleet());
     }
 
+    public function exportLocations()
+    {
+        return Response::json($this->supplierApi->updateDepots());
+    } 
+
     public function getLocations()
     {
         return Response::json($this->supplierApi->getLocations());
