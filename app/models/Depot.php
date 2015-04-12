@@ -247,13 +247,13 @@ class Depot extends BaseModel
 
     public static function updateDepotRecord($data)
     {
-        try{
+        try {
             $resultMessage = '';
             $depoObject = Depot::whereCode($data["locationCode"])
                                 ->whereSupplierId($data["supplierID"])
                                 ->first();
 
-            if(empty($depoObject)) {
+            if (empty($depoObject)) {
                 $depoObject = new Depot();
             } 
 
@@ -261,23 +261,23 @@ class Depot extends BaseModel
             $depoObject->setCountryId($data["countryCode"]);
             $depoObject->setCode($data["locationCode"]);
             $depoObject->setName($data["locationName"]);
-            $depoObject->setaddress($data["address"]);
-            $depoObject->setcity($data["city"]);
+            $depoObject->setAddress($data["address"]);
+            $depoObject->setCity($data["city"]);
             $depoObject->setIsAirport($data["isAirport"]);
-            $depoObject->setpostCode($data["postCode"]);
-            $depoObject->setphoneNumber($data["phoneNumber"]);
+            $depoObject->setPostCode($data["postCode"]);
+            $depoObject->setPhoneNumber($data["phoneNumber"]);
             $depoObject->setLatitude($data["latitude"]);
-            $depoObject->setLongitude($data["latitude"]);
+            $depoObject->setLongitude($data["longitude"]);
 
             $result =  $depoObject->save();
 
 
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $result        =  false;
             $resultMessage = $e->getMessage();
         }
 
-        $response =  array(
+        $response = array(
             'result'  => $result,
             'message' => $resultMessage
         );
