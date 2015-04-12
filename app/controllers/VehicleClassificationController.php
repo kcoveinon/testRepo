@@ -10,14 +10,10 @@ class VehicleClassificationController extends BaseController
 
 	public function __construct()
 	{
-		$this->categories = $this->getCategories();
-
-		$this->types = $this->getTypes();
-
-		$this->transmissions = $this->getTransmissions();
-
-		$this->fuelTypes = $this->getFuelTypes();
-
+		$this->categories      = $this->getCategories();
+		$this->types           = $this->getTypes();
+		$this->transmissions   = $this->getTransmissions();
+		$this->fuelTypes       = $this->getFuelTypes();
 		$this->classifications = array(
 			'category'     => $this->categories,
 			'type'         => $this->types,

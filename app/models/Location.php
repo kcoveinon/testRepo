@@ -218,6 +218,4 @@ class Location extends BaseModel {
 	{
 		return $query->where($this->table . '.' . $this->primaryKey, '=', $id);
 	}
-	
-
 }

@@ -1,0 +1,294 @@
+/* ClearFix */
+.cf:before,
+.cf:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+
+.cf:after {
+    clear: both;
+}
+
+/**
+ * For IE 6/7 only
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+.cf {
+    *zoom: 1;
+}
+
+/* Image Flip */
+.img-flip {
+        -moz-transform: scaleX(-1);
+        -o-transform: scaleX(-1);
+        -webkit-transform: scaleX(-1);
+        transform: scaleX(-1);
+        filter: FlipH;
+        -ms-filter: "FlipH";
+}
+
+/* Custom Classes */
+.top0 { margin-top:0px; }
+.top5 { margin-top:5px; }
+.top10 { margin-top:10px; }
+.top15 { margin-top:15px; }
+.top20 { margin-top:20px; }
+.top25 { margin-top:25px; }
+.top30 { margin-top:30px; }
+
+.bottom0 { margin-bottom:0px; }
+.bottom5 { margin-bottom:5px; }
+.bottom10 { margin-bottom:10px; }
+.bottom15 { margin-bottom:15px; }
+.bottom20 { margin-bottom:20px; }
+.bottom25 { margin-bottom:25px; }
+.bottom30 { margin-bottom:30px; }
+
+.padding0 { padding: 0px; }
+.padding5 { padding: 5px; }
+.padding10 { padding: 10px; }
+.padding15 { padding: 15px; }
+.padding20 { padding: 20px; }
+.padding25 { padding: 25px; }
+.padding30 { padding: 30px; }
+
+.lpadding0 { padding-left: 0px; }
+.lpadding5 { padding-left: 5px; }
+.lpadding10 { padding-left: 10px; }
+.lpadding15 { padding-left: 15px; }
+.lpadding20 { padding-left: 20px; }
+.lpadding25 { padding-left: 25px; }
+.lpadding30 { padding-left: 30px; }
+
+.rpadding0 { padding-right: 0px; }
+.rpadding5 { padding-right: 5px; }
+.rpadding10 { padding-right: 10px; }
+.rpadding15 { padding-right: 15px; }
+.rpadding20 { padding-right: 20px; }
+.rpadding25 { padding-right: 25px; }
+.rpadding30 { padding-right: 30px; }
+
+input.ng-invalid.ng-dirty{
+    background: pink;
+}
+
+b, strong{ font-weight: bold;}
+
+.input-group[class*="col-"].glyph-padding-lr15{
+	padding-left: 15px; 
+    padding-right: 15px;
+} /* fix for input with glyphs */
+
+.input-group.glyph-overlap span{
+	background: #fff;
+    padding-right: 5px;
+} /* change glyph bg to comply with texbox */
+.input-group.glyph-overlap input,
+.input-group.glyph-overlap button{
+	border-left: 0px;
+} /* remove glyph border */
+
+/* Fonts */
+@font-face {
+    font-family: GravurCondensedRegular;
+    src: url(../fonts/GravurCondensed-Regular.ttf);
+} 
+@font-face {
+    font-family: GravurCondensedThin;
+    src: url(../fonts/GravurCondensed-Thin.ttf);
+} 
+@font-face {
+    font-family: GravurCondensedBlack;
+    src: url(../fonts/GravurCondensed-Black.ttf);
+} 
+/* End Fonts */
+
+body, html{
+    font-family: GravurCondensedRegular;
+}
+
+/* DatePicker Custom Styles */
+.xdsoft_datetimepicker .xdsoft_datepicker.active,
+.xdsoft_datetimepicker .xdsoft_timepicker.active{
+    margin-left: 5px;
+}
+.xdsoft_datetimepicker .xdsoft_calendar table td > div{
+    text-align: center;
+    padding-right: 0px;
+    padding: 9px;
+    border-radius: 18px;
+}
+.xdsoft_datetimepicker .xdsoft_calendar table td > div:hover,
+.xdsoft_datetimepicker .xdsoft_calendar table td.xdsoft_current > div{
+    background: orange;
+}
+.xdsoft_datetimepicker .xdsoft_calendar table td:hover,
+.xdsoft_datetimepicker .xdsoft_calendar table td.xdsoft_current{
+    background: none !important;
+    box-shadow: none;
+}
+/*
+.xdsoft_datetimepicker .xdsoft_calendar table td:hover,
+.xdsoft_datetimepicker .xdsoft_calendar table td.xdsoft_current{
+    background: transparent url(../images/calendar-active-bg.png) center no-repeat !important;
+    box-shadow: none;
+}*/
+.xdsoft_datetimepicker .xdsoft_calendar table td,
+.xdsoft_datetimepicker .xdsoft_calendar table th{
+    border: none;
+}
+.xdsoft_mounthpicker, .xdsoft_mounthpicker div {
+    background: #cbcbcb !important;
+    float: left;
+}
+.custom-date-style{
+    background: #000 !important;
+}
+/* End Custom DatePicker Styles */
+
+/* Location Auto Complete Styles */
+.location-enter,
+.location-return{
+    position: relative;
+}
+.form-group .location-enter input[type="text"]{
+    border-radius: 0 6px 6px 0 !important;
+}
+ul.autocomplete-list,
+.doubledropdown{
+    background: none repeat scroll 0 0 #fff;
+    border: 1px solid #cbcbcb;
+    left: 5%;
+    position: absolute;
+    top: 50px;
+    min-width: 260px;
+    z-index: 10;
+}
+.doubledropdown{
+    height: 350px;
+}
+ul.autocomplete-list li:hover{
+    cursor: pointer;
+}
+.result-count{
+    color: #888;
+    font-size: 12px;
+}
+
+/* Double DropDown Styles*/
+.driver-info.input-group.glyph-overlap span{
+    padding-right: 0px;
+}
+.driver-info.input-group.glyph-overlap button{
+    border-radius: 0px 5px 5px 0px !important;
+    padding: 0 15px;
+}
+.dd-country{
+    text-align: center;
+    width: 55%;
+}
+.dd-age{
+    text-align: center;
+    width: 40%;
+}
+.dd-country ul.dropdown-menu, 
+.dd-age ul.dropdown-menu{
+    border: medium none;
+    display: block;
+    height: 290px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    padding: 10px;
+    width: inherit;
+    min-width: inherit;
+}
+.dd-country ul.dropdown-menu{
+    width: 145px;
+}
+.dd-country ul.dropdown-menu > li > a{
+    padding: 3px 0;
+}
+.dd-age ul.dropdown-menu{
+    margin-left: 10px;
+    width: 100px;
+}
+.dd-age ul.dropdown-menu > li > a:hover{
+    background: #cbcbcb;
+}
+.doubledropdown button.dropdown-toggle{
+    border: medium none;
+}
+/* End DropDown Styles */
+
+
+.line-separator{
+    background: transparent url(../images/line.png) repeat-x;
+    height: 10px;
+}
+.home-search{
+    background: #fff;
+    border-radius: 10px 10px 0 0;
+}
+.checked-info{
+    background: #0f2860;
+    text-align: center;
+}
+.social-buttons{
+    background: #0a1d48;
+}
+.successful-bookings-info{
+    background: #fff;
+    text-align: center;
+}
+.popular-locations div.top15{
+    border-radius: 5px;
+    margin: 5px;
+    overflow: hidden;
+    width: 23.6%;
+    background: #0a1d48;
+}
+.popular-locations a.loc-name{
+    background: #0a1d48;
+    bottom: 0;
+    cursor: pointer;
+    font-family: GravurCondensedBlack;
+    color: #fff;
+}
+footer{
+    background: transparent url(../images/temp-footer-bg.jpg) top left no-repeat;
+    height: 110px;
+}
+h3{
+    font-family: GravurCondensedBlack;
+    color: #4b4b4b;
+    font-size: 24px;
+}
+.mini-sliders{
+    min-height: 200px;
+}
+.mini-sliders .next-prev a{
+    cursor: pointer;
+}
+
+.info-tabs p.text-left{
+    font-size: 12px;
+}
+.info-tabs .tab-links a{
+    background: #9d9d9d;
+    border: 1px solid #999;
+    border-radius: 5px 5px 0 0;
+    font-size: 18px;
+    outline: none;
+    text-decoration: none;
+    color: #fff;
+}
+.info-tabs .tab-links a.active{
+    background: #0a1d48;
+}
+.info-tabs .tab-content{
+    border-top: 1px solid #999;
+    margin-top: 2px;
+}
+.sidebar-info ul{
+    background: #f2f2f2;
+}

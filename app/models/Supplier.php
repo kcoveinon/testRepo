@@ -4,6 +4,11 @@ class Supplier extends BaseModel
 {
 	protected $table = 'supplier';
 
+	public function getSupplierID()
+	{
+	    return $this->attributes['supplierID'];
+	}
+
 	/* scopes */
 	public function scopeWhereValid($query)
 	{
@@ -27,4 +32,11 @@ class Supplier extends BaseModel
 
 		return $exist;
 	}
+
+    public static function getSupplierIDByCode($supplierCode) 
+    {
+        $supplierID = Supplier::select('supplierID')->where('supplierCode', '=', $supplierCode)->where('isDeleted', '=', 0)->first();
+        
+        return $supplierID;
+    }
 }
