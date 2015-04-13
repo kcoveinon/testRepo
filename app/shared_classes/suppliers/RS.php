@@ -264,17 +264,18 @@ class RS extends SupplierApi
 
     /**
      * Updates Depot table for RedSpot
-     * @return XML Object
+     * @return bool
      */
     public function updateDepots()
     {
         $response = new SimpleXMLElement(file_get_contents($this->locationsUrl));
         $supplierObject = Supplier::getSupplierIDByCode($this->supplierCode);
+        $stationsAdded = 0;
         if(!is_null($supplierObject)) {
             foreach ($response as $key => $value) {
                 $stateObject = State::whereCode($value->statecode)->first();
                 $data = array(
-                    'supplierID'   => $supplierObject->getSupplierID(),
+                    'supplierID'   => $supplierObject->getId(),
                     'locationCode' => $key,
                     'countryCode'  => is_null($stateObject) ? '0' : $stateObject->getCountryId(),
                     'postCode'     => $value->postcode,
@@ -286,9 +287,23 @@ class RS extends SupplierApi
                     'isAirport'    => strpos(strtolower($value->name), 'airport') !== false ? 1 : 0,
                     'locationName' => $value->name
                 );
-                $response = Depot::updateDepotRecord($data);
+                $response = Depot::updateOrCreateDepot($data);
+                if (!$response["result"]) {
+                    break;
+                }
+                else {
+                    $stationsAdded++;
+                }
             }
         }
+
+        $result = array(
+            "success"   => $response["result"],
+            "message"   => $response["message"],
+            "rowsAdded" => $stationsAdded
+        );
+
+        return $result;
     }
 
 

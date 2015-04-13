@@ -245,7 +245,7 @@ class Depot extends BaseModel
         return $query->where($this->table . '.supplierID', '=', $supplierId);
     }
 
-    public static function updateDepotRecord($data)
+    public static function updateOrCreateDepot($data)
     {
         try {
             $resultMessage = '';
@@ -268,9 +268,11 @@ class Depot extends BaseModel
             $depoObject->setPhoneNumber($data["phoneNumber"]);
             $depoObject->setLatitude($data["latitude"]);
             $depoObject->setLongitude($data["longitude"]);
+            $depoObject->setIsDeleted(0);
+            $depoObject->setDeletedAt(null);
+            $depoObject->setDeletedBy(null);
 
             $result =  $depoObject->save();
-
 
         } catch (Exception $e) {
             $result        =  false;
@@ -284,6 +286,32 @@ class Depot extends BaseModel
 
         return $response;
     }
+
+    /**
+     * Mark other depots that are not included on the array of depots
+     * @param type $supplierId
+     * @param type $depots
+     * @return boolean
+     */
+    public static function markAsDeletedOtherDepots($supplierId, $depots)
+    {
+        
+        if( empty($supplierId) || empty($depots) ){
+            return false;
+        }
+            
+        self::where('supplierID', $supplierId)
+                ->whereNotIn('depotCode', $depots) 
+                -> update(
+                    array(
+                        'isDeleted'  => 1,
+                        'deleted_at' => date('Y-m-d H:i:s')
+                    )
+                );
+        
+        return true;        
+    }
+
 }
 
 

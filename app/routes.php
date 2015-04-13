@@ -12,57 +12,152 @@
 */
 
 Route::group(array('prefix' => 'prototype'), function () {
-	Route::any('convert-rate/{value}/{from}/{to}', function ($value, $from, $to) {
-		echo Currency::convert($value, $from, $to);
-	});
+  Route::any('search-page', function() {
+    return View::make('prototype.search_page');
+  });
 
-	Route::any('search-page', function() {
-		return View::make('prototype.search_page');
-	});
+  // /prototype/async-search-requests/2015-12-13/10:00/2015-12-15/10:00/1926/1926/AU/25+
+  Route::any(
+    'async-search-requests/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{driverAge}', 
+    function (
+      $pickUpDate,
+      $pickUpTime,
+      $returnDate,
+      $returnTime,
+      $pickUpLocationId,
+      $returnLocationId,
+      $countryCode,
+      $driverAge
+    ) {
+      $data = array(
+        'pickUpDate'        => $pickUpDate,
+        'pickUpTime'        => $pickUpTime,
+        'returnDate'        => $returnDate,
+        'returnTime'        => $returnTime,
+        'pickUpLocationId' => $pickUpLocationId,
+        'returnLocationId' => $returnLocationId,
+        'countryCode'       => $countryCode,
+        'driverAge'         => $driverAge
+      );
 
-	// /prototype/async-search-requests/2015-12-13/10:00/2015-12-15/10:00/1926/1926/AU/25+
-	Route::any(
-		'async-search-requests/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpLocationId}/{returnLocationId}/{countryCode}/{driverAge}', 
-		function (
-			$pickUpDate,
-			$pickUpTime,
-			$returnDate,
-			$returnTime,
-			$pickUpLocationId,
-			$returnLocationId,
-			$countryCode,
-			$driverAge
-		) {
-			$data = array(
-				'pickUpDate'        => $pickUpDate,
-				'pickUpTime'        => $pickUpTime,
-				'returnDate'        => $returnDate,
-				'returnTime'        => $returnTime,
-				'pickUpLocationId'  => $pickUpLocationId,
-				'returnLocationId'  => $returnLocationId,
-				'countryCode'       => $countryCode,
-				'driverAge'         => $driverAge
-			);
+      return View::make('prototype.async_search_requests', $data);
+    }
+  );
 
-			return View::make('prototype.async_search_requests', $data);
-		}
-	);
+  Route::any('europcar-booking', function () {
+    return View::make('prototype.europcar_booking');
+  });
 
-	Route::any('europcar-booking', function () {
-		return View::make('prototype.europcar_booking');
-	});
+  Route::any('acriss-decoder/{carCategoryCode}', function ($carCategoryCode) {
+    $acrissHelper = new AcrissHelper();
 
-	Route::any('acriss-decoder/{carCategoryCode}', function ($carCategoryCode) {
-		$acrissHelper = new AcrissHelper();
+    $expandedCode = $acrissHelper->expandCode($carCategoryCode);
 
-		$expandedCode = $acrissHelper->expandCode($carCategoryCode);
-
-		// print readable $expandedCode
-		echo '<pre>' . print_r($expandedCode, true) . '</pre>';
-	});
+    // print readable $expandedCode
+    echo '<pre>' . print_r($expandedCode, true) . '</pre>';
+  });
 });
 
 Route::group(array('prefix' => 'EC'), function () {
+  Route::any('depots/update-records', function() {
+    ini_set('max_execution_time', 300);
+
+    $supplierCode = 'EC';
+
+    $supplier = Supplier::whereCode($supplierCode)->first();
+
+    if (empty($supplier)) {
+      die('Unable to get supplier information');
+    }
+
+    $supplierId = $supplier->getId();
+
+    $responseXML = simplexml_load_file('C:\Users\ibaguio\Documents\europcar_depots.xml');
+
+    // get all countries for
+    $countries = Country::all();
+
+    foreach ($countries as $country) {
+      $countryIds[$country->getCode()] = $country->getId();
+    }
+
+    $nonExistingCountries = array();
+    $stationsNotAdded     = 0;
+    $stationsAdded        = 0;
+
+    foreach ($responseXML->station as $stationNode) {
+      $station = array(
+        'areaType'         => (string) $stationNode['areaType'],
+        'address1'         => (string) $stationNode['address1'],
+        'address2'         => (string) $stationNode['address2'],
+        'countryCode'      => (string) $stationNode['countryCode'],
+        'phoneNumber'      => (string) $stationNode['phoneNumber'],
+        'phoneCountryCode' => (string) $stationNode['phoneCountryCode'],
+        'phoneAreaCode'    => (string) $stationNode['phoneAreaCode'],
+        'stationCode'      => (string) $stationNode['stationCode'],
+        'stationName'      => (string) $stationNode['stationName'],
+        'cityName'         => (string) $stationNode['cityName'],
+        'postalCode'       => (string) $stationNode['postalCode'],
+        'longitude'        => (string) $stationNode['longitude'],
+        'latitude'         => (string) $stationNode['latitude'],
+        'countryName'      => (string) $stationNode['countryName'], // temporary code
+      );
+
+      if (!isset($countryIds[$station['countryCode']])) {
+        $nonExistingCountries[] = $station['countryCode'] . '+' . $station['countryName'];
+        $stationsNotAdded++;
+        continue;
+      }
+
+      $isAirPort   = ($station['areaType'] == 'T') ? 1 : 0;
+      $address     = trim($station['address1'] . ' ' . $station['address2']);
+      $countryId   = $countryIds[$station['countryCode']];
+      $phoneNumber = '';
+
+      if (!empty($station['phoneNumber'])) {
+        if (!empty($station['phoneCountryCode'])) {
+          $phoneNumber = '(' . $station['phoneCountryCode'] .') ';
+        }
+
+        if (!empty($station['phoneAreaCode'])) {
+          $phoneNumber .= $station['phoneAreaCode'] . ' ';
+        }
+
+        $phoneNumber .= $station['phoneNumber'];
+      }
+        $data = array(
+            'supplierID'   => $supplierId,
+            'locationCode' => $station['stationCode'],
+            'countryCode'  => $station['stationCode'],
+            'postCode'     => $station['postalCode'],
+            'city'         => $station['cityName'],
+            'address'      => $address,
+            'phoneNumber'  => $phoneNumber,
+            'latitude'     => $station['latitude'],
+            'longitude'    => $station['longitude'],
+            'isAirport'    => $isAirPort,
+            'locationName' => $station['stationName']
+        );
+
+        $response = Depot::updateOrCreateDepot($data);
+
+        if (!$response["result"]) {
+            break;
+        }
+
+        $stationsAdded++;
+
+    }
+    $result = array(
+        "success"   => $response["result"],
+        "message"   => $response["message"],
+        "rowsAdded" => $stationsAdded
+    );
+
+    return Response::json($result);
+
+    });
+
 	Route::any(
 		'search/{pickUpDate}/{pickUpTime}/{returnDate}/{returnTime}/{pickUpStationCode}/{returnStationCode}/{countryCode}/{driverAge}',
 		'ECController@searchVehicles'
@@ -112,13 +207,14 @@ Route::group(array('prefix' => 'HZ/'), function()
     Route::any('get-depot-details/{locationCode}', 'HZController@getDepotDetails');
     Route::any('get-location-depots/{locationCode}', 'HZController@getLocationDepots');
     Route::any('view-depots', 'HZController@viewDepots');
-    Route::any('export-depot-location', 'HZController@exportDepotCompilation');
+    Route::any('depots/update-records', 'HZController@exportDepotCompilation');
 });
 
 Route::group(array('prefix' => 'RS/'), function()
 {
+    Route::any('depots/update-records', 'HZController@exportDepotCompilation');  
     Route::any('get-fleet', 'RSController@getFleet');
-    Route::any('export-depot-location', 'RSController@exportLocations');
+    Route::any('depots/update-records', 'RSController@exportLocations');
     Route::any('get-locations', 'RSController@getLocations');
     Route::any('get-extras', 'RSController@getExtras');
     Route::any('show-booking-form', 'RSController@showBooking');
@@ -132,6 +228,8 @@ Route::group(array('prefix' => 'RS/'), function()
 Route::any('update-supplier-depots', 'CronController@updateDepotTable');
 
 Route::group(array('prefix' => 'TH'),function(){
+
+     Route::get('/depots/update-records' ,'THController@updateDepots');
 
    // Get all locations
    Route::any('/getAllDepots','THController@getAllDepots');

@@ -811,6 +811,8 @@ class HZ extends SupplierApi
 			$chunkedArray  = array_chunk($explodedArray, 110, false);
 			$supplierObject = Supplier::getSupplierIDByCode($this->supplierCode);
 			$countryArray = [];
+
+			$stationsAdded = 0;
 			if(!is_null($supplierObject)) {
 	            foreach ($chunkedArray as $key => $value) {
 	                if (count($value) > 1) {
@@ -830,7 +832,7 @@ class HZ extends SupplierApi
 						$countryObj = Country::where('countryCode', $country)->first();
 
 						$data = array(
-							'supplierID'   => $supplierObject->getSupplierID(),
+							'supplierID'   => $supplierObject->getId(),
 							'locationCode' => $oagCode,
 							'countryCode'  => is_null($countryObj) ? '0' : $countryObj->getId(),
 							'postCode'     => $zipCode,
@@ -851,12 +853,26 @@ class HZ extends SupplierApi
                     		'isAirport'    => strpos(strtolower($locDesc), 'airport') !== false ? 1 : 0,
 							'locationName' => htmlentities($locDesc)
 						);
-						$response = Depot::updateDepotRecord($data);
-	            	} else {
-	            		break;
+						$response = Depot::updateOrCreateDepot($data);
+
+						if (!$response["result"]) {
+							break;
+						}
+						else {
+							$stationsAdded++;
+						}
 	            	}
 	            }
         	}
+
+        	$result = array(
+				"success"   => $response["result"],
+				"message"   => $response["message"],
+				"rowsAdded" => $stationsAdded
+        	);
+
+        	return $result;
+
         } else {
         	 echo 'File does not exist';
         }	
@@ -922,8 +938,6 @@ class HZ extends SupplierApi
 						'locationName' => htmlentities($locDesc)
 					];
 
-            	} else {
-            		break;
             	}
             }
 

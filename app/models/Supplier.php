@@ -4,7 +4,7 @@ class Supplier extends BaseModel
 {
 	protected $table = 'supplier';
 
-	public function getSupplierID()
+	public function getId()
 	{
 	    return $this->attributes['supplierID'];
 	}

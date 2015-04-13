@@ -4,7 +4,7 @@ class TH extends SupplierApi
 {
     private $soapRequest;
 
-    const TIME_LIMIT  = 150;
+    const TIME_LIMIT  = 250;
     const VENDOR_CODE = 'ZT';
     const VENDOR_NAME = 'Thrifty';
     const VENDOR_CLASS_CODE = 'TH';
@@ -21,113 +21,20 @@ class TH extends SupplierApi
             'xmlns:xsi'     => 'http://www.w3.org/2001/XMLSchema-instance',
             'Target'        => Config::get('TH.api.target'),
             'Version'       => '2.000',
-            'PrimaryLangID' => Config::get('TH.api.primaryLangID'),
+            'PrimaryLangID' => Config::get('TH.AU.primaryLangID'),
             'POS'           => array(
                 'Source' => array(
+                    'ISOCountry' => 'AU',
+                    'ISOCurrency' => 'AUD',
                     'RequestorID' => array(
-                        'Type' => Config::get('TH.api.requestorIdType'),
-                        'ID'   => Config::get('TH.api.accountNumber')
+                        'Type' => Config::get('TH.AU.requestorIdType'),
+                        'ID'   => Config::get('TH.AU.accountNumber')
                     )
                 )
             )
         );
     }
-    
-    
-    
-    public function testRquestAu(){
-       
-       
-        $username = 'C||3103424||';
-        $password = '490INT0014';
-        $URL      = 'https://xmlweb.thrifty.com.au/thriftyens/Thrifty.OBS.Service.WebService.cls?wsdl';
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL,$URL);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 180); //timeout after 30 seconds
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
-        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-//        curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        $status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);   //get status code
-        $result=curl_exec ($ch);
                
-        echo '<pre> ' . __FILE__ . ':' . __LINE__ . '<br/>';
-        print_r($ch);
-        print_r( var_dump(curl_errno ( $ch )) );
-        print_r(var_dump( $status_code ));
-        print_r(var_dump( $result ) );
-        echo '</pre>';
-        
-        curl_close ($ch);
-        die;
-       
-       
-              
-       
-       
-        try {
-            $opts = array(
-                'http' => array(
-                    'user_agent' => 'PHPSoapClient'
-                ),                
-            );
-
-            // SOAP 1.2 client
-            $context = stream_context_create($opts);
-            $clientUrl = 'http://xmlwebdev.thrifty.com.au/csp/obsdevens/Thrifty.OBS.Service.WebService.cls';
-                      
-            $client =  new SoapClient(NULL, array(
-                'location'       => $clientUrl,
-                'uri'            => 'http://xmlwebdev.thrifty.com.au/',
-                'stream_context' => $context,
-                'cache_wsdl'     => WSDL_CACHE_NONE,
-                'trace'          => 1,
-                'exceptions'     => 1,                
-            ));
-                        
-            
-            
-            
-            
-
-            // Request core details
-            $requestCore = array(
-                'VehLocSearchCriterion' => array(
-                    'Address' => array(
-                        'CityName' => 'SYD'
-                    )
-                ),
-            );
-
-            // Set time limit for this one
-            set_time_limit(self::TIME_LIMIT);
-            
-            
-            
-            $data = $client->__soapCall('OTA_VehLocSearchRQ',array_merge($this->soapRequest, $requestCore));
-
-            die(__FILE__ . ':' . __LINE__ . "");
-            return $data;
-            
-//            $auth   = array(
-//                'UserName' => 'C||3103424||',
-//                'Password' => '490INT0014',                
-//            );
-//            $header = new SoapHeader('NAMESPACE', 'Auth', $auth, false);
-//            $client->__setSoapHeaders($header);
-            
-            return $client;
-            
-        } catch (Exception $e) {
-            // Do nothing
-            echo $e->getMessage();
-        }
-                
-       
-   }
-
-
     private function getSoapClient($url)
     {
         if (empty($url)) {
@@ -148,14 +55,47 @@ class TH extends SupplierApi
 
             // SOAP 1.2 client
             $context = stream_context_create($opts);
-            $clientUrl = Config::get('TH.api.url') . $url;
+            $clientUrl = Config::get('TH.US.url') . $url;
             
-            return new SoapClient($clientUrl, array(
+            $return =  new SoapClient($clientUrl, array(
                 'stream_context' => $context,
                 'cache_wsdl'     => WSDL_CACHE_NONE,
                 'trace'          => 1,
                 'exceptions'     => 1,
             ));
+            
+            return $return;
+        } catch (Exception $e) {
+            // Do nothing
+            echo $e->getMessage();
+        }
+    }
+    
+    private function getSoapClientAu()
+    {
+        try {
+            $opts = array(
+                'http' => array(
+                    'user_agent' => 'PHPSoapClient'
+                ),
+                'ssl'  => array(
+                    'ciphers'          => 'RC4-SHA',
+                    'verify_peer'      => false,
+                    'verify_peer_name' => false
+                )
+            );
+
+            // SOAP 1.2 client
+            $context = stream_context_create($opts);
+            set_time_limit(self::TIME_LIMIT);
+            $client = new SoapClient(Config::get('TH.AU.url') , array(
+                'stream_context' => $context,
+                'cache_wsdl'     => WSDL_CACHE_NONE,
+                'trace'          => 1,
+                 'exceptions'     => 1,
+            ));
+            
+            return $client;
             
         } catch (Exception $e) {
             // Do nothing
@@ -175,61 +115,51 @@ class TH extends SupplierApi
         $returnLocationCode, 
         $countryCode, 
         $driverAge
-    ){        
-        $result         = array();
-        $timeStart      = time();
-        $acrissHelper   = new \AcrissHelper();        
-        $client         = $this->getSoapClient('RateService.svc?wsdl');
-        
+    ) {        
+        $result       = array();
+        $timeStart    = time();
+        $acrissHelper = new \AcrissHelper();        
+        $client       = $this->getSoapClientAu();
+                
         if (empty($client)) {
             return false;
         }
-
+        
         $requestCore = array(
-            'VehAvailRQCore' => array(
-                'VehRentalCore' => array(
-                    'PickUpDateTime' => date('Y-m-d\TH:i:s', strtotime($pickUpDate . ' ' . $pickUpTime)),
-                    'ReturnDateTime' => date('Y-m-d\TH:i:s', strtotime($returnDate . ' ' . $returnTime)),
-                    'PickUpLocation' => array(
-//                        'LocationCode' => 'SYD', //
-//                        'ExtendedLocationCode' => $pickUpLocationCode,
-                        'LocationCode' => $pickUpLocationCode,
+            'request' => array(
+                'VehAvailRQCore' => array(
+                    'VehRentalCore' => array(
+                        'PickUpDateTime' => date('Y-m-d\TH:i:s', strtotime($pickUpDate . ' ' . $pickUpTime)),
+                        'ReturnDateTime' => date('Y-m-d\TH:i:s', strtotime($returnDate . ' ' . $returnTime)),
+                        'PickUpLocation' => $pickUpLocationCode,
+                        'ReturnLocation' => $returnLocationCode,                        
+                        'DriverType'     => array(
+                            'Age' => $driverAge
+                        ),
                     ),
-                    'ReturnLocation' => array(
-//                        'LocationCode' => 'SYD',
-//                        'ExtendedLocationCode' => $returnLocationCode,
-                        'LocationCode' => $returnLocationCode,
-                    )
                 ),
-                'VendorPrefs'   => array(
-                    'VendorPref' => array(
-                        'Code' => 'ZT'
-                    )
-                )
             )
         );
 
         set_time_limit(self::TIME_LIMIT);
-        $data = $client->GetRates(array(
-            'OTA_VehAvailRateRQ' => array_merge($this->soapRequest, $requestCore)
-        ));
-        
+        $data = $client->VehAvailRate($requestCore);
+                    
         if(isset($data->OTA_VehAvailRateRS->Errors)){
             return $data;
         }
-       
+               
         // Get the results
-        $vehAvails = $data->OTA_VehAvailRateRS
+        $vehAvails = $data->VehAvailRateResult
                         ->VehAvailRSCore
                         ->VehVendorAvails
                         ->VehVendorAvail
                         ->VehAvails
                         ->VehAvail;
                 
-        if ( isset($data->OTA_VehAvailRateRS->Success) ){
+        if (isset($data->VehAvailRateResult->Success)) {
             $result['status'] = 'OK';
-            foreach ( $vehAvails as $vehAvail 
-            ){                               
+
+            foreach ($vehAvails as $vehAvail) {
                 $result['data'][] = array(
                     'supplierCode' => self::VENDOR_CLASS_CODE,
                     'hasAirCondition' => $vehAvail->VehAvailCore->Vehicle->AirConditionInd,
@@ -239,8 +169,8 @@ class TH extends SupplierApi
                     ),
                     'baggageQty' => $vehAvail->VehAvailCore->Vehicle->BaggageQuantity,
                     'co2Qty' => 'N/A',
-                    'categoryCode' => $vehAvail->VehAvailCore->Vehicle->Code,
-                    'expandedCode' => $acrissHelper->expandCode($vehAvail->VehAvailCore->Vehicle->Code),
+                    'categoryCode' => $vehAvail->VehAvailCore->Vehicle->VehMakeModel->Code,
+                    'expandedCode' => $acrissHelper->expandCode($vehAvail->VehAvailCore->Vehicle->VehMakeModel->Code),
                     'doorCount' => 'N/A',
                     'name' => $vehAvail->VehAvailCore->Vehicle->VehMakeModel->Name,
                     'seats' => $vehAvail->VehAvailCore->Vehicle->PassengerQuantity,
@@ -251,13 +181,13 @@ class TH extends SupplierApi
                     'maxAge' => 'N/A',
                     'minAge' => 'N/A',
                     'rateId' => 'N/A',
-                    'basePrice' => $vehAvail->VehAvailCore->RentalRate->VehicleCharges->VehicleCharge->Amount,
-                    'currency' => $vehAvail->VehAvailCore->RentalRate->VehicleCharges->VehicleCharge->CurrencyCode,
-                    'bookingCurrencyOfTotalRateEstimate' => $vehAvail->VehAvailCore->RentalRate->VehicleCharges->VehicleCharge->CurrencyCode,
-                    'xrsBasePrice' => $vehAvail->VehAvailCore->RentalRate->VehicleCharges->VehicleCharge->Amount,
-                    'xrsBasePriceInBookingCurrency' => $vehAvail->VehAvailCore->RentalRate->VehicleCharges->VehicleCharge->Amount,
-                    'totalRateEstimate' => $vehAvail->VehAvailCore->RentalRate->VehicleCharges->VehicleCharge->Amount,
-                    'totalRateEstimateInBookingCurrency' => $vehAvail->VehAvailCore->RentalRate->VehicleCharges->VehicleCharge->Amount,
+                    'basePrice' => 'N/A',
+                    'currency' => 'N/A',
+                    'bookingCurrencyOfTotalRateEstimate' => 'N/A',
+                    'xrsBasePrice' => 'N/A',
+                    'xrsBasePriceInBookingCurrency' => 'N/A',
+                    'totalRateEstimate' => 'N/A',
+                    'totalRateEstimateInBookingCurrency' => 'N/A',
                 );
             }
         }   
@@ -265,6 +195,7 @@ class TH extends SupplierApi
         // before the return keyword
         $result['executionTime'] = time() - $timeStart;
         $result['supplierCode']  = self::VENDOR_CLASS_CODE;
+
         return $result;
     }
 
@@ -272,26 +203,17 @@ class TH extends SupplierApi
      *
      * @return boolean|unknown
      */
-    public function getLocations()
+    public function vehLocDetailsNotif()
     {
-        $requestCore = array(
-            'Vendor' => array(
-                'Code' => self::VENDOR_CODE
-            )
-        );
-        $client = $this->getSoapClient('LocationService.svc?wsdl');
+        $client = $this->getSoapClientAu();
         
-        if (empty($client)) {
+        if (empty($client)) {            
             return false;
         }
 
         // Set time limit for this one
         set_time_limit(self::TIME_LIMIT);
-
-        $data = $client->GetAllLocations(array(
-            'OTA_VehLocSearchRQ' => array_merge($this->soapRequest, $requestCore)
-        ));
-
+        $data = $client->VehLocDetailsNotif();
         return $data;
     }
 
@@ -310,9 +232,9 @@ class TH extends SupplierApi
                 'CodeRef'        => array(
                     'LocationCode' => $locationCode
                 ),
-                'RefPoint'       => array($locationCode)
+                'RefPoint' => array($locationCode)
             ),
-            'Vendor'                => array(
+            'Vendor' => array(
                 'Code' => self::VENDOR_CODE
             )
         );
@@ -376,7 +298,7 @@ class TH extends SupplierApi
         $pickUpLocation, 
         $returnLocation, 
         $carCategory
-    ){
+    ) {
         $client = $this->getSoapClient('RateService.svc?wsdl');
         
         if (empty($client)) {
@@ -437,8 +359,9 @@ class TH extends SupplierApi
         $returnTime,
         $pickUpLocationCode, 
         $returnLocationCode, 
-        $carCategory
-    ){
+        $carCategory,
+        $inetId
+    ) {
         $client = $this->getSoapClient('ReservationService.svc?wsdl');
         
         if (empty($client)) {
@@ -453,13 +376,9 @@ class TH extends SupplierApi
                     'ReturnDateTime' => date('Y-m-d\TH:i:s', strtotime($returnDate . ' ' . $returnTime)),
                     'PickUpLocation' => array(
                         'LocationCode' => $pickUpLocationCode,
-//                        'LocationCode'         => 'LAX', //
-//                        'ExtendedLocationCode' => 'ATLC61',
                     ),
                     'ReturnLocation' => array(
                         'LocationCode' => $returnLocationCode,
-//                        'LocationCode'         => 'LAX',
-//                        'ExtendedLocationCode' => 'ATLC61',
                     )
                 ),
                 'Customer' => array(
@@ -483,7 +402,7 @@ class TH extends SupplierApi
             'VehResRQInfo' => array(
                 'Reference' => array(
                     'Type'       => '8',
-                    'ID'         => '11451964',
+                    'ID'         => $inetId,
                     'ID_Context' => 'InetID',                    
                 )
             )
@@ -494,14 +413,7 @@ class TH extends SupplierApi
         $data = $client->MakeReservation(array(
             'OTA_VehResRQ' => array_merge($this->soapRequest, $requestCore)
         ));
-        
-        
-        echo '<pre> ' . __FILE__ . ':' . __LINE__ . '<br/>';
-        print_r( str_replace('>','><br/>', htmlentities( $client->__getLastRequest() )));
-        print_r($data);
-        echo '</pre>';
-        die;
-
+            
         return $data;
     }
 
@@ -524,8 +436,8 @@ class TH extends SupplierApi
                 ),
             ),
             'VehRetResRQInfo' => array(
-                'Vendor'    => array(
-                    'Code'             => self::VENDOR_CODE,
+                'Vendor' => array(
+                    'Code' => self::VENDOR_CODE,
                     'CompanyShortName' => self::VENDOR_NAME,
                 ),
                 'Telephone' => array(
@@ -603,98 +515,53 @@ class TH extends SupplierApi
      * @param type $driverAge
      * @return boolean
      */
-    public function searchVehicles2007A(
+    public function vehAvailRate(
         $pickUpDate, 
         $pickUpTime, 
         $returnDate, 
         $returnTime, 
         $pickUpLocationCode, 
-        $returnLocationCode, 
-        $countryCode, 
+        $returnLocationCode,
         $driverAge
-    ){        
-        $result         = array();
-        $timeStart      = time();
-        $acrissHelper   = new \AcrissHelper();        
-        $client         = $this->getSoapClient('RateService.svc?wsdl');
+    ) {        
+        $result       = array();
+        $timeStart    = time();
+        $acrissHelper = new \AcrissHelper();
+        $client       = $this->getSoapClientAu();
         
         if (empty($client)) {
             return false;
         }
-
+        
         $requestCore = array(
-            'VehAvailRQCore' => array(
-                'VehRentalCore' => array(
-                    'PickUpDateTime' => date('Y-m-d\TH:i:s', strtotime($pickUpDate . ' ' . $pickUpTime)),
-                    'ReturnDateTime' => date('Y-m-d\TH:i:s', strtotime($returnDate . ' ' . $returnTime)),
-                    'PickUpLocation' => array(
-                        'LocationCode' => $pickUpLocationCode,
-                    ),
-                    'ReturnLocation' => array(
-                        'LocationCode' => $returnLocationCode,
+            'request' => array(
+                'VehAvailRQCore' => array(
+                    'VehRentalCore' => array(
+                        'PickUpDateTime' => date('Y-m-d\TH:i:s', strtotime($pickUpDate . ' ' . $pickUpTime)),
+                        'ReturnDateTime' => date('Y-m-d\TH:i:s', strtotime($returnDate . ' ' . $returnTime)),
+                        'PickUpLocation' => $pickUpLocationCode,
+                        'ReturnLocation' => $returnLocationCode,                        
+                        'DriverType'     => array(
+                            'Age' => $driverAge,
+                        ),
+                        'RateQualifier' => array(
+                            'RateQualifier' => 'True',
+                        ), 
+                        'TPA_Extensions' => array(
+                            'SingleQuote' => 'True',
+                        ),
                     ),
                 ),
             )
         );
 
         set_time_limit(self::TIME_LIMIT);
-        $data = $client->OTA_VehAvailRateRQ(array_merge($this->soapRequest, $requestCore));
+        $data = $client->VehAvailRate($requestCore);
         
-        return $data;
-        /*
-        // Get the results
-        $vehAvails = $data->OTA_VehAvailRateRS
-                        ->VehAvailRSCore
-                        ->VehVendorAvails
-                        ->VehVendorAvail
-                        ->VehAvails
-                        ->VehAvail;
-                
-        if ( isset($data->OTA_VehAvailRateRS->Success) ){
-            $result['status'] = 'OK';
-            foreach ( $vehAvails as $vehAvail 
-            ){                               
-                $result['data'][] = array(
-                    'supplierCode' => self::VENDOR_CLASS_CODE,
-                    'hasAirCondition' => $vehAvail->VehAvailCore->Vehicle->AirConditionInd,
-                    'transmission' => array(
-                        'code'        => $this->transmitionCode[$vehAvail->VehAvailCore->Vehicle->TransmissionType],
-                        'description' => "{$vehAvail->VehAvailCore->Vehicle->TransmissionType} Transmission"
-                    ),
-                    'baggageQty' => $vehAvail->VehAvailCore->Vehicle->BaggageQuantity,
-                    'co2Qty' => 'N/A',
-                    'categoryCode' => $vehAvail->VehAvailCore->Vehicle->Code,
-                    'expandedCode' => $acrissHelper->expandCode($vehAvail->VehAvailCore->Vehicle->Code),
-                    'doorCount' => 'N/A',
-                    'name' => $vehAvail->VehAvailCore->Vehicle->VehMakeModel->Name,
-                    'seats' => $vehAvail->VehAvailCore->Vehicle->PassengerQuantity,
-                    'vehicleStatus' => array(
-                        'code'        => 'N/A',
-                        'description' => 'N/A'
-                    ),
-                    'maxAge' => 'N/A',
-                    'minAge' => 'N/A',
-                    'rateId' => 'N/A',
-                    'basePrice' => $vehAvail->VehAvailCore->RentalRate->VehicleCharges->VehicleCharge->Amount,
-                    'currency' => $vehAvail->VehAvailCore->RentalRate->VehicleCharges->VehicleCharge->CurrencyCode,
-                    'bookingCurrencyOfTotalRateEstimate' => $vehAvail->VehAvailCore->RentalRate->VehicleCharges->VehicleCharge->CurrencyCode,
-                    'xrsBasePrice' => $vehAvail->VehAvailCore->RentalRate->VehicleCharges->VehicleCharge->Amount,
-                    'xrsBasePriceInBookingCurrency' => $vehAvail->VehAvailCore->RentalRate->VehicleCharges->VehicleCharge->Amount,
-                    'totalRateEstimate' => $vehAvail->VehAvailCore->RentalRate->VehicleCharges->VehicleCharge->Amount,
-                    'totalRateEstimateInBookingCurrency' => $vehAvail->VehAvailCore->RentalRate->VehicleCharges->VehicleCharge->Amount,
-                );
-            }
-        }   
-        
-        // before the return keyword
-        $result['executionTime'] = time() - $timeStart;
-        $result['supplierCode']  = self::VENDOR_CLASS_CODE;
-        return $result;
-         * 
-         */
+        return $data;        
     }
     
-    public function createBooking2007A(
+    public function vehRes(
         $pickUpDate, 
         $pickUpTime, 
         $returnDate,
@@ -702,7 +569,7 @@ class TH extends SupplierApi
         $pickUpLocationCode, 
         $returnLocationCode, 
         $carCategory
-    ){
+    ) {
         $client = $this->getSoapClient('ReservationService.svc?wsdl');
         
         if (empty($client)) {
@@ -721,12 +588,12 @@ class TH extends SupplierApi
                         'LocationCode' => $returnLocationCode,
                     ),
                 ),
-                'Customer'          => array(
+                'Customer' => array(
                     'Primary' => array(
                         'BirthDate'  => '1989-01-01',
                         'PersonName' => array(
                             'GivenName' => 'TEST', // Todo : Add real values
-                            'Surname'   => 'TESTER',
+                            'Surname' => 'TESTER',
                         ),
                         'Email' => array('test@test.com'),
                     )
@@ -771,7 +638,7 @@ class TH extends SupplierApi
                 ),
                 'PersonName' => array(
                     'GivenName' => 'test',
-                    'Surname'   => 'tester'
+                    'Surname' => 'tester'
                 ),
             ),            
         );
@@ -841,26 +708,19 @@ class TH extends SupplierApi
         return $data;
     }
     
-    public function locationDetail2007A($location)
-    {   
-        $client = $this->getSoapClient('ReservationService.svc?wsdl');
-        
-        if (empty($client)) {
-            return false;
-        }
-        
-        // Request core details
-        $requestCore = array(
-            'Location' => array(
-                'Code' => array($location),
-            ),            
-        );
-
-        // Set time limit for this one
-        set_time_limit(self::TIME_LIMIT);
-        $data = $client->OTA_VehLocDetailRQ(array_merge($this->soapRequest, $requestCore));
-
-        return $data;
+    public function vehLocDetail($location)
+    {           
+        $client = $this->getSoapClientAu();
+                
+        $return = $client->VehLocDetail(array(
+            'Request' => array(
+                'Location' => array(
+                    'LocationCode' => $location
+                )
+            )
+        ));
+       
+        return $return;
     }
     
 }   
