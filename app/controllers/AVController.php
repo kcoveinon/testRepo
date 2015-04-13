@@ -35,7 +35,6 @@ class AVController extends BaseController
 		$vehicleCategory,
 		$vehicleClass
 	) {
-
 		$result = $this->supplierApi->searchVehicles(
 			$pickUpDate,
 			$pickUpTime,
@@ -53,13 +52,12 @@ class AVController extends BaseController
 
 	/**
 	 * @param $locationCode
-	 * @param $countryCode
 	 *
 	 * @return mixed
 	 */
-	public function getVehicleLocations($locationCode, $countryCode)
+	public function getDepotsByCity($locationCode)
 	{
-		$result = $this->supplierApi->getLocations($locationCode, $countryCode);
+		$result = $this->supplierApi->getDepots($locationCode);
 
 		return Response::json($result);
 	}
@@ -214,6 +212,12 @@ class AVController extends BaseController
 			$vehicleClass
 		);
 
+		return Response::json($result);
+	}
+
+	public function ping()
+	{
+		$result = $this->supplierApi->ping();
 		return Response::json($result);
 	}
 }

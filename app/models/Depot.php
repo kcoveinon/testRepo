@@ -255,7 +255,7 @@ class Depot extends BaseModel
 
             if (empty($depoObject)) {
                 $depoObject = new Depot();
-            } 
+            }
 
             $depoObject->setSupplierId($data["supplierID"]);
             $depoObject->setCountryId($data["countryCode"]);

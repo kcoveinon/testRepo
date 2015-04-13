@@ -52,13 +52,12 @@ class BGController extends BaseController
 
 	/**
 	 * @param $locationCode
-	 * @param $countryCode
 	 *
 	 * @return mixed
 	 */
-	public function getVehicleLocations($locationCode, $countryCode)
+	public function getDepotsByCity($locationCode)
 	{
-		$result = $this->supplierApi->getLocations($locationCode, $countryCode);
+		$result = $this->supplierApi->getDepots($locationCode);
 
 		return Response::json($result);
 	}

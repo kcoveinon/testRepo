@@ -10,10 +10,10 @@ class BG extends SupplierApi
 	private $version;
 	private $authUrl;
 
-	const TIME_LIMIT                 = 150;
 	const VENDOR_CODE                = 'BG';
 	const VENDOR_NAME                = 'Budget';
 	const VENDOR_CLASS_CODE          = 'BG';
+	const VERSION                    = '1.0';
 
 	const SEARCH_VEHICLE_ACTION      = 'OTA_VehAvailRateRQ';
 	const BOOK_VEHICLE_ACTION        = 'OTA_VehResRQ';
@@ -29,11 +29,8 @@ class BG extends SupplierApi
 	const DEFAULT_REQUEST_TYPE       = '1';
 	const DEFAULT_CODE_CONTEXT       = 'IATA';
 	const DEFAULT_REQUEST_STATUS     = 'Available';
-	const DEFAULT_MAX_RESPONSE       = '10';
+	const DEFAULT_MAX_RESPONSE       = '1000';
 
-	/**
-	 *
-	 */
 	public function __construct ()
 	{
 		$this->target          = Config::get(self::VENDOR_CODE . '.api.target');
@@ -46,49 +43,65 @@ class BG extends SupplierApi
 		$this->version         = Config::get(self::VENDOR_CODE . '.api.version');
 		$this->authUrl         = Config::get(self::VENDOR_CODE . '.api.authUrl');
 
-		$this->soapClient = new SoapClient( null, array(
+		$this->soapClient = new SoapClient(null, array(
 			'location' => $this->apiLocation,
 			'uri'      => $this->apiUri,
-			'trace'    => 1,
-			'features' => SOAP_LITERAL
-		) );
+			'trace'    => 1
+		));
+	}
+
+	public function ping()
+	{
+		/*$params = new stdClass();
+		$params->OTA_PingRQ = new stdClass();
+		$params->OTA_PingRQ->Version = '1.0';
+		$params->EchoData = new stdClass();
+		$params->EchoData = 'Hello World';
+		$params->OTA_PingRQ->EchoData = $params->EchoData;*/
+
+		$this->setSoapHeader();
+		//header("Content-Type:text/xml");
+		$echoData = "Hi, Hello World - Budget";
+		try {
+			return $this->soapClient->__soapCall('Request',
+				array(
+					new SoapVar('<OTA_PingRQ Version="1.0">', XSD_ANYXML),
+					new SoapParam($echoData, 'EchoData'),
+					new SoapVar('</OTA_PingRQ>', XSD_ANYXML)
+				));
+		} catch (SoapFault $e) {
+			echo $this->soapClient->__getLastRequest();
+		}
 	}
 
 	/**
-	 * @param        $locationCode
-	 * @param string $countryCode
+	 * @param $locationCode
 	 *
 	 * @return array
 	 */
-	public function getLocations($locationCode, $countryCode = 'AU')
+	public function getDepots($locationCode)
 	{
 		$timeStart = time();
-		$soapVar = $this->otaRQNode(self::GET_LOCATION_SEARCH_ACTION, true).
-			           "<VehLocSearchCriterion>
-							<Address>
-								<CityName>{$locationCode}</CityName>
-								<CountryName Code='{$countryCode}'/>
-							</Address>
-							<Radius DistanceMax='40' DistanceMeasure='Miles'/>
-						</VehLocSearchCriterion>
-						<Vendor Code='".self::VENDOR_NAME."'/>
-						<TPA_Extensions>
-							<SortOrderType>DESCENDING</SortOrderType>
-							<TestLocationType>NO</TestLocationType>
-							<LocationStatusType>OPEN</LocationStatusType>
-							<LocationType>RENTAL</LocationType>
-						</TPA_Extensions>".
-		           $this->otaRQNode(self::GET_LOCATION_SEARCH_ACTION, false);
 
 		if (!empty($locationCode)) {
-			$params = new SoapVar($soapVar, XSD_ANYXML);
 			$this->setSoapHeader();
-			$this->soapClient->Request($params);
+			$this->soapClient->__soapCall('Request',
+				array(
+					new SoapVar($this->otaRQNode(self::GET_LOCATION_SEARCH_ACTION, true), XSD_ANYXML),
+					new SoapVar("<VehLocSearchCriterion>", XSD_ANYXML),
+					new SoapVar("<CodeRef CodeContext='apo' LocationCode='{$locationCode}'/>", XSD_ANYXML),
+					new SoapVar('</VehLocSearchCriterion>', XSD_ANYXML),
+					new SoapVar("<Vendor Code='".self::VENDOR_NAME."'/>", XSD_ANYXML),
+					new SoapVar($this->otaRQNode(self::GET_LOCATION_SEARCH_ACTION, false), XSD_ANYXML)
+				)
+			);
+
+			//echo htmlentities($this->soapClient->__getLastRequest());die;
 			$parseResponse = $this->parseResponse($this->soapClient->__getLastResponse());
 
 			$response = [];
 			if (isset($parseResponse->OTA_VehLocSearchRS->Errors)) {
-				$response['status'] =  "Failed";
+				$response['status'] = "Failed";
 				$response['data']   = (string) $parseResponse->OTA_VehLocSearchRS->Errors->Error;
 			} else {
 				$response = $parseResponse->OTA_VehLocSearchRS; // TODO need to send only required information
@@ -126,44 +139,44 @@ class BG extends SupplierApi
 		$countryCode = 'AU',
 		$vehicleCategory = 1,
 		$vehicleClass = 3
-	)
-	{
+	) {
 		$timeStart = time();
 
 		$pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
 		$returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
 
-		$soapVar = $this->otaRQNode(self::SEARCH_VEHICLE_ACTION, true).
-						"<VehAvailRQCore Status='".self::DEFAULT_REQUEST_STATUS."'>
-	                        <VehRentalCore PickUpDateTime='{$pickUpDateTime}' ReturnDateTime='{$returnDateTime}'>
-	                            <PickUpLocation LocationCode='{$pickUpLocationCode}'/>
-	                            <ReturnLocation LocationCode='{$returnLocationCode}'/>
-	                        </VehRentalCore>
-	                        <VendorPrefs>
-	                            <VendorPref CompanyShortName='".self::VENDOR_NAME."'/>
-	                        </VendorPrefs>
-	                        <VehPrefs>
-		                        <VehPref ClassPref='Preferred' TransmissionPref='Preferred' TransmissionType='Automatic' TypePref='Preferred'>
-		                            <VehType VehicleCategory='{$vehicleCategory}'/>
-		                            <VehClass Size='{$vehicleClass}'/>
-		                        </VehPref>
-	                        </VehPrefs>
-	                    </VehAvailRQCore>
-	                    <VehAvailRQInfo>
-	                        <Customer>
-	                            <Primary>
-	                                <CitizenCountryName Code='{$countryCode}'/>
-	                            </Primary>
-	                        </Customer>
-	                    </VehAvailRQInfo>".
-					$this->otaRQNode(self::SEARCH_VEHICLE_ACTION, false);
-
 		if ($this->validateDate($pickUpDate, $pickUpTime)
 		    && $this->validateDate($returnDate, $returnTime)
 		) {
-			$params = new SoapVar($soapVar, XSD_ANYXML);
 			$this->setSoapHeader();
-			$this->soapClient->Request($params);
+			$this->soapClient->__soapCall('Request',
+				array(
+					new SoapVar($this->otaRQNode(self::SEARCH_VEHICLE_ACTION, true), XSD_ANYXML),
+					new SoapVar("<VehAvailRQCore Status='Available'>", XSD_ANYXML),
+					new SoapVar("<VehRentalCore PickUpDateTime='{$pickUpDateTime}' ReturnDateTime='{$returnDateTime}'>", XSD_ANYXML),
+					new SoapVar("<PickUpLocation LocationCode='{$pickUpLocationCode}'/>", XSD_ANYXML),
+					new SoapVar("<ReturnLocation LocationCode='{$returnLocationCode}'/>", XSD_ANYXML),
+					new SoapVar("</VehRentalCore>", XSD_ANYXML),
+					new SoapVar('<VendorPrefs>', XSD_ANYXML),
+					new SoapVar("<VendorPref CompanyShortName='".self::VENDOR_NAME."'/>", XSD_ANYXML),
+					new SoapVar('</VendorPrefs>', XSD_ANYXML),
+					new SoapVar('<VehPrefs>', XSD_ANYXML),
+					new SoapVar("<VehPref ClassPref='Preferred' TransmissionPref='Preferred' TransmissionType='Automatic' TypePref='Preferred'>", XSD_ANYXML),
+					new SoapVar("<VehType VehicleCategory='{$vehicleCategory}'/>", XSD_ANYXML),
+					new SoapVar("<VehClass Size='{$vehicleClass}'/>", XSD_ANYXML),
+					new SoapVar('</VehPref>', XSD_ANYXML),
+					new SoapVar('</VehPrefs>', XSD_ANYXML),
+					new SoapVar("</VehAvailRQCore>", XSD_ANYXML),
+					new SoapVar('<VehAvailRQInfo>', XSD_ANYXML),
+					new SoapVar('<Customer>', XSD_ANYXML),
+					new SoapVar('<Primary>', XSD_ANYXML),
+					new SoapVar("<CitizenCountryName Code='{$countryCode}'/>", XSD_ANYXML),
+					new SoapVar('</Primary>', XSD_ANYXML),
+					new SoapVar('</Customer>', XSD_ANYXML),
+					new SoapVar('</VehAvailRQInfo>', XSD_ANYXML),
+					new SoapVar($this->otaRQNode(self::SEARCH_VEHICLE_ACTION, false), XSD_ANYXML)
+				)
+			);
 			$parseResponse = $this->parseResponse($this->soapClient->__getLastResponse());
 
 			$response = [];
@@ -216,36 +229,37 @@ class BG extends SupplierApi
 		$pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
 		$returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
 
-		$soapVar = $this->otaRQNode(self::BOOK_VEHICLE_ACTION, true).
-			           "<VehResRQCore Status='".self::DEFAULT_REQUEST_STATUS."'>
-							<VehRentalCore PickUpDateTime='{$pickUpDateTime}' ReturnDateTime='{$returnDateTime}'>
-								<PickUpLocation LocationCode='{$pickUpLocationCode}'/>
-								<ReturnLocation LocationCode='{$returnLocationCode}'/>
-							</VehRentalCore>
-							<Customer>
-								<Primary>
-									<PersonName>
-										<GivenName>{$firstName}</GivenName>
-										<Surname>{$lastName}</Surname>
-									</PersonName>
-									<CitizenCountryName Code='{$countryCode}'/>
-								</Primary>
-							</Customer>
-							<VendorPref CompanyShortName='".self::VENDOR_NAME."'/>
-							<VehPref TypePref='Only' ClassPref='Only' TransmissionType='Automatic' TransmissionPref='Only' AirConditionPref='Only'>
-								<VehType VehicleCategory='{$vehicleCategory}'/>
-								<VehClass Size='{$vehicleClass}'/>
-							</VehPref>
-							<RateQualifier RateQualifier='2A'/>
-						</VehResRQCore>".
-		           $this->otaRQNode(self::BOOK_VEHICLE_ACTION, false);
-
 		if ($this->validateDate($pickUpDate, $pickUpTime)
 		    && $this->validateDate($returnDate, $returnTime)
 		) {
-			$params = new SoapVar($soapVar, XSD_ANYXML);
 			$this->setSoapHeader();
-			$this->soapClient->Request($params);
+			$this->soapClient->__soapCall('Request',
+				array(
+					new SoapVar($this->otaRQNode(self::BOOK_VEHICLE_ACTION, true), XSD_ANYXML),
+					new SoapVar("<VehResRQCore Status='Available'>", XSD_ANYXML),
+					new SoapVar("<VehRentalCore PickUpDateTime='{$pickUpDateTime}' ReturnDateTime='{$returnDateTime}'>", XSD_ANYXML),
+					new SoapVar("<PickUpLocation LocationCode='{$pickUpLocationCode}'/>", XSD_ANYXML),
+					new SoapVar("<ReturnLocation LocationCode='{$returnLocationCode}'/>", XSD_ANYXML),
+					new SoapVar("</VehRentalCore>", XSD_ANYXML),
+					new SoapVar('<Customer>', XSD_ANYXML),
+					new SoapVar('<Primary>', XSD_ANYXML),
+					new SoapVar('<PersonName>', XSD_ANYXML),
+					new SoapParam($firstName, 'GivenName'),
+					new SoapParam($lastName, 'Surname'),
+					new SoapVar('</PersonName>', XSD_ANYXML),
+					new SoapVar("<CitizenCountryName Code='{$countryCode}'/>", XSD_ANYXML),
+					new SoapVar('</Primary>', XSD_ANYXML),
+					new SoapVar('</Customer>', XSD_ANYXML),
+					new SoapVar("<VendorPref CompanyShortName='".self::VENDOR_NAME."'/>", XSD_ANYXML),
+					new SoapVar("<VehPref TypePref='Only' ClassPref='Only' TransmissionType='Automatic' TransmissionPref='Only' AirConditionPref='Only'>", XSD_ANYXML),
+					new SoapVar("<VehType VehicleCategory='{$vehicleCategory}'/>", XSD_ANYXML),
+					new SoapVar("<VehClass Size='{$vehicleClass}'/>", XSD_ANYXML),
+					new SoapVar('</VehPref>', XSD_ANYXML),
+					new SoapVar("<RateQualifier RateQualifier='2A'/>", XSD_ANYXML),
+					new SoapVar('</VehResRQCore>', XSD_ANYXML),
+					new SoapVar($this->otaRQNode(self::BOOK_VEHICLE_ACTION, false), XSD_ANYXML)
+				)
+			);
 			$parseResponse = $this->parseResponse($this->soapClient->__getLastResponse());
 
 			$response = [];
@@ -275,33 +289,34 @@ class BG extends SupplierApi
 	{
 		$timeStart = time();
 
-		$soapVar = $this->otaRQNode(self::GET_BOOKING_INFO_ACTION, true).
-		           "<VehRetResRQCore>
-						<UniqueID Type='14' ID='{$bookingId}'/>
-						<PersonName>
-							<Surname>{$surname}</Surname>
-						</PersonName>
-					</VehRetResRQCore>
-					<VehRetResRQInfo>
-						<Vendor CompanyShortName='".self::VENDOR_NAME."'/>
-					</VehRetResRQInfo>".
-		           $this->otaRQNode(self::GET_BOOKING_INFO_ACTION, false);
-
 		if (!empty($bookingId)) {
-			$params = new SoapVar($soapVar, XSD_ANYXML);
 			$this->setSoapHeader();
-			$this->soapClient->Request($params);
+			$this->soapClient->__soapCall('Request',
+				array(
+					new SoapVar($this->otaRQNode(self::GET_BOOKING_INFO_ACTION, true), XSD_ANYXML),
+					new SoapVar("<VehRetResRQCore>", XSD_ANYXML),
+					new SoapVar("<UniqueID Type='14' ID='{$bookingId}'/>", XSD_ANYXML),
+					new SoapVar('<PersonName>', XSD_ANYXML),
+					new SoapParam($surname, 'Surname'),
+					new SoapVar('</PersonName>', XSD_ANYXML),
+					new SoapVar('</VehRetResRQCore>', XSD_ANYXML),
+					new SoapVar('<VehRetResRQInfo>', XSD_ANYXML),
+					new SoapVar("<Vendor CompanyShortName='".self::VENDOR_NAME."'/>", XSD_ANYXML),
+					new SoapVar('</VehRetResRQInfo>', XSD_ANYXML),
+					new SoapVar($this->otaRQNode(self::GET_BOOKING_INFO_ACTION, false), XSD_ANYXML)
+				)
+			);
 			$parseResponse = $this->parseResponse($this->soapClient->__getLastResponse());
 
 			$response = [];
 			if (isset($parseResponse->OTA_VehRetResRS->Errors)) {
-				$response['status'] =  "Failed";
+				$response['status'] = "Failed";
 				$response['data']   = (string) $parseResponse->OTA_VehRetResRS->Errors->Error;
 			} else {
 				$response = $parseResponse->OTA_VehRetResRS; // TODO need to send only required information
 			}
 		} else {
-			$response =  ["result" => "Invalid Parameters"];
+			$response = ["result" => "Invalid Parameters"];
 		}
 
 		$response['executionTime'] = time() - $timeStart;
@@ -345,35 +360,36 @@ class BG extends SupplierApi
 		$pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
 		$returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
 
-		$soapVar = $this->otaRQNode(self::MODIFY_BOOKING_ACTION, true).
-		           "<VehModifyRQCore ModifyType='Modify'>
-						<UniqueID Type='14' ID='{$bookingId}'/>
-						<VehRentalCore PickUpDateTime='{$pickUpDateTime}' ReturnDateTime='{$returnDateTime}'>
-							<PickUpLocation LocationCode='{$pickUpLocationCode}'/>
-							<ReturnLocation LocationCode='{$returnLocationCode}'/>
-						</VehRentalCore>
-						<Customer>
-							<Primary>
-								<PersonName>
-									<GivenName>{$firstName}</GivenName>
-									<Surname>{$lastName}</Surname>
-								</PersonName>
-								<CitizenCountryName Code='{$countryCode}'/>
-							</Primary>
-						</Customer>
-						<VendorPref CompanyShortName='".self::VENDOR_NAME."'/>
-						<VehPref TypePref='Only' ClassPref='Only' TransmissionType='Automatic' TransmissionPref='Only' AirConditionPref='Only'>
-							<VehType VehicleCategory='{$vehicleCategory}'/>
-							<VehClass Size='{$vehicleClass}'/>
-						</VehPref>
-						<RateQualifier RateCategory='3' RateQualifier='2A'/>
-					</VehModifyRQCore>".
-		           $this->otaRQNode(self::MODIFY_BOOKING_ACTION, false);
-
 		if (!empty($bookingId)) {
-			$params = new SoapVar($soapVar, XSD_ANYXML);
 			$this->setSoapHeader();
-			$this->soapClient->Request($params);
+			$this->soapClient->__soapCall('Request',
+				array(
+					new SoapVar($this->otaRQNode(self::MODIFY_BOOKING_ACTION, true), XSD_ANYXML),
+					new SoapVar("<VehModifyRQCore ModifyType='Modify'>", XSD_ANYXML),
+					new SoapVar("<UniqueID Type='14' ID='{$bookingId}'/>", XSD_ANYXML),
+					new SoapVar("<VehRentalCore PickUpDateTime='{$pickUpDateTime}' ReturnDateTime='{$returnDateTime}'>", XSD_ANYXML),
+					new SoapVar("<PickUpLocation LocationCode='{$pickUpLocationCode}'/>", XSD_ANYXML),
+					new SoapVar("<ReturnLocation LocationCode='{$returnLocationCode}'/>", XSD_ANYXML),
+					new SoapVar("</VehRentalCore>", XSD_ANYXML),
+					new SoapVar('<Customer>', XSD_ANYXML),
+					new SoapVar('<Primary>', XSD_ANYXML),
+					new SoapVar('<PersonName>', XSD_ANYXML),
+					new SoapParam($firstName, 'GivenName'),
+					new SoapParam($lastName, 'Surname'),
+					new SoapVar('</PersonName>', XSD_ANYXML),
+					new SoapVar("<CitizenCountryName Code='{$countryCode}'/>", XSD_ANYXML),
+					new SoapVar('</Primary>', XSD_ANYXML),
+					new SoapVar('</Customer>', XSD_ANYXML),
+					new SoapVar("<VendorPref CompanyShortName='".self::VENDOR_NAME."'/>", XSD_ANYXML),
+					new SoapVar("<VehPref TypePref='Only' ClassPref='Only' TransmissionType='Automatic' TransmissionPref='Only' AirConditionPref='Only'>", XSD_ANYXML),
+					new SoapVar("<VehType VehicleCategory='{$vehicleCategory}'/>", XSD_ANYXML),
+					new SoapVar("<VehClass Size='{$vehicleClass}'/>", XSD_ANYXML),
+					new SoapVar('</VehPref>', XSD_ANYXML),
+					new SoapVar("<RateQualifier RateQualifier='2A'/>", XSD_ANYXML),
+					new SoapVar('</VehModifyRQCore>', XSD_ANYXML),
+					new SoapVar($this->otaRQNode(self::MODIFY_BOOKING_ACTION, false), XSD_ANYXML)
+				)
+			);
 			$parseResponse = $this->parseResponse($this->soapClient->__getLastResponse());
 
 			$response = [];
@@ -403,22 +419,23 @@ class BG extends SupplierApi
 	{
 		$timeStart = time();
 
-		$soapVar = $this->otaRQNode(self::CANCEL_BOOKING_ACTION, true).
-		           "<VehCancelRQCore CancelType='Commit'>
-						<UniqueID Type='15' ID='{$bookingId}'/>
-						<PersonName>
-							<Surname>{$surname}</Surname>
-						</PersonName>
-					</VehCancelRQCore>
-					<VehCancelRQInfo>
-						<Vendor CompanyShortName='".self::VENDOR_NAME."'/>
-					</VehCancelRQInfo>".
-		           $this->otaRQNode(self::CANCEL_BOOKING_ACTION, false);
-
 		if (!empty($bookingId)) {
-			$params = new SoapVar($soapVar, XSD_ANYXML);
 			$this->setSoapHeader();
-			$this->soapClient->Request($params);
+			$this->soapClient->__soapCall('Request',
+				array(
+					new SoapVar($this->otaRQNode(self::CANCEL_BOOKING_ACTION, true), XSD_ANYXML),
+					new SoapVar("<VehCancelRQCore CancelType='Commit'>", XSD_ANYXML),
+					new SoapVar("<UniqueID Type='15' ID='{$bookingId}'/>", XSD_ANYXML),
+					new SoapVar('<PersonName>', XSD_ANYXML),
+					new SoapParam($surname, 'Surname'),
+					new SoapVar('</PersonName>', XSD_ANYXML),
+					new SoapVar('</VehCancelRQCore>', XSD_ANYXML),
+					new SoapVar('<VehCancelRQInfo>', XSD_ANYXML),
+					new SoapVar("<Vendor CompanyShortName='".self::VENDOR_NAME."'/>", XSD_ANYXML),
+					new SoapVar('</VehCancelRQInfo>', XSD_ANYXML),
+					new SoapVar($this->otaRQNode(self::CANCEL_BOOKING_ACTION, false), XSD_ANYXML)
+				)
+			);
 			$parseResponse = $this->parseResponse($this->soapClient->__getLastResponse());
 
 			$response = [];
@@ -467,28 +484,28 @@ class BG extends SupplierApi
 		$pickUpDateTime = $this->convertToDateTimeDefaultFormat($pickUpDate, $pickUpTime);
 		$returnDateTime = $this->convertToDateTimeDefaultFormat($returnDate, $returnTime);
 
-		$soapVar = $this->otaRQNode(self::GET_RATE_RULE_ACTION, true).
-		           "<RentalInfo>
-						<VehRentalCore PickUpDateTime='{$pickUpDateTime}' ReturnDateTime='{$returnDateTime}'>
-							<PickUpLocation LocationCode='{$pickUpLocationCode}' />
-							<ReturnLocation LocationCode='{$returnLocationCode}' />
-						</VehRentalCore>
-						<VehicleInfo TypePref='Only' TransmissionPref='Only' TransmissionType='Automatic' AirConditionPref='Only' ClassPref='Only'>
-							<VehType VehicleCategory='{$vehicleCategory}'/>
-							<VehClass Size='{$vehicleClass}'/>
-						</VehicleInfo>
-						<RateQualifier RateQualifier='2A'/>
-						<CustomerID Type='1' ID='{$countryCode}'/>
-					</RentalInfo>".
-		           $this->otaRQNode(self::GET_RATE_RULE_ACTION, false);
-
 		if ($this->validateDate($pickUpDate, $pickUpTime)
 		    && $this->validateDate($returnDate, $returnTime)
 		) {
-			$params = new SoapVar($soapVar, XSD_ANYXML);
 			$this->setSoapHeader();
-			$this->soapClient->Request($params);
-
+			$this->soapClient->__soapCall('Request',
+				array(
+					new SoapVar($this->otaRQNode(self::GET_RATE_RULE_ACTION, true), XSD_ANYXML),
+					new SoapVar("<RentalInfo>", XSD_ANYXML),
+					new SoapVar("<VehRentalCore PickUpDateTime='{$pickUpDateTime}' ReturnDateTime='{$returnDateTime}'>", XSD_ANYXML),
+					new SoapVar("<PickUpLocation LocationCode='{$pickUpLocationCode}'/>", XSD_ANYXML),
+					new SoapVar("<ReturnLocation LocationCode='{$returnLocationCode}'/>", XSD_ANYXML),
+					new SoapVar("</VehRentalCore>", XSD_ANYXML),
+					new SoapVar("<VehicleInfo TypePref='Only' TransmissionPref='Only' TransmissionType='Automatic' AirConditionPref='Only' ClassPref='Only'>", XSD_ANYXML),
+					new SoapVar("<VehType VehicleCategory='{$vehicleCategory}'/>", XSD_ANYXML),
+					new SoapVar("<VehClass Size='{$vehicleClass}'/>", XSD_ANYXML),
+					new SoapVar('</VehicleInfo>', XSD_ANYXML),
+					new SoapVar("<RateQualifier RateQualifier='2A'/>", XSD_ANYXML),
+					new SoapVar("<CustomerID Type='1' ID='{$countryCode}'/>", XSD_ANYXML),
+					new SoapVar('</RentalInfo>', XSD_ANYXML),
+					new SoapVar($this->otaRQNode(self::GET_RATE_RULE_ACTION, false), XSD_ANYXML)
+				)
+			);
 			$parseResponse = $this->parseResponse($this->soapClient->__getLastResponse());
 
 			$response = [];
@@ -517,18 +534,21 @@ class BG extends SupplierApi
 	private function otaRQNode($action, $openNode = true)
 	{
 		if($openNode) {
-			return "<{$action} Version='{$this->version}'
-		            SequenceNmbr='".self::DEFAULT_SEQUENCE_NUMBER."'
-		            MaxResponses='".self::DEFAULT_MAX_RESPONSE."'
-		            xmlns:xsi='".self::DEFAULT_XMLNS_XSI."'>
-                    <POS>
-                        <Source>
-							<RequestorID Type='".self::DEFAULT_REQUEST_TYPE."' ID='{$this->requestorID}' />
-                        </Source>
-                    </POS>";
+			$requestNode = array(
+				new SoapVar("<$action xmlns:xsi='".self::DEFAULT_XMLNS_XSI."' Version='".self::VERSION."' MaxResponses='".self::DEFAULT_MAX_RESPONSE."' SequenceNmbr='".self::DEFAULT_SEQUENCE_NUMBER."'>", XSD_ANYXML),
+				new SoapVar('<POS>', XSD_ANYXML),
+				new SoapVar('<Source>', XSD_ANYXML),
+				new SoapVar("<RequestorID Type='".self::DEFAULT_REQUEST_TYPE."' ID='{$this->requestorID}'/>", XSD_ANYXML),
+				new SoapVar('</Source>', XSD_ANYXML),
+				new SoapVar('</POS>', XSD_ANYXML)
+			);
 		} else {
-			return "</{$action}>";
+			$requestNode = array(
+				new SoapVar("</$action>", XSD_ANYXML)
+			);
 		}
+
+		return $requestNode;
 	}
 
 	/**
