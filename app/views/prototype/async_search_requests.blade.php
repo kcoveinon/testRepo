@@ -327,7 +327,6 @@
 							"executionTime" : 0
 						}
 					}
-
 					// not needed for actual search page
 					var date = new Date();
 

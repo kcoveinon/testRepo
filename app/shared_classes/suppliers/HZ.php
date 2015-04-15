@@ -866,9 +866,10 @@ class HZ extends SupplierApi
         	}
 
         	$result = array(
-				"success"   => $response["result"],
-				"message"   => $response["message"],
-				"rowsAdded" => $stationsAdded
+				"success"      => $response["result"],
+				"message"      => $response["message"],
+				"rowsAdded"    => $stationsAdded,
+				"supplierCode" => $this->supplierCode
         	);
 
         	return $result;

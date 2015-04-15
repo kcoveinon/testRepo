@@ -10,7 +10,6 @@
 | and give it the Closure to execute when that URI is requested.
 |
 */
-
 Route::group(array('prefix' => 'prototype'), function () {
   Route::any('search-page', function() {
     return View::make('prototype.search_page');
@@ -212,7 +211,6 @@ Route::group(array('prefix' => 'HZ/'), function()
 
 Route::group(array('prefix' => 'RS/'), function()
 {
-    Route::any('depots/update-records', 'HZController@exportDepotCompilation');  
     Route::any('get-fleet', 'RSController@getFleet');
     Route::any('depots/update-records', 'RSController@exportLocations');
     Route::any('get-locations', 'RSController@getLocations');

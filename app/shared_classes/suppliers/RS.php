@@ -300,7 +300,8 @@ class RS extends SupplierApi
         $result = array(
             "success"   => $response["result"],
             "message"   => $response["message"],
-            "rowsAdded" => $stationsAdded
+            "rowsAdded" => $stationsAdded,
+            "supplierCode" => $this->supplierCode
         );
 
         return $result;

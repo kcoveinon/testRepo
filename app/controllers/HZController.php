@@ -98,7 +98,7 @@ class HZController extends BaseController
 
 	public function exportDepotCompilation()
 	{	
-        return Response::json($this->supplierApi->updateDepots());
+        return Response::json($this->supplierApi->updateDepots())->setCallBack(Input::get('callback'));;
 	}
 
 	public function viewDepots()

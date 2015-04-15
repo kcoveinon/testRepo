@@ -101,7 +101,7 @@ class RSController extends BaseController
 
     public function exportLocations()
     {
-        return Response::json($this->supplierApi->updateDepots());
+        return Response::json($this->supplierApi->updateDepots())->setCallBack(Input::get('callback'));
     } 
 
     public function getLocations()
